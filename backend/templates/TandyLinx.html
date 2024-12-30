@@ -1,0 +1,47 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./templates/TandyLinx/TandyLinx.css">
+    <title>PCoT Linx Tree</title>
+    <link rel="icon"
+        href="https://raw.githubusercontent.com/The-People-s-Coalition-of-Tandy/PCoTandy/main/Assets/PCoTandyLogo.ico">
+</head>
+
+<body>
+    <main>
+        <!-- <img src="./templates/TandyLinx/TandyIconSpiro200x200.png" alt="People's Coalition of Tandy Logo"
+            class="pcot-logo"><br> -->
+        <a href="https://pcotandy.org" target="_blank"><img src="./templates/TandyLinx/tandyBannerAlpha.png"
+                alt="People's Coalition of Tandy Logo" class="pcot-logo"></a>
+        <br>
+
+        <header>
+            <p>
+                Welcome to the
+                <br>
+                <!-- <span class="release-name"><a href="https://pcotandy.org" target="_blank">People's Coalition of Tandy</a></span><br><br> -->
+                <a href="https://pcotandy.org" target="_blank">{{ pageTitle }}</a>
+                <br>
+                Linx Tree
+            </p>
+        </header>
+
+        <div class="links" id="links_container">
+            {% for link in links %}
+            <a href="{{ link.url }}" class="link">{{ link.name }}</a>
+            {% endfor %}
+        </div>
+        <footer>
+            <section>
+                <img class="explosion" src="./templates/TandyLinx/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+                <a href="https://www.pcotandy.org" target="_blank"> <img class="tandyLinx"
+                        src="./templates/TandyLinx/tandyLinx1.png" alt="Tandy Linx logo"></a>
+                <img class="explosion" src="./templates/TandyLinx/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+            </section>
+        </footer>
+    </main>
+
+</body>
+
+</html>

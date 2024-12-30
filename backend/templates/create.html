@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create TandyLinx Page</title>
+    <link rel="stylesheet" href="/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+
+.linkPairsGrid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr) 40px; /* name, URL, delete button */
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    /* Ensure that the labels don't contribute to overflow */
+    .linkPairsGrid>div>label {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+        .linkPairsGrid {
+            grid-template-columns: 1fr 1fr 40px; /* Adjust for smaller screens */
+            max-width: 90vw;
+        }
+
+        .linkPairsGrid input {
+            width: 100%; /* Full width on small screens */
+        }
+
+        .deleteLink {
+            margin-top: 5px; /* Give some space if the button wraps to the next line */
+        }
+
+        /* Hide the text of the delete button on smaller screens for more space */
+        .deleteLink {
+            font-size: 0; /* Hide text */
+            width: 30px; /* Reduce width */
+            height: 30px; /* Reduce height */
+        }
+        .deleteLink::after {
+            content: 'X';
+            font-size: 16px; /* Show "X" text */
+            display: block;
+            margin: 0 auto;
+        }
+
+        .styleSelector, #linksContainer, #addLink, #createButton {
+            width: 100%; /* Full width on small screens */
+        }
+
+        .styleSelector {
+            flex-direction: column; /* Stack the label and select on small screens */
+        }
+
+        .styleSelector label, .styleSelector select {
+            width: 100%; /* Full width for children inside styleSelector */
+        }
+    }
+        .styleSelector {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            background-color: antiquewhite;
+            padding: 10px;
+            border: 5px ridge gray;
+            width: fit-content;
+        }
+        .linkPairsGrid>div {
+            display: flex;
+            align-items: center;
+            /* Aligns items vertically in the center */
+        }
+
+        .deleteLink {
+            background-color: rgb(161, 0, 0);
+            color: white;
+            cursor: pointer;
+            justify-self: center;
+            /* Centers the button in the delete column */
+        }
+
+        #addLink {
+            padding: 2px;
+            /* font-size: 16px; */
+            cursor: pointer;
+            margin-top: 10px;
+            background-color: green;
+            color: white;
+        }
+
+        #createButton {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            background-color: blue;
+            color: white;
+            align-self: center;
+            /* margin-left: -25px; */
+        }
+
+        #linksContainer {
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            align-items: flex-end;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Create a New TandyLinx Page</h1>
+    {% if errorMessage %}
+    <p style="color: red;">{{ errorMessage }}</p>
+    {% endif %}
+
+    <form id="linksForm" action="/create" method="POST">
+        <label for="pageTitle"><b>Page Title</b></label>
+        <input type="text" name="pageTitle" placeholder="Page Title" required value="{{ pageTitle }}" id="pageTitleInput"><br><br>
+        <label for="pageURL"><b>https://linx.pcotandy.org/</b></label>
+        <input type="text" name="pageURL" placeholder="Page URL" required value="{{ pageURL }}" id="pageURLInput">
+        <!-- Status indicator -->
+        <span id="nameStatus"></span>
+
+        <div id="linksContainer">
+            <!-- Container for headers and dynamic link pairs -->
+            <div class="linkPairsGrid" id="linkPairsGrid">
+                <!-- Static headers for Name and URL -->
+                <div><strong>Link Name</strong></div>
+                <div><strong>URL</strong></div>
+                <div>
+                    <!-- Placeholder for delete button -->
+                </div>
+
+                <!-- Existing link pairs (if any) will be rendered here -->
+                <!-- ... dynamic link pairs inserted via JavaScript -->
+                {% if links and links.length > 0 %}
+                {% for link in links %}
+                <input type="text" name="linkNames[]" placeholder="Link Name" required>
+                <input type="text" name="linkURLs[]" placeholder="Link URL" required>
+                <button type="button" class="deleteLink" onclick="deleteLink(this)">X</button>
+                {% endfor %}
+                {% else %}
+                <input type="text" name="linkNames[]" placeholder="Link Name" required>
+                <input type="text" name="linkURLs[]" placeholder="Link URL" required>
+                <button type="button" class="deleteLink" onclick="deleteLink(this)">X</button>
+                {% endif %}
+            </div>
+            <button type="button" id="addLink">+ Add Link</button>
+        </div>
+                <!-- Style Selector Dropdown -->
+                <div class="styleSelector">
+                    <label for="styleSelector">Choose a style:</label>
+                    <select name="style" id="styleSelector">
+                        {% for style in styles %}
+                        <option value="{{ style.name }}">{{ style.displayName }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+        <button type="submit" id="createButton">Create</button>
+
+
+    </form>
+
+    <script>
+        document.getElementById('addLink').addEventListener('click', () => {
+            const newLinkNameInput = document.createElement('input');
+            newLinkNameInput.setAttribute('type', 'text');
+            newLinkNameInput.setAttribute('name', 'linkNames[]');
+            newLinkNameInput.setAttribute('placeholder', 'Link Name');
+            newLinkNameInput.required = true;
+
+            const newLinkUrlInput = document.createElement('input');
+            newLinkUrlInput.setAttribute('type', 'text');
+            newLinkUrlInput.setAttribute('name', 'linkURLs[]');
+            newLinkUrlInput.setAttribute('placeholder', 'Link URL');
+            newLinkUrlInput.required = true;
+
+            const newDeleteButton = document.createElement('button');
+            newDeleteButton.setAttribute('type', 'button');
+            newDeleteButton.classList.add('deleteLink');
+            newDeleteButton.textContent = 'X';
+            newDeleteButton.onclick = function () {
+                deleteLink(this);
+            };
+
+            const grid = document.getElementById('linkPairsGrid');
+            grid.appendChild(newLinkNameInput);
+            grid.appendChild(newLinkUrlInput);
+            grid.appendChild(newDeleteButton);
+        });
+
+
+        function deleteLink(button) {
+            // Get the parent grid container
+            if (document.getElementsByClassName('deleteLink').length === 1) {
+                return;
+            }
+            const grid = button.closest('.linkPairsGrid');
+            const url = button.previousElementSibling;
+            const name = url.previousElementSibling;
+            grid.removeChild(name);
+            grid.removeChild(url);
+            grid.removeChild(button);
+        }
+
+        document.getElementById('pageURLInput').addEventListener('input', async function () {
+            const pageURLInput = this.value;
+            const statusIndicator = document.getElementById('nameStatus');
+
+            if (pageURLInput.length === 0) {
+                statusIndicator.textContent = ''; // Clear status when input is empty
+                return;
+            }
+
+            try {
+                const response = await fetch(`/checkPageURL?name=${encodeURIComponent(pageURLInput)}`);
+                if (!response.ok) throw new Error('Network response was not ok.');
+                const data = await response.json();
+
+                if (data.exists) {
+                    statusIndicator.textContent = " taken" //'❌ taken'; // Page name exists
+                    statusIndicator.style.color = 'red';
+                } else {
+                    statusIndicator.textContent = " available" //'✅ available'; // Page name is available
+                    statusIndicator.style.color = 'green';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusIndicator.textContent = 'Error checking name'; // Display error
+                statusIndicator.style.color = 'orange';
+            }
+        });
+    </script>
+</body>
+
+</html>

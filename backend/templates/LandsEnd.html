@@ -1,0 +1,120 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./templates/LandsEnd/flashlight.css">
+    <title>{{ pageTitle }}</title>
+    <link rel="icon" href="./assets/images/PCoTandyLogo.ico">
+    
+</head>
+
+<body>
+    <video autoplay muted loop id="myVideo">
+        <source src="./templates/LandsEnd/shortlandsend.mp4" type="video/mp4">
+    </video>
+    <main id="main">
+
+        <img src="./assets/images/TandyLogoSpiro.png" alt="People's Coalition of Tandy Logo"
+            class="pcot-logo"><br>
+        <header>
+            <p>
+                Welcome to
+                    <span class="release-name">{{ pageTitle }}</span>
+                <!-- <br><br>
+                a new song by
+                <b><a style="color: white; text-underline-offset: 3px;" href="https://kotc.life/">
+                        Ko T.C.</a></b> -->
+                <br>
+            </p>
+        </header>
+        <div class="links">
+            {% for link in links %}
+            <a href="{{ link.url }}" class="link">{{ link.name }}</a>
+            {% endfor %}
+        </div>
+        <footer>
+            <img src="./assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+            <a href="https://www.pcotandy.org"> <img class="tandyLinx" src="./assets/images/tandyLinx1.png"
+                    alt="Tandy Linx logo"></a>
+            <img src="./assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+        </footer>
+        <div class="cover"></div>
+    </main>
+    <svg>
+        <defs>
+            <filter id="turbulence-1">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+
+            <filter id="turbulence-2">
+                <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+
+            <filter id="turbulence-3">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+
+            <filter id="turbulence-4">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+
+            <filter id="turbulence-5">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+
+            <filter id="turbulence-6">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+
+
+            <filter id="turbulence-8">
+                <feTurbulence type="fractalNoise" baseFrequency="0.4" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+
+            <filter id="turbulence-9">
+                <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+
+            <filter id="turbulence-10">
+                <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="2" data-filterId="3" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" in="SourceGraphic" scale="25" />
+            </filter>
+        </defs>
+    </svg>
+    <script>
+        var rect = document.getElementById("main").getBoundingClientRect();
+
+function update(e) {
+  var x = e.clientX - rect.left; //x position within the element.
+  var y = e.clientY - rect.top; //y position within the element.
+
+  document.documentElement.style.setProperty("--cursorX", x + "px");
+  document.documentElement.style.setProperty(
+    "--cursorY",
+    y + window.scrollY + "px"
+  );
+}
+
+function remove(e) {
+  document.documentElement.style.setProperty("--cursorX", "0px");
+  document.documentElement.style.setProperty("--cursorY", "0px");
+}
+
+var main = document.getElementById("main");
+
+main.addEventListener("mousemove", update);
+main.addEventListener("mouseout", remove);
+main.addEventListener("touchmove", update);
+
+    </script>
+</body>
+
+</html>

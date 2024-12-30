@@ -1,0 +1,139 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Verdana, sans-serif;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+video {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1;
+}
+
+.pcot-logo {
+    height: 150px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    filter: brightness(85%);
+}
+
+header {
+    text-align: center;
+    background-color: rgb(64, 5, 131);
+    border: 3px solid black;
+    margin-bottom: 15px;
+    padding: 5px;
+    border-radius: 17px;
+    color: white;
+    letter-spacing: 1px;
+}
+
+.release-name {
+    font-size: 13pt;
+    font-weight: bold;
+    border: 2px gray solid;
+    background-color: rgb(42, 27, 61);
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.link {
+    background-color: rgb(121, 170, 106);
+    height: 45px;
+    font-size: 16pt;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px outset #1f1038;
+    text-decoration: none;
+    text-align: center;
+    color: rgb(251, 241, 221);
+    line-height: 40px;
+    background-image: url(./wicker.jpeg);
+    background-blend-mode: soft-light;
+}
+
+.link:nth-of-type(odd) {
+    background-color: rgb(42, 83, 28) !important;
+
+}
+
+.links {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+footer {
+    padding: 20px;
+}
+
+@keyframes squigglevision {
+    0% {
+        filter: url("#turbulence-1");
+    }
+
+    25% {
+        filter: url("#turbulence-2");
+    }
+
+    50% {
+        filter: url("#turbulence-3");
+    }
+
+    75% {
+        filter: url("#turbulence-4");
+    }
+
+    100% {
+        filter: url("#turbulence-5");
+    }
+}
+
+svg {
+    position: absolute;
+    pointer-events: none;
+}
+
+:root {
+    --cursorX: 50vw;
+    --cursorY: 50vh;
+}
+
+@media only screen and (min-width: 1000px) {
+    main {
+        position: relative;
+        padding: 50px;
+        border: 10px rgb(40, 0, 77) ridge;
+    }
+
+    .cover {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: radial-gradient(circle 10vmax at var(--cursorX) var(--cursorY),
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, .5) 80%,
+                rgba(0, 0, 0, .90) 100%);
+        pointer-events: none;
+    }
+
+    span:hover,
+    .pcot-logo:hover,
+    footer img:hover {
+        animation: squigglevision .25s linear infinite;
+    }
+
+    .link:hover {
+        filter: invert();
+    }
+}

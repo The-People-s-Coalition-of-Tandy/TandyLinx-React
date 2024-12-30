@@ -1,0 +1,112 @@
+.link-field-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px;
+    flex-grow: 1;
+}
+
+.link-field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+p.link-field-input {
+    outline: none;
+    border: none;
+    background-color: transparent;
+    padding: 6px 8px;
+    margin: 0;
+    border-radius: 4px;
+    min-width: 0;
+    flex-grow: 0;
+    display: flex;
+    align-items: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    max-width: 100%;
+}
+
+.edit-button.hidden {
+    visibility: hidden;
+}
+
+.link-field-input:focus-visible {
+    outline: 2px solid #4a4eff;
+    background-color: #303030;
+}
+
+.edit-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0px;
+    /* opacity: 0.6; */
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.edit-button:hover {
+    opacity: 1;
+    background-color: #404040;
+}
+
+.drag-test-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background-color: #343434;
+    border-radius: 6px;
+    max-width: 100%;
+}
+
+.drag-handle {
+    padding: 6px;
+    cursor: grab;
+    opacity: 0.6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    align-self: stretch;
+}
+
+.drag-handle:hover {
+    opacity: 1;
+    background-color: #404040;
+}
+
+.drag-handle-dots {
+    display: grid;
+    grid-template-columns: repeat(2, 2px);
+    gap: 2px;
+    position: sticky;
+    top: 12px;
+    transform: translateX(-1px);
+}
+
+.drag-handle-dots::before,
+.drag-handle-dots::after {
+    content: "⋮";
+    font-size: 14px;
+    line-height: 1;
+    color: currentColor;
+    text-align: center;
+    width: 8px;
+    margin-left: -3px;
+}
+
+.link-title-text {
+    font-weight: 500;
+}
+
+.link-url-text {
+    color: #a0a0a0;
+    font-size: 0.95em;
+}

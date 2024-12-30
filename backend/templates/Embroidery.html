@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<!-- to update Linx, update DATA array in index.js -->
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./templates/Embroidery/style.css">
+    <link rel="icon" type="image/x-icon"  href="./templates/Embroidery/assets/cover.png">
+    <title>{{ pageTitle }}</title>
+    <script src="./templates/Embroidery/p5.min.js"></script>
+
+</head>
+
+<body>
+    <div id="wheat"></div>
+    <main id="mainDiv">
+        <!-- <img src="../Assets/TandyIconSpiro200x200.png" alt="People's Coalition of Tandy Logo"
+            class="pcot-logo"><br> -->
+            <div class="links" id="album_cover">
+                <img src="./templates/Embroidery/assets/cover-min.png" alt="Album Cover" id="album_cover_img"></div>
+        
+
+        <header id="welcome_to">Welcome to the <br> <a href="https://youtu.be/2zfUIc63BZo">{{pageTitle}}</a><br> Tandy Link Tree</header>
+
+        <div class="links" id="links_container">
+            {% for link in links %}
+            <a href="{{ link.url }}" class="link">{{ link.name }}</a>
+            {% endfor %}
+        </div>
+          
+        <footer>
+            <section>
+                <center>
+                <img class="explosion" src="./assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+                <a href="https://tandylinx.pcotandy.org/" target="_blank"> <img class="tandyLinx" src="./assets/images/tandyLinx1.png"
+                        alt="Tandy Linx logo"></a>
+                <img class="explosion" src="./assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+               </center>
+            </section>
+        </footer>
+    </main>
+    
+    <script src="./templates/Embroidery/sketch.js"></script>
+    <script src="./templates/Embroidery/wheat.js"></script>
+    <div id="spacer"></div>
+    
+</body>
+
+</html>
