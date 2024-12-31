@@ -1,5 +1,7 @@
 import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
+import { useAuth } from './AuthContext';
+import debounce from 'lodash.debounce';
 
 export const LinkContext = createContext();
 
@@ -10,17 +12,15 @@ export const LinkProvider = ({ children }) => {
     const [currentPageLinks, setCurrentPageLinks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isInitialized, setIsInitialized] = useState(false);
+    const { user } = useAuth();
 
     const fetchUserPages = useCallback(async () => {
-        if (isInitialized) return;
-
+        setIsLoading(true);
         try {
             const response = await axios.get(`${API_URL}/get-user-links`, {
                 withCredentials: true
             });
             setUserPages(response.data);
-            setIsInitialized(true);
         } catch (err) {
             console.error('Error fetching pages:', err);
             setError(err.message);
@@ -28,14 +28,24 @@ export const LinkProvider = ({ children }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [isInitialized]);
+    }, []);
+
+    // Reset state when user changes
+    useEffect(() => {
+        if (!user) {
+            setUserPages([]);
+            setCurrentPageLinks([]);
+            setError(null);
+        } else {
+            fetchUserPages();
+        }
+    }, [user, fetchUserPages]);
 
     const getLinksFromPage = async (pageURL) => {
         try {
             const response = await axios.get(`${API_URL}/get-page-links/${pageURL}`, {
                 withCredentials: true
             });
-            // Parse the links from the response if they're stored as a JSON string
             const links = response.data.links ? JSON.parse(response.data.links) : [];
             return links;
         } catch (err) {
@@ -44,21 +54,46 @@ export const LinkProvider = ({ children }) => {
         }
     };
 
+    const savePageChanges = async (pageURL, changes) => {
+        try {
+            await axios.put(
+                `${API_URL}/pages/${pageURL}`,
+                changes,
+                { withCredentials: true }
+            );
+        } catch (err) {
+            console.error('Error saving changes:', err);
+            throw err;
+        }
+    };
+
+    // Debounced version that will wait 1 second after last call
+    const debouncedSave = useMemo(
+        () => debounce(savePageChanges, 1000),
+        []
+    );
+
+    // Add a new immediate save function for drag-and-drop
+    const savePageChangesImmediate = async (pageURL, changes) => {
+        console.log('Saving changes immediately:', changes);
+        try {
+            await axios.put(
+                `${API_URL}/pages/${pageURL}`,
+                changes,
+                { withCredentials: true }
+            );
+        } catch (err) {
+            console.error('Error saving changes:', err);
+            throw err;
+        }
+    };
+
+    // Cleanup on unmount
     useEffect(() => {
-        let mounted = true;
-
-        const initFetch = async () => {
-            if (!isInitialized && mounted) {
-                await fetchUserPages();
-            }
-        };
-
-        initFetch();
-
         return () => {
-            mounted = false;
+            debouncedSave.cancel();
         };
-    }, [fetchUserPages, isInitialized]);
+    }, [debouncedSave]);
 
     const contextValue = useMemo(() => ({
         userPages,
@@ -68,8 +103,10 @@ export const LinkProvider = ({ children }) => {
         isLoading,
         error,
         fetchUserPages,
-        getLinksFromPage
-    }), [userPages, currentPageLinks, isLoading, error, fetchUserPages]);
+        getLinksFromPage,
+        savePageChanges: debouncedSave,
+        savePageChangesImmediate
+    }), [userPages, currentPageLinks, isLoading, error, fetchUserPages, debouncedSave]);
 
     return (
         <LinkContext.Provider value={contextValue}>

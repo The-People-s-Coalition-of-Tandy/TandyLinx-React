@@ -14,7 +14,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           {/* <Route path="/register" element={<Register />} /> */}
           <Route
-            path="/editor"
+            path="/:pageURL/edit"
             element={
               <ProtectedRoute>
                 <>
@@ -27,7 +27,9 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/profile" element={<Profile />} />
+          
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
         </Routes>
       </Router>
   );

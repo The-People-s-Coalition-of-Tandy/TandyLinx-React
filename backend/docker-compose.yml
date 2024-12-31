@@ -3,13 +3,13 @@ services:
   node-app:
     build: .
     ports:
-      - "3000:3000" # Map the container's port 3000 to your MacBook's port 3000
+      - "3000:3000"
     volumes:
-      - .:/app # Mount the project directory for live updates
-      - /app/node_modules # Prevent syncing of node_modules
-      - ~/Database:/app/Database:rw  # Added ':rw' for explicit read-write permissions
-
+      - .:/app:delegated
+      - /app/node_modules
+      - ~/Database:/app/Database:rw
     environment:
       - NODE_ENV=development
-    stdin_open: true # Keep stdin open for debugging
-    tty: true        # Allocate a pseudo-TTY
+      - CHOKIDAR_USEPOLLING=true
+    stdin_open: true
+    tty: true

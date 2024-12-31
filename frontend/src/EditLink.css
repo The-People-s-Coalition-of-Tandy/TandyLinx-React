@@ -4,6 +4,7 @@
     gap: 2px;
     padding: 10px;
     flex-grow: 1;
+    min-width: 0;
 }
 
 .link-field {
@@ -26,9 +27,15 @@ p.link-field-input {
     align-items: center;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     display: block;
-    max-width: 100%;
+    max-width: calc(100% - 30px);
+}
+
+p.link-field-input::-webkit-scrollbar {
+    display: none;
 }
 
 .edit-button.hidden {
@@ -38,6 +45,7 @@ p.link-field-input {
 .link-field-input:focus-visible {
     outline: 2px solid #4a4eff;
     background-color: #303030;
+    text-overflow: clip;
 }
 
 .edit-button {
@@ -60,9 +68,10 @@ p.link-field-input {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    background-color: #343434;
+    background-color: #e8e8e8;
     border-radius: 6px;
     max-width: 100%;
+    min-width: 0;
 }
 
 .drag-handle {
@@ -109,4 +118,29 @@ p.link-field-input {
 .link-url-text {
     color: #a0a0a0;
     font-size: 0.95em;
+}
+
+.link-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0 12px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.delete-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    color: #ff4a4a;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+}
+
+.delete-button:hover {
+    opacity: 1;
+    background-color: #404040;
 }

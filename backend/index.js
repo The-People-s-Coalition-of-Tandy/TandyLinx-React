@@ -31,16 +31,15 @@ const __filename = fileURLToPath(
 const __dirname = dirname(__filename);
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, "public")));
+// Comment out static file serving since frontend will be separate
+// app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({
     extended: true
 }));
-
-app.set("view engine", "html");
+app.use(express.json()); // Add this for JSON parsing
 
 app.use(session({
-    secret: process.env.SECRET_KEY, // Change this to a random secret string
+    secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -49,14 +48,8 @@ app.use(session({
     }
 }));
 
-// Nunjucks configuration
-nunjucks.configure("./templates", {
-    autoescape: true,
-    express: app,
-});
-
 app.use(cors({
-    origin: 'http://localhost:5173', // Your Vite frontend URL
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true
 }));
 
@@ -64,14 +57,11 @@ function checkAuthenticated(req, res, next) {
     if (req.session.userId) {
         return next();
     }
-    res.redirect('/login'); // Redirect to login if not authenticated
+    res.status(401).json({ error: 'Not authenticated' });
 }
 
-app.get("/", (req, res) => {
-    res.render("index.html");
-})
-
-app.get("/profile", checkAuthenticated, (req, res) => {
+// Convert profile route to API endpoint
+app.get("/api/profile", checkAuthenticated, (req, res) => {
     const userId = req.session.userId;
     const query = db.prepare("SELECT username FROM users WHERE id = ?");
     const user = query.get(userId);
@@ -79,85 +69,82 @@ app.get("/profile", checkAuthenticated, (req, res) => {
     const stmt = db.prepare("SELECT pageTitle, pageURL FROM links WHERE userId = ?");
     const pages = stmt.all(userId);
 
-    res.render("profile.html", {
+    res.json({
         username: user.username,
         pages
     });
-})
-
-
-
-app.get('/register', (req, res) => {
-    res.render('register.html');
 });
 
-app.post('/register', async (req, res) => {
-    const {
-        username,
-        password
-    } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+
+// Convert register routes to API endpoints
+// app.get('/register' route can be removed as frontend will handle the form
+app.post('/api/register', async (req, res) => {
+    const { username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
         const insert = db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
         insert.run(username, hashedPassword);
-        res.redirect('/login'); // Redirect to login page after registration
+        res.json({ success: true, message: 'Registration successful' });
     } catch (error) {
         console.error(error.message);
-        res.redirect('/register?error=User already exists or other error.');
+        res.status(400).json({ error: 'User already exists or other error' });
     }
 });
 
-app.get('/login', (req, res) => {
-    const {
-        error
-    } = req.query;
-
-    if (req.session.userId) {
-        return res.redirect('/profile');
-    }
-
-    res.render('login.html', {
-        errorMessage: error
-    });
-});
-
-app.post('/login', (req, res) => {
-    console.log("login");
-    const {
-        username,
-        password
-    } = req.body;
+// Convert login routes to API endpoints
+// Remove app.get('/login') as frontend will handle the form
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
     const query = db.prepare("SELECT * FROM users WHERE username = ?");
     const user = query.get(username);
 
     if (user && bcrypt.compareSync(password, user.password)) {
-        // Passwords match
-        req.session.userId = user.id; // Save the user id in the session
-        res.redirect('/profile'); // Redirect to the home page or dashboard
-    } else {
-        res.redirect('/login?error=Invalid username or password');
-    }
-});
-
-app.get('/api/check-auth', (req, res) => {
-    console.log("check-auth", req.session.userId);
-    if (req.session.userId) {
-        const query = db.prepare("SELECT id, username FROM users WHERE id = ?");
-        const user = query.get(req.session.userId);
+        req.session.userId = user.id;
         res.json({ 
-            authenticated: true,
+            success: true,
             user: {
                 id: user.id,
                 username: user.username
             }
         });
     } else {
-        res.status(401).json({ 
-            authenticated: false,
-            message: "Not authenticated" 
-        });
+        res.status(401).json({ error: 'Invalid username or password' });
     }
+});
+
+// Keep existing API routes
+app.get('/api/check-auth', (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const userId = req.session.userId;
+    const query = db.prepare("SELECT id, username FROM users WHERE id = ?");
+    const user = query.get(userId);
+
+    if (!user) {
+        req.session.destroy();
+        return res.status(401).json({ error: "User not found" });
+    }
+
+    res.json({ id: user.id, username: user.username });
+});
+
+app.get('/api/get-page/:pageURL', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const pageURL = req.params.pageURL;
+    // check if page belongs to user
+    const checkStmt = db.prepare("SELECT * FROM links WHERE pageURL = ? AND userId = ?");
+    const page = checkStmt.get(pageURL, req.session.userId);
+    if (!page) {
+        return res.status(404).json({ error: "Page not found" });
+    }
+    
+    res.json(page);
 });
 
 app.get('/api/get-page-links/:pageURL', async (req, res) => {
@@ -197,13 +184,14 @@ app.get('/api/get-user-links', (req, res) => {
     res.json(pages);
 });
 
-app.post('/logout', (req, res) => {
-    req.session.destroy(() => { // Destroy the session
-        res.redirect('/login'); // Redirect to login page
+app.post('/api/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.json({ success: true });
     });
 });
 
-app.get("/checkpageURL", (req, res) => {
+// Convert utility endpoints to API format
+app.get("/api/check-pageURL", (req, res) => {
     const pageURL = req.query.name;
     const checkStmt = db.prepare(
         "SELECT EXISTS(SELECT 1 FROM links WHERE pageURL = ?) AS exist"
@@ -216,7 +204,7 @@ app.get("/checkpageURL", (req, res) => {
     });
 });
 
-app.get("/checkUsername", (req, res) => {
+app.get("/api/check-username", (req, res) => {
     const username = req.query.name;
     const checkStmt = db.prepare(
         "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?) AS exist"
@@ -228,156 +216,94 @@ app.get("/checkUsername", (req, res) => {
         exists: !!exist
     });
 });
-app.get("/create", (req, res) => {
-    // Extract query parameters if any
-    const {
-        error,
-        pageURL,
-        links
-    } = req.query;
 
-    const stylesPath = path.join(__dirname, 'styles.json');
-    const styles = JSON.parse(fs.readFileSync(stylesPath, 'utf8'));
-
-    // If there are links, parse them back into an array
-    let linksArray = [];
-    if (links) {
-        try {
-            linksArray = JSON.parse(links);
-        } catch (parseError) {
-            console.error(parseError);
-        }
-    }
-
-    res.render("create.html", {
-        errorMessage: error,
-        pageURL: pageURL || "",
-        links: linksArray,
-        styles,
-    });
-});
-app.post("/create", (req, res) => {
-    const {
-        pageURL,
-        pageTitle,
-        linkNames,
-        linkURLs,
-        style
-    } = req.body;
-
-    // Combine link names and URLs into an array of objects
-    const links = linkNames.map((name, index) => {
-        return { name: name, url: linkURLs[index] };
-    });
-    const linksJSON = JSON.stringify(links);
-
-    const userId = req.session.userId; // Assuming this is set during login
-
-    // Ensure the user is logged in
-    if (!userId) {
-        return res.redirect('/login');
-    }
+// Convert create/edit routes to API endpoints
+app.post("/api/create", checkAuthenticated, (req, res) => {
+    const { pageURL, pageTitle, links, style } = req.body;
+    const userId = req.session.userId;
 
     const checkStmt = db.prepare("SELECT EXISTS(SELECT 1 FROM links WHERE pageURL = ?) AS exist");
     const exist = checkStmt.get(pageURL).exist;
 
     if (exist) {
-        return res.redirect('/create?error=Page name already exists. Please choose a different name.');
-    } else {
-        try {
-            const insertStmt = db.prepare("INSERT INTO links (pageURL, pageTitle, links, style, userId) VALUES (?, ?, ?, ?, ?)");
-            insertStmt.run(pageURL, pageTitle, linksJSON, style, userId);
-            res.redirect(`/${pageURL}`);
-        } catch (err) {
-            console.error(err.message);
-            res.status(500).send("Failed to create the TandyLinx page.");
-        }
+        return res.status(400).json({ error: 'Page name already exists' });
     }
-});
 
-
-app.get("/:pageURL", (req, res) => {
     try {
-        const stmt = db.prepare("SELECT links, style, pageTitle FROM links WHERE pageURL = ?");
-        const row = stmt.get(req.params.pageURL);
-        if (row) {
-            console.log(row);
-            const links = JSON.parse(row.links); // Parse the JSON string back into an array
-            res.render(row.style, {
-                links,
-                pageTitle: row.pageTitle
-            });
-        } else {
-            res.status(404).send("Page not found");
-        }
+        const insertStmt = db.prepare("INSERT INTO links (pageURL, pageTitle, links, style, userId) VALUES (?, ?, ?, ?, ?)");
+        insertStmt.run(pageURL, pageTitle, JSON.stringify(links), style, userId);
+        res.json({ success: true, pageURL });
     } catch (err) {
         console.error(err.message);
-        res.status(500).send("Failed to retrieve the TandyLinx page.");
+        res.status(500).json({ error: 'Failed to create the TandyLinx page' });
     }
 });
 
-app.get("/edit/:pageURL", checkAuthenticated, (req, res) => {
-    const pageURL = req.params.pageURL;
+app.put('/api/pages/:pageURL', checkAuthenticated, (req, res) => {
+    const { pageURL } = req.params;
+    const { links, pageTitle, style, newPageURL } = req.body;
     const userId = req.session.userId;
-
-    const stylesPath = path.join(__dirname, 'styles.json');
-    const styles = JSON.parse(fs.readFileSync(stylesPath, 'utf8'));
+    console.log("PUT /api/pages/:pageURL", req.body);
 
     try {
-        const stmt = db.prepare("SELECT * FROM links WHERE pageURL = ? AND userId = ?");
-        const pageData = stmt.get(pageURL, userId);
+        // First verify the page exists and belongs to the user
+        const checkStmt = db.prepare("SELECT * FROM links WHERE pageURL = ? AND userId = ?");
+        const page = checkStmt.get(pageURL, userId);
 
-        if (pageData) {
-            const links = JSON.parse(pageData.links); // Assuming links are stored as a JSON string
-            res.render("editPage", {
-                pageURL: pageData.pageURL,
-                pageTitle: pageData.pageTitle,
-                links: links,
-                style: pageData.style,
-                styles: styles
-            });
+        if (!page) {
+            return res.status(404).json({ error: 'Page not found or unauthorized' });
+        }
+
+        // If only updating links, use a simplified update
+        if (links && !pageTitle && !style && !newPageURL) {
+            const updateStmt = db.prepare(`
+                UPDATE links 
+                SET links = ?
+                WHERE pageURL = ? AND userId = ?
+            `);
+            updateStmt.run(JSON.stringify(links), pageURL, userId);
         } else {
-            res.status(404).send("Page not found or you do not have permission to edit it.");
+            // Build update query dynamically based on what's provided
+            let updates = [];
+            let params = [];
+            
+            if (links !== undefined) {
+                updates.push('links = ?');
+                params.push(JSON.stringify(links));
+            }
+            if (pageTitle !== undefined) {
+                updates.push('pageTitle = ?');
+                params.push(pageTitle);
+            }
+            if (style !== undefined) {
+                updates.push('style = ?');
+                params.push(style);
+            }
+            if (newPageURL !== undefined) {
+                updates.push('pageURL = ?');
+                params.push(newPageURL);
+            }
+
+            params.push(pageURL, userId);
+            
+            const updateStmt = db.prepare(`
+                UPDATE links 
+                SET ${updates.join(', ')}
+                WHERE pageURL = ? AND userId = ?
+            `);
+            updateStmt.run(...params);
         }
+
+        res.json({ 
+            success: true,
+            newPageURL: newPageURL || pageURL
+        });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send("Failed to retrieve the TandyLinx page for editing.");
+        console.error('Error updating page:', err);
+        res.status(500).json({ error: 'Failed to update page' });
     }
 });
-
-app.post("/update/:pageURL", checkAuthenticated, (req, res) => {
-    const originalpageURL = req.params.pageURL;
-    const { linkNames, linkURLs, style, pageURL, pageTitle } = req.body;
-    const userId = req.session.userId; // Verify this is the owner of the link page
-
-    // Combine link names and URLs into an array of objects
-    const links = linkNames.map((name, index) => ({
-        name: name,
-        url: linkURLs[index]
-    }));
-
-    if(pageURL !== originalpageURL) { 
-        const checkStmt = db.prepare("SELECT EXISTS(SELECT 1 FROM links WHERE pageURL = ?) AS exist");
-        const exist = checkStmt.get(pageURL).exist;
-
-        if (exist) {
-            return res.redirect(`/edit/${originalpageURL}?error=Page name already exists. Please choose a different name.`);
-        }
-    }
-
-    try {
-        const updateStmt = db.prepare("UPDATE links SET links = ?, style = ?, pageTitle = ?, pageURL = ? WHERE pageURL = ? AND userId = ?");
-        updateStmt.run(JSON.stringify(links), style, pageTitle, pageURL, originalpageURL, userId);
-        
-        res.redirect("/profile"); // Redirect to the profile page or the updated page itself
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send("Failed to update the TandyLinx page.");
-    }
-});
-
-
 
 app.listen(PORT, () => {
-    console.log(`Example app listening at http://localhost:${PORT}`);
+    console.log(`API server listening at http://localhost:${PORT}`);
 });

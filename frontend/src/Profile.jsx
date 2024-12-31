@@ -13,10 +13,9 @@ const Profile = () => {
                     <button onClick={async () => {
                         // get links from page
                         const links = await getLinksFromPage(page.pageURL);
-
                         setCurrentPageLinks(links);
                         // go to editor
-                        navigate('/editor');
+                        navigate(`/${page.pageURL}/edit`);
                     }}>
                         {page.pageTitle}
                     </button>

@@ -1,14 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Login.css';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get the redirect path from state, or default to /profile
+  const from = location.state?.from?.pathname || '/profile';
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, loading, navigate, from]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,11 +26,15 @@ const Login = () => {
     const result = await login(username, password);
     
     if (result.success) {
-      navigate('/editor');
+      navigate(from, { replace: true });
     } else {
       setError(result.error);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="login-container">

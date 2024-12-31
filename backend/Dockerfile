@@ -19,5 +19,5 @@ RUN mkdir -p /app/Database && chmod 777 /app/Database
 # Expose the port your app runs on
 EXPOSE 3000
 
-# Command to run the application
-CMD ["npm", "start"]
+# Use nodemon instead of npm start for development
+CMD ["npm", "run", "dev"]

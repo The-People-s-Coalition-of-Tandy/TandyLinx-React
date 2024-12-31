@@ -1,0 +1,91 @@
+.page-header {
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #e8e8e8;
+    border-radius: 6px;
+}
+
+.header-field {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-field:last-child {
+    margin-bottom: 0;
+}
+
+.field-label {
+    font-weight: 500;
+    min-width: 60px;
+}
+
+.display-field {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.display-field:hover {
+    background-color: #d8d8d8;
+}
+
+.edit-field {
+    flex-grow: 1;
+    position: relative;
+}
+
+.edit-field input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: inherit;
+    font-family: inherit;
+}
+
+.edit-field input:focus {
+    outline: none;
+    border-color: #4a4eff;
+}
+
+.edit-field input.checking {
+    border-color: #ffd700;
+}
+
+.edit-field input.available {
+    border-color: #4aff4a;
+}
+
+.edit-field input.unavailable {
+    border-color: #ff4a4a;
+}
+
+.url-status {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9em;
+    color: #666;
+}
+
+.edit-button {
+    opacity: 0.6;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.edit-button:hover {
+    opacity: 1;
+    background-color: #c8c8c8;
+} 
