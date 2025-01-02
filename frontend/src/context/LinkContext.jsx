@@ -17,13 +17,21 @@ export const LinkProvider = ({ children }) => {
     const fetchUserPages = useCallback(async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get(`${API_URL}/get-user-links`, {
-                withCredentials: true
+            const response = await fetch(`${API_URL}/get-user-links`, {
+                credentials: 'include',
+                validateStatus: status => status === 200 || status === 401
             });
-            setUserPages(response.data);
-        } catch (err) {
-            console.error('Error fetching pages:', err);
-            setError(err.message);
+            
+            if (response.ok) {
+                const data = await response.json();
+                setUserPages(data);
+            } else {
+                setUserPages([]);
+            }
+        } catch (error) {
+            if (!error.response || error.response.status !== 401) {
+                console.error('Error fetching pages:', error);
+            }
             setUserPages([]);
         } finally {
             setIsLoading(false);

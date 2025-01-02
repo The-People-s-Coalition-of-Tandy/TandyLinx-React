@@ -61,7 +61,7 @@ p.link-field-input::-webkit-scrollbar {
 
 .edit-button:hover {
     opacity: 1;
-    background-color: #404040;
+    /* background-color: #404040; */
 }
 
 .drag-test-item {
@@ -84,11 +84,6 @@ p.link-field-input::-webkit-scrollbar {
     justify-content: center;
     width: 24px;
     align-self: stretch;
-}
-
-.drag-handle:hover {
-    opacity: 1;
-    background-color: #404040;
 }
 
 .drag-handle-dots {

@@ -57,6 +57,7 @@ function checkAuthenticated(req, res, next) {
     if (req.session.userId) {
         return next();
     }
+    // Silent 401 for authentication checks
     res.status(401).json({ error: 'Not authenticated' });
 }
 
@@ -116,6 +117,7 @@ app.post('/api/login', (req, res) => {
 // Keep existing API routes
 app.get('/api/check-auth', (req, res) => {
     if (!req.session.userId) {
+        // Silent 401 for auth checks
         return res.status(401).json({ error: "Not authenticated" });
     }
 
@@ -125,6 +127,7 @@ app.get('/api/check-auth', (req, res) => {
 
     if (!user) {
         req.session.destroy();
+        // Silent 401 for missing user
         return res.status(401).json({ error: "User not found" });
     }
 
@@ -132,14 +135,12 @@ app.get('/api/check-auth', (req, res) => {
 });
 
 app.get('/api/get-page/:pageURL', async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).json({ error: "Not authenticated" });
-    }
 
     const pageURL = req.params.pageURL;
-    // check if page belongs to user
-    const checkStmt = db.prepare("SELECT * FROM links WHERE pageURL = ? AND userId = ?");
-    const page = checkStmt.get(pageURL, req.session.userId);
+    
+    // get page from database
+    const stmt = db.prepare("SELECT * FROM links WHERE pageURL = ?");
+    const page = stmt.get(pageURL);
     if (!page) {
         return res.status(404).json({ error: "Page not found" });
     }
@@ -149,6 +150,7 @@ app.get('/api/get-page/:pageURL', async (req, res) => {
 
 app.get('/api/get-page-links/:pageURL', async (req, res) => {
     if (!req.session.userId) {
+        // Silent 401 for page links
         return res.status(401).json({ error: "Not authenticated" });
     }
 
@@ -162,7 +164,6 @@ app.get('/api/get-page-links/:pageURL', async (req, res) => {
         }
 
         res.json(result);
-        console.log(result);
     } catch (err) {
         console.error('Error fetching page links:', err);
         res.status(500).json({ error: "Server error" });
@@ -170,17 +171,14 @@ app.get('/api/get-page-links/:pageURL', async (req, res) => {
 });
 
 app.get('/api/get-user-links', (req, res) => {
-    console.log("get-user-links, userId:", req.session.userId);
     if (!req.session.userId) {
-        return res.status(401).json({ 
-            error: "Not authenticated" 
-        });
+        // Silent 401 for user links
+        return res.status(401).json({ error: "Not authenticated" });
     }
 
     const userId = req.session.userId;
     const stmt = db.prepare("SELECT pageTitle, pageURL FROM links WHERE userId = ?");
     const pages = stmt.all(userId);
-    console.log("Found pages:", pages);
     res.json(pages);
 });
 
@@ -301,6 +299,24 @@ app.put('/api/pages/:pageURL', checkAuthenticated, (req, res) => {
     } catch (err) {
         console.error('Error updating page:', err);
         res.status(500).json({ error: 'Failed to update page' });
+    }
+});
+
+// Add new public endpoint for getting page data
+app.get('/api/public/pages/:pageURL', (req, res) => {
+    try {
+        const pageURL = req.params.pageURL;
+        const stmt = db.prepare("SELECT pageTitle, links, style FROM links WHERE pageURL = ?");
+        const result = stmt.get(pageURL);
+
+        if (!result) {
+            return res.status(404).json({ error: "Page not found" });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error('Error fetching page:', err);
+        res.status(500).json({ error: "Server error" });
     }
 });
 

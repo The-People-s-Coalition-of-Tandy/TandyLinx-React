@@ -65,27 +65,4 @@
 
 .edit-field input.unavailable {
     border-color: #ff4a4a;
-}
-
-.url-status {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.9em;
-    color: #666;
-}
-
-.edit-button {
-    opacity: 0.6;
-    background: none;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.edit-button:hover {
-    opacity: 1;
-    background-color: #c8c8c8;
 } 

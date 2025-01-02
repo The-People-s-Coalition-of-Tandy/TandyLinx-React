@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import { LinkContext } from './context/LinkContext';
+import { LinkContext } from '../../../context/LinkContext';
 import { Draggable } from '@hello-pangea/dnd';
-import DeleteConfirmModal from './components/DeleteConfirmModal';
+import DeleteConfirmModal from '../DeleteConfirmModal/DeleteConfirmModal';
 import './EditLink.css';
 
 const EditLink = ({ link, index }) => {
@@ -12,14 +12,10 @@ const EditLink = ({ link, index }) => {
     const titleInputRef = useRef(null);
     const { savePageChangesImmediate, currentPageLinks, setCurrentPageLinks } = useContext(LinkContext);
 
-    // Single effect to handle focus for both title and URL
     useEffect(() => {
-        const shouldFocus = editingTitle || editingURL;
         const element = editingTitle ? titleInputRef.current : urlInputRef.current;
-
-        if (shouldFocus && element) {
+        if ((editingTitle || editingURL) && element) {
             element.focus();
-            // Move cursor to end
             const range = document.createRange();
             const selection = window.getSelection();
             range.selectNodeContents(element);
@@ -32,32 +28,19 @@ const EditLink = ({ link, index }) => {
     const handleBlur = (setEditing, field) => {
         setEditing(false);
         
-        // Reset scroll position to start
         const element = field === 'url' ? urlInputRef.current : titleInputRef.current;
         if (element) {
             element.scrollLeft = 0;
         }
 
-        // Get the current value from the ref
-        const newValue = field === 'url' 
-            ? urlInputRef.current.textContent 
-            : titleInputRef.current.textContent;
-        
-        // More efficient update using spread and direct index access
-        const updatedLinks = [
-            ...currentPageLinks.slice(0, index),
-            {
-                ...currentPageLinks[index],
-                [field === 'url' ? 'url' : 'name']: newValue
-            },
-            ...currentPageLinks.slice(index + 1)
-        ];
+        const newValue = element.textContent;
+        const updatedLinks = currentPageLinks.map((l, i) => 
+            i === index ? { ...l, [field === 'url' ? 'url' : 'name']: newValue } : l
+        );
 
-        // Update state and save changes
         setCurrentPageLinks(updatedLinks);
-        // Use the pageURL from the link prop
         savePageChangesImmediate(link.pageURL, { links: updatedLinks });
-    }
+    };
 
     const handleKeyDown = (e, setEditing, field) => {
         if (e.key === 'Enter') {

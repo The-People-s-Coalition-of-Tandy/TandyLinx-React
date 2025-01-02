@@ -32,15 +32,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const checkAuth = useCallback(async (force = false) => {
-    // Prevent multiple simultaneous checks
-    if (authState.loading || (authState.initialized && !force)) {
+    if (!force && authState.initialized) {
       return;
     }
 
     try {
       setAuthState(prev => ({ ...prev, loading: true }));
       const response = await fetch('/api/check-auth', {
-        credentials: 'include'
+        credentials: 'include',
+        validateStatus: status => status === 200 || status === 401
       });
       
       if (response.ok) {
@@ -52,25 +52,27 @@ export const AuthProvider = ({ children }) => {
           error: null
         });
       } else {
-        localStorage.removeItem('authState');
+        // Silently handle 401s
         updateAuthState({
           user: null,
           loading: false,
           initialized: true,
-          error: 'Authentication failed'
+          error: null
         });
       }
     } catch (error) {
-      localStorage.removeItem('authState');
-      console.error('Auth check failed:', error);
+      // Only log non-401 errors
+      if (!error.response || error.response.status !== 401) {
+        console.error('Auth check error:', error);
+      }
       updateAuthState({
         user: null,
         loading: false,
         initialized: true,
-        error: 'Network error'
+        error: null
       });
     }
-  }, [authState.loading, authState.initialized]);
+  }, [authState.initialized]);
 
   // Initial auth check
   useEffect(() => {
