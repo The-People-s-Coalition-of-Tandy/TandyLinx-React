@@ -1,0 +1,43 @@
+/* Reset for all templates */
+.template-base,
+.template-base * {
+    box-sizing: border-box;
+}
+
+.template-base {
+    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+}
+
+/* Style specifically for preview mode */
+.preview-content .template-base {
+    min-height: 100%;
+    height: 100%;
+    border-radius: 8px;
+    position: relative;
+}
+
+/* Style for full-page mode */
+:global(.full-page) {
+    min-height: 100vh;
+    width: 100%;
+    height: 100%;
+}
+
+/* Allow templates to extend full-page styles */
+:global(.full-page.tandy-template) {
+    background-image: url('./assets/TandyLogo.png');
+}
+
+:global(.full-page.lands-end-template) {
+    background: black;
+}
+
+:global(.full-page.embroidery-template) {
+    background-color: #b80000;
+    background-image: url('./assets/arabesque.png');
+}

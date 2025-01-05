@@ -1,0 +1,133 @@
+@import '../shared/template-base.css';
+
+.embroideryTemplate {
+  background-color: #b80000 ;
+  background-image: url('./assets/arabesque.png');
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wheat {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.wheat canvas {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  height: 100dvh;
+  z-index: 9999;
+}
+
+.mainContent {
+  border: 50px rgba(255, 166, 0, 0) ridge;
+  margin-top: 5%;
+  background-color: rgb(208, 222, 151);
+  background-image: url('./assets/light-grey-floral-motif.png');
+  position: relative;
+}
+
+.mainContent canvas {
+  position: absolute;
+  pointer-events: none;
+  top: -100px;
+  left: -100px;
+  z-index: 2;
+}
+
+.albumCover {
+  text-align: center;
+}
+
+.albumCover img {
+  width: 200px;
+  border: 3px black double;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.header {
+  text-align: center;
+  background-color: azure;
+  border: 2px solid rgb(189, 209, 10);
+  margin-bottom: 30px;
+  padding: 5px;
+  border-radius: 17px;
+  width: fit-content;
+  min-width: 300px;
+  margin: auto;
+  background-image: url('./assets/back-pattern.png');
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.link {
+  background-color: rgb(225, 195, 214);
+  padding: 10px 0px;
+  font-size: 18pt;
+  cursor: pointer;
+  border-radius: 100px;
+  border: 3px outset rgb(164, 96, 139);
+  text-decoration: none;
+  text-align: center;
+  color: #2525d5;
+  width: 50%;
+  min-width: 350px;
+  background-image: url('./assets/light-grey-floral-motif.png');
+}
+
+.link:hover,
+.link:focus {
+  border-style: inset;
+  filter: brightness(120%);
+}
+
+.footer {
+  padding: 20px;
+  margin: 0 auto;
+}
+
+.footerContent {
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.tandyLinx {
+  width: calc(100% - 200px);
+}
+
+.spacer {
+  height: 150px;
+  background-color: tomato;
+}
+
+@media only screen and (max-width: 600px) {
+  .mainContent {
+    max-width: 50%;
+  }
+
+  .link {
+    min-width: fit-content;
+    padding: 15px;
+  }
+  
+  .header {
+    min-width: fit-content;
+  }
+} 

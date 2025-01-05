@@ -21,48 +21,129 @@
     min-width: 60px;
 }
 
-.display-field {
-    flex-grow: 1;
+.edit-field {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.display-field:hover {
-    background-color: #d8d8d8;
-}
-
-.edit-field {
-    flex-grow: 1;
+    gap: 4px;
     position: relative;
 }
 
-.edit-field input {
-    width: 100%;
-    padding: 6px 8px;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    background-color: #fff;
-    font-size: inherit;
-    font-family: inherit;
-}
-
-.edit-field input:focus {
+.field-text {
     outline: none;
-    border-color: #4a4eff;
+    border: none;
+    background-color: transparent;
+    padding: 6px 8px;
+    margin: 0;
+    border-radius: 4px;
+    min-width: 0;
+    flex-grow: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    max-width: fit-content;
 }
 
-.edit-field input.checking {
-    border-color: #ffd700;
+.field-text::-webkit-scrollbar {
+    display: none;
 }
 
-.edit-field input.available {
-    border-color: #4aff4a;
+.field-text:focus-visible {
+    outline: 2px solid black;
+    background-color: white;
+    text-overflow: clip;
 }
 
-.edit-field input.unavailable {
-    border-color: #ff4a4a;
+.edit-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.2s;
+}
+
+.edit-field:hover .edit-button {
+    opacity: 0.6;
+}
+
+.edit-button:hover {
+    opacity: 1 !important;
+}
+
+.url-status {
+    font-size: 0.85em;
+    margin-left: 8px;
+}
+
+.url-status.checking {
+    color: #666;
+}
+
+.url-status.unavailable {
+    color: #ff4a4a;
+}
+
+.url-status.available {
+    color: #4CAF50;
+}
+
+.field-text.url-unavailable {
+    color: #ff4a4a;
+}
+
+.field-text.url-available {
+    color: #4CAF50;
+}
+
+.url-status-container {
+    min-width: 90px;
+    margin-left: 8px;
+}
+
+.url-status {
+    font-size: 0.85em;
+    font-weight: 500;
+    opacity: 0;
+    animation: fadeIn 0.2s ease-in forwards;
+}
+
+.url-status.checking {
+    color: #666;
+    animation: pulse 1.5s infinite;
+}
+
+.url-status.unavailable {
+    color: #ff4a4a;
+}
+
+.url-status.available {
+    color: #4CAF50;
+}
+
+.field-text.url-unavailable {
+    color: #ff4a4a;
+}
+
+.field-text.url-available {
+    color: #4CAF50;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
+
+.edit-button svg {
+    position: static !important;
+    pointer-events: auto !important;
 } 

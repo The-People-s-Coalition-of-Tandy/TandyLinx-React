@@ -1,23 +1,33 @@
-import React from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { templates } from '../../templates/registry';
+import TemplateWrapper from '../../templates/TemplateWrapper';
 import './Preview.css';
 
 const Preview = ({ pageTitle, links, style }) => {
     const Template = React.lazy(async () => {
-        const { component } = templates[style];
-        return import(`../../templates/${component}`);
+        const { folder } = templates[style];
+        return import(`../../templates/${folder}`);
     });
+
 
     return (
         <div className="preview-container">
             <div className="preview-header">Preview</div>
             <div className="preview-content">
-                <React.Suspense fallback={<div>Loading...</div>}>
-                    <Template pageTitle={pageTitle} links={links} />
-                </React.Suspense>
+                <div className="preview-frame-container">
+                    <div className="preview-frame">
+                        <div className="preview-scale-container">
+                            <div className="preview-viewport-context">
+                                <Suspense fallback={<div>Loading...</div>}>
+                                    <TemplateWrapper Template={Template} pageTitle={pageTitle} links={links} />
+                                </Suspense>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
-export default Preview; 
+export default Preview;

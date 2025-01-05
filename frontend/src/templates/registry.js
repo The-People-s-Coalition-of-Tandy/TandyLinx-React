@@ -2,14 +2,22 @@
 export const templates = {
   TandyLinx: {
     name: 'TandyLinx',
-    component: 'Classic'
+    folder: 'TandyLinx'
   },
   embroidery: {
     name: 'Embroidery',
-    component: 'Embroidery'
+    folder: 'Embroidery'
   },
   icepode: {
     name: 'Icepode',
-    component: 'Icepode'
+    folder: 'Icepode'
+  },
+  LandsEnd: {
+    name: 'LandsEnd',
+    folder: 'LandsEnd'
+  },
+  Cubes: {
+    name: 'Cubes',
+    folder: 'Cubes'
   }
 }; 

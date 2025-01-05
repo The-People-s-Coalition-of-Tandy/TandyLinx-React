@@ -1,0 +1,14 @@
+@import '../shared/template-base.css';
+
+/* Style for full-page mode */
+/* :global(.preview-viewport-context), :global(.full-page) {
+    background-image: url('./assets/TandyLogo.png');
+    padding: 20px;
+} */
+
+.tandyTemplate {
+    background-image: url('./assets/TandyLogo.png');
+    box-sizing: border-box;
+    padding: 20px;
+    min-height: 100vh;
+}

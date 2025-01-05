@@ -1,0 +1,30 @@
+/* Reset for all templates */
+.template-base,
+.template-base * {
+    box-sizing: border-box;
+}
+
+.template-base {
+    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+}
+
+/* Style specifically for preview mode */
+.preview-content .template-base {
+    min-height: 100%;
+    height: 100%;
+    border-radius: 8px;
+    position: relative;
+}
+
+/* Style for full-page mode */
+.full-page {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}

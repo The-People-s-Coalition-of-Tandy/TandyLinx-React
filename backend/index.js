@@ -135,12 +135,11 @@ app.get('/api/check-auth', (req, res) => {
 });
 
 app.get('/api/get-page/:pageURL', async (req, res) => {
-
     const pageURL = req.params.pageURL;
     
-    // get page from database
-    const stmt = db.prepare("SELECT * FROM links WHERE pageURL = ?");
+    const stmt = db.prepare("SELECT *, userId FROM links WHERE pageURL = ?");
     const page = stmt.get(pageURL);
+    
     if (!page) {
         return res.status(404).json({ error: "Page not found" });
     }
@@ -148,7 +147,7 @@ app.get('/api/get-page/:pageURL', async (req, res) => {
     res.json(page);
 });
 
-app.get('/api/get-page-links/:pageURL', async (req, res) => {
+app.get('/api/get-page-links/:pageURL', checkAuthenticated, checkPageOwnership, (req, res) => {
     if (!req.session.userId) {
         // Silent 401 for page links
         return res.status(401).json({ error: "Not authenticated" });
@@ -216,28 +215,74 @@ app.get("/api/check-username", (req, res) => {
 });
 
 // Convert create/edit routes to API endpoints
-app.post("/api/create", checkAuthenticated, (req, res) => {
-    const { pageURL, pageTitle, links, style } = req.body;
+app.post("/api/pages", checkAuthenticated, (req, res) => {
+    const { pageURL, pageTitle } = req.body;
     const userId = req.session.userId;
+
+    // Input validation
+    if (!pageURL || !pageTitle) {
+        return res.status(400).json({ error: 'Page URL and title are required' });
+    }
+
+    // URL format validation
+    if (!/^[a-zA-Z0-9-]+$/.test(pageURL)) {
+        return res.status(400).json({ error: 'Invalid URL format' });
+    }
 
     const checkStmt = db.prepare("SELECT EXISTS(SELECT 1 FROM links WHERE pageURL = ?) AS exist");
     const exist = checkStmt.get(pageURL).exist;
 
     if (exist) {
-        return res.status(400).json({ error: 'Page name already exists' });
+        return res.status(400).json({ error: 'Page URL already exists' });
     }
 
     try {
-        const insertStmt = db.prepare("INSERT INTO links (pageURL, pageTitle, links, style, userId) VALUES (?, ?, ?, ?, ?)");
-        insertStmt.run(pageURL, pageTitle, JSON.stringify(links), style, userId);
-        res.json({ success: true, pageURL });
+        const insertStmt = db.prepare(
+            "INSERT INTO links (pageURL, pageTitle, links, style, userId) VALUES (?, ?, ?, ?, ?)"
+        );
+        // Initialize with empty links array and default style
+        insertStmt.run(
+            pageURL, 
+            pageTitle, 
+            JSON.stringify([]), // empty links array
+            'TandyLinx',         // default style
+            userId
+        );
+        
+        res.json({ 
+            success: true, 
+            page: {
+                pageURL,
+                pageTitle
+            }
+        });
     } catch (err) {
         console.error(err.message);
-        res.status(500).json({ error: 'Failed to create the TandyLinx page' });
+        res.status(500).json({ error: 'Failed to create page' });
     }
 });
 
-app.put('/api/pages/:pageURL', checkAuthenticated, (req, res) => {
+// Add this middleware function
+function checkPageOwnership(req, res, next) {
+    const userId = req.session.userId;
+    const pageURL = req.params.pageURL;
+
+    const stmt = db.prepare("SELECT userId FROM links WHERE pageURL = ?");
+    const page = stmt.get(pageURL);
+
+    if (!page) {
+        return res.status(404).json({ error: 'Page not found' });
+    }
+
+    if (page.userId !== userId) {
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    next();
+}
+
+// Update the routes to use the new middleware
+app.put('/api/pages/:pageURL', checkAuthenticated, checkPageOwnership, (req, res) => {
     const { pageURL } = req.params;
     const { links, pageTitle, style, newPageURL } = req.body;
     const userId = req.session.userId;
@@ -299,6 +344,26 @@ app.put('/api/pages/:pageURL', checkAuthenticated, (req, res) => {
     } catch (err) {
         console.error('Error updating page:', err);
         res.status(500).json({ error: 'Failed to update page' });
+    }
+});
+
+// Add this after the PUT /api/pages/:pageURL endpoint
+app.delete('/api/pages/:pageURL', checkAuthenticated, checkPageOwnership, (req, res) => {
+    const { pageURL } = req.params;
+    const userId = req.session.userId;
+
+    try {
+        const deleteStmt = db.prepare('DELETE FROM links WHERE pageURL = ? AND userId = ?');
+        const result = deleteStmt.run(pageURL, userId);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: 'Page not found or unauthorized' });
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error deleting page:', err);
+        res.status(500).json({ error: 'Failed to delete page' });
     }
 });
 

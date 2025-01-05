@@ -103,6 +103,28 @@ export const LinkProvider = ({ children }) => {
         };
     }, [debouncedSave]);
 
+    const createPage = async (pageTitle, pageURL) => {
+        try {
+            const response = await fetch('/api/pages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pageTitle, pageURL }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create page');
+            }
+
+            const newPage = await response.json();
+            setUserPages(prev => [...prev, newPage]);
+            return newPage;
+        } catch (error) {
+            throw error;
+        }
+    };
+
     const contextValue = useMemo(() => ({
         userPages,
         setUserPages,
@@ -113,8 +135,9 @@ export const LinkProvider = ({ children }) => {
         fetchUserPages,
         getLinksFromPage,
         savePageChanges: debouncedSave,
-        savePageChangesImmediate
-    }), [userPages, currentPageLinks, isLoading, error, fetchUserPages, debouncedSave]);
+        savePageChangesImmediate,
+        createPage
+    }), [userPages, currentPageLinks, isLoading, error, fetchUserPages, debouncedSave, savePageChangesImmediate, createPage]);
 
     return (
         <LinkContext.Provider value={contextValue}>

@@ -1,3 +1,7 @@
+body {
+    background-image: url('../assets/images/TandyLogoBG.png');
+}
+
 .editor-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -13,7 +17,6 @@
     max-width: 800px;
     margin: 0;
     overflow: auto;
-    background-color: #a7a7a7;
     padding: 12px;
     border-radius: 6px;
     height: 100%;
@@ -21,18 +24,14 @@
 
 .add-link-button {
     margin-bottom: 20px;
-    padding: 8px 16px;
-    background-color: #4a4eff;
-    color: white;
-    border: none;
-    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
     cursor: pointer;
-    font-weight: 500;
     transition: background-color 0.2s;
 }
 
 .add-link-button:hover {
-    background-color: #3a3eee;
+    background-color: #777777;
 }
 
 .template-selector {

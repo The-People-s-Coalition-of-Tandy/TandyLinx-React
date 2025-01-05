@@ -7,6 +7,8 @@ import axios from 'axios';
 import EditLink from '../../components/Editor/EditLink/EditLink';
 import PageHeader from '../../components/Editor/TitleEditor/PageHeader';
 import Preview from '../../components/Preview/Preview';
+import MobilePreview from '../../components/Preview/MobilePreview';
+import TemplateBrowser from '../../components/TemplateBrowser/TemplateBrowser';
 import './Editor.css';
 
 const Editor = () => {
@@ -20,6 +22,7 @@ const Editor = () => {
     const [pageTitle, setPageTitle] = useState('');
     const [currentTemplate, setCurrentTemplate] = useState('');
     const [showPreview, setShowPreview] = useState(false);
+    const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
     const { pageURL } = useParams();
 
     useEffect(() => {
@@ -47,12 +50,13 @@ const Editor = () => {
         const newTemplate = e.target.value;
         setCurrentTemplate(newTemplate);
         try {
-            await axios.post(`http://localhost:3000/api/update-page/${pageURL}`, 
+            await axios.put(`http://localhost:3000/api/pages/${pageURL}`, 
                 { style: newTemplate },
                 { withCredentials: true }
             );
         } catch (error) {
             console.error('Failed to update template:', error);
+            setCurrentTemplate(currentTemplate);
         }
     };
 
@@ -91,7 +95,11 @@ const Editor = () => {
     return (
         <div className="editor-layout">
             <div className="editor">
-                <PageHeader currentPageURL={pageURL} initialTitle={pageTitle} />
+                <PageHeader 
+                    currentPageURL={pageURL} 
+                    initialTitle={pageTitle} 
+                    onTitleChange={setPageTitle} 
+                />
                 
                 <div className="template-selector">
                     <label htmlFor="template">Template Style:</label>
@@ -100,7 +108,23 @@ const Editor = () => {
                             <option key={key} value={key}>{template.name}</option>
                         ))}
                     </select>
+                    <button 
+                        className="browse-templates-button" 
+                        onClick={() => setShowTemplateBrowser(true)}
+                    >
+                        Browse Templates
+                    </button>
                 </div>
+
+                {showTemplateBrowser && (
+                    <TemplateBrowser
+                        currentTemplate={currentTemplate}
+                        onSelect={handleTemplateChange}
+                        pageTitle={pageTitle}
+                        links={currentPageLinks}
+                        onClose={() => setShowTemplateBrowser(false)}
+                    />
+                )}
 
                 <button className="add-link-button" onClick={handleAddLink}>Add Link</button>
                 
@@ -126,7 +150,7 @@ const Editor = () => {
 
             <div className={`preview-modal ${showPreview ? 'open' : ''}`}>
                 <button className="close-preview" onClick={() => setShowPreview(false)}>×</button>
-                <Preview pageTitle={pageTitle} links={currentPageLinks} style={currentTemplate} />
+                <MobilePreview pageTitle={pageTitle} links={currentPageLinks} style={currentTemplate} />
             </div>
         </div>
     );

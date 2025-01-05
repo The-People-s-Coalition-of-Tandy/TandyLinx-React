@@ -1,0 +1,95 @@
+.cubesContainer {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+.canvasContainer {
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+}
+
+.title {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.linkLabel {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 1000;
+}
+
+.detailsPanel {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(191, 208, 255, 0.238);
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    min-width: 200px;
+}
+
+.detailsPanel h2 {
+    margin: 0 0 15px 0;
+    color: #ffffff;
+    font-size: 24px;
+}
+
+.detailsPanel p {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.visitLink {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: #F010D4;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    transition: transform 0.2s;
+    pointer-events: auto;
+}
+
+.visitLink:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 20px;
+        top: 10px;
+    }
+    .linkLabel {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+} 

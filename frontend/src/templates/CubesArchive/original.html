@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Metallic Cubes</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .link-label {
+                position: fixed;
+                background: rgba(0, 0, 0, 0.7);
+                color: #fff;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s;
+                z-index: 1000;
+            }
+
+            .title {
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: #fff;
+                font-family: Arial, sans-serif;
+                font-size: 24px;
+                text-align: center;
+                z-index: 1000;
+            }
+
+            .details-panel {
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(191, 208, 255, 0.238);
+                color: #fff;
+                padding: 20px;
+                border-radius: 12px;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                opacity: 0;
+                transition: opacity 0.3s;
+                pointer-events: none;
+                z-index: 1000;
+                backdrop-filter: blur(5px);
+                font-family: 'Arial', sans-serif;
+                /* border: 1px solid rgba(240, 16, 212, 0.3); */
+                /* box-shadow: 0 0 20px rgba(240, 16, 212, 0.2); */
+            }
+
+            .details-panel h2 {
+                margin: 0 0 15px 0;
+                color: #ffffff;
+                font-size: 24px;
+            }
+
+            .details-panel p {
+                margin: 10px 0;
+                font-size: 16px;
+                line-height: 1.4;
+            }
+
+            .details-panel .visit-link {
+                display: inline-block;
+                margin-top: 15px;
+                padding: 8px 20px;
+                background: #F010D4;
+                color: white;
+                text-decoration: none;
+                border-radius: 20px;
+            
+                transition: transform 0.2s;
+                pointer-events: auto;
+            }
+
+            .details-panel .visit-link:hover {
+                transform: scale(1.05);
+            }
+
+            @media (max-width: 768px) {
+                .title {
+                    font-size: 20px;
+                    top: 10px;
+                }
+                .link-label {
+                    font-size: 12px;
+                    padding: 6px 10px;
+                }
+            }
+            
+            body {
+                touch-action: none;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+    </style>
+</head>
+<body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.152.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.152.0/examples/jsm/",
+                "cannon-es": "https://unpkg.com/cannon-es@0.20.0/dist/cannon-es.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import * as CANNON from 'cannon-es';
+        import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+        
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 35, 0);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        document.body.appendChild(renderer.domElement);
+
+        // Add environment map
+        const cubeTextureLoader = new THREE.CubeTextureLoader();
+        const environmentMap = cubeTextureLoader
+            .setPath('https://threejs.org/examples/textures/cube/SwedishRoyalCastle/')
+            .load([
+                'px.jpg',
+                'nx.jpg',
+                'py.jpg',
+                'ny.jpg',
+                'pz.jpg',
+                'nz.jpg'
+            ]);
+        
+        scene.environment = environmentMap;
+        scene.background = null; // Keep background transparent
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1.5);
+        pointLight.position.set(10, 20, 10);
+        pointLight.castShadow = true;
+        pointLight.shadow.mapSize.width = 2048;
+        pointLight.shadow.mapSize.height = 2048;
+        scene.add(pointLight);
+
+        // Add rim light for the metallic edge effect
+        const rimLight = new THREE.PointLight(0xffffff, 1);
+        rimLight.position.set(-15, 5, -15);
+        scene.add(rimLight);
+
+        // Ground
+        const groundGeometry = new THREE.PlaneGeometry(60, 60);
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+            // color: 0xFFFFFF,
+            color: 0x000000,
+            roughness: 0.5,
+            metalness: 0.3,
+            envMapIntensity: 0.4,
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Physics world
+        const world = new CANNON.World({ gravity: new CANNON.Vec3(0, -9.82, 0) });
+
+        // Ground physics
+        const groundBody = new CANNON.Body({
+            mass: 0, // Static ground
+            shape: new CANNON.Plane(),
+        });
+        groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+        world.addBody(groundBody);
+
+        // Create walls
+        function createWall(width, height, depth, x, y, z, rotation = 0) {
+            // Physics wall only
+            const wallShape = new CANNON.Box(new CANNON.Vec3(width/2, height/2, depth/2));
+            const wallBody = new CANNON.Body({
+                mass: 0,
+                shape: wallShape,
+            });
+            wallBody.position.set(x, y, z);
+            wallBody.quaternion.setFromEuler(0, rotation, 0);
+            world.addBody(wallBody);
+        }
+
+        // Add walls
+        const wallThickness = 0.5;
+        const wallHeight = 10;  // Reduced from 20
+        const areaSize = 15;    // Reduced from 30
+
+        // Back wall
+        createWall(30, wallHeight, wallThickness, 0, wallHeight/2, -areaSize);
+        // Front wall
+        createWall(30, wallHeight, wallThickness, 0, wallHeight/2, areaSize);
+        // Left wall
+        createWall(30, wallHeight, wallThickness, -areaSize, wallHeight/2, 0, Math.PI/2);
+        // Right wall
+        createWall(30, wallHeight, wallThickness, areaSize, wallHeight/2, 0, Math.PI/2);
+
+        // Cubes
+        const cubes = [];
+        const cubeBodies = [];
+
+        // Add link data structure after imports
+        const links = [
+            { url: "https://github.com/yourusername", title: "GitHub" },
+            { url: "https://twitter.com/yourusername", title: "Twitter" },
+            { url: "https://linkedin.com/in/yourusername", title: "LinkedIn" },
+            { url: "https://yourportfolio.com", title: "Portfolio" },
+            { url: "https://yourportfolio.com", title: "Portfolio" },
+            { url: "https://yourportfolio.com", title: "Portfolio" },
+            { url: "https://yourportfolio.com", title: "Portfolio" },
+            { url: "https://yourportfolio.com", title: "Portfolio" },
+            { url: "https://yourportfolio.com", title: "Portfolio" },
+            { url: "https://yourportfolio.com", title: "Portfolio" },
+            { url: "https://yourportfolio.com", title: "Portfolio" }
+        ];
+
+        // Add HTML elements
+        // document.head.insertAdjacentHTML('beforeend', `<style>${styles}</style>`);
+        document.body.insertAdjacentHTML('beforeend', `
+            <div class="title">Your Name</div>
+            <div class="link-label"></div>
+        `);
+
+        // Modify cube creation to include link data
+        function createCube(x, y, z, linkData) {
+            const cubeSize = 5;
+            const geometry = new RoundedBoxGeometry(cubeSize, cubeSize, cubeSize, 16, 0.5);
+            const material = new THREE.MeshPhysicalMaterial({
+                color: 0xF010D4,
+                metalness: 1.0,
+                roughness: 0.02,
+                envMapIntensity: 2.0,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.05,
+                reflectivity: 1.0,
+                ior: 3.0,
+                specularIntensity: 1.0,
+                specularColor: 0xffffff
+            });
+
+            const cube = new THREE.Mesh(geometry, material);
+            cube.castShadow = true;
+            cube.receiveShadow = true;
+            cube.position.set(x, y, z);
+            cube.userData.link = linkData; // Store link data in cube
+            scene.add(cube);
+            cubes.push(cube);
+
+            // Physics body setup remains the same
+            const shape = new CANNON.Box(new CANNON.Vec3(cubeSize/2, cubeSize/2, cubeSize/2));
+            const body = new CANNON.Body({ 
+                mass: 1,
+                shape: shape,
+                linearDamping: 0.3,
+                angularDamping: 0.9
+            });
+            body.position.set(x, y, z);
+            world.addBody(body);
+            cubeBodies.push(body);
+        }
+
+        // Add this after the camera setup
+        function adjustCameraForScreen() {
+            if (window.innerWidth <= 768) {
+                camera.position.set(0, 45, 0); // Higher camera on mobile for better view
+                camera.lookAt(0, 0, 0);
+            } else {
+                camera.position.set(0, 35, 0);
+                camera.lookAt(0, 0, 0);
+            }
+        }
+
+        // Call it initially and on resize
+        adjustCameraForScreen();
+        window.addEventListener('resize', adjustCameraForScreen);
+
+        // Fix the touch handling functions
+        function getMouseCoordinates(event) {
+            let x, y;
+            if (event.type.includes('touch')) {
+                if (event.type === 'touchend') {
+                    // For touchend, use changedTouches instead of touches
+                    x = event.changedTouches[0].clientX;
+                    y = event.changedTouches[0].clientY;
+                } else {
+                    x = event.touches[0].clientX;
+                    y = event.touches[0].clientY;
+                }
+            } else {
+                x = event.clientX;
+                y = event.clientY;
+            }
+            return { x, y };
+        }
+
+        // Modify the createCubesGrid function for better mobile layout
+        function createCubesGrid() {
+            const isMobile = window.innerWidth <= 768;
+            const cubesPerRow = Math.ceil(Math.sqrt(links.length));
+            const spacing = isMobile ? 8 : 10; // Closer spacing on mobile
+            const startX = -(cubesPerRow - 1) * spacing / 2;
+            const startZ = startX;
+
+            links.forEach((link, index) => {
+                const row = Math.floor(index / cubesPerRow);
+                const col = index % cubesPerRow;
+                const x = startX + col * spacing;
+                const z = startZ + row * spacing;
+                createCube(
+                    x,
+                    isMobile ? 12 : 15, // Lower height on mobile
+                    z,
+                    link
+                );
+            });
+        }
+
+        // Replace the cube creation loop with
+        createCubesGrid();
+
+        // Add after scene setup
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredBody = null;
+
+        // Add link label handling
+        const linkLabel = document.querySelector('.link-label');
+
+        // Add touch event handling functions
+        function handleInteraction(event) {
+            const coords = getMouseCoordinates(event);
+            
+            // Calculate mouse/touch position in normalized device coordinates (-1 to +1)
+            mouse.x = (coords.x / window.innerWidth) * 2 - 1;
+            mouse.y = -(coords.y / window.innerHeight) * 2 + 1;
+
+            // Update the raycaster
+            raycaster.setFromCamera(mouse, camera);
+
+            // Check for intersections
+            const intersects = raycaster.intersectObjects(cubes);
+            
+            if (intersects.length > 0) {
+                const intersectedCube = intersects[0].object;
+                const linkData = intersectedCube.userData.link;
+                
+                // Show link label
+                linkLabel.textContent = linkData.title;
+                linkLabel.style.opacity = '1';
+                linkLabel.style.left = coords.x + 20 + 'px';
+                linkLabel.style.top = coords.y + 'px';
+
+                const cubeIndex = cubes.indexOf(intersectedCube);
+                hoveredBody = cubeBodies[cubeIndex];
+                
+                // Dampen any existing angular velocity
+                hoveredBody.angularVelocity.scale(0.5);
+                
+                // Calculate force direction
+                const force = new CANNON.Vec3();
+                
+                // Adjust forces for top-down view
+                force.y = 25;
+                force.x = mouse.x * 15;
+                force.z = -mouse.y * 15;
+                
+                // Apply force closer to center
+                const point = new CANNON.Vec3(
+                    hoveredBody.position.x + intersects[0].point.x * 0.05,
+                    hoveredBody.position.y + intersects[0].point.y * 0.05,
+                    hoveredBody.position.z + intersects[0].point.z * 0.05
+                );
+                
+                hoveredBody.applyForce(force, point);
+            } else {
+                hoveredBody = null;
+                linkLabel.style.opacity = '0';
+            }
+        }
+
+        // Add new state variables after the hoveredBody declaration
+        let selectedCube = null;
+        let selectedBody = null;
+        let isTransitioning = false;
+
+        // Add HTML for details panel
+        document.body.insertAdjacentHTML('beforeend', `
+            <div class="details-panel">
+                <h2></h2>
+                <p></p>
+                <a href="#" class="visit-link" target="_blank">Visit Link</a>
+            </div>
+        `);
+
+        const detailsPanel = document.querySelector('.details-panel');
+
+        // Modify the handleClick function
+        function handleClick(event) {
+            const coords = getMouseCoordinates(event);
+            mouse.x = (coords.x / window.innerWidth) * 2 - 1;
+            mouse.y = -(coords.y / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(cubes);
+            
+            if (intersects.length > 0) {
+                const intersectedCube = intersects[0].object;
+                const cubeIndex = cubes.indexOf(intersectedCube);
+                
+                if (selectedCube === intersectedCube) {
+                    // If clicking the same cube, open the link
+                    window.open(intersectedCube.userData.link.url, '_blank');
+                } else {
+                    // Deselect previous cube if any
+                    if (selectedCube) {
+                        deselectCube();
+                    }
+                    
+                    // Select new cube
+                    selectedCube = intersectedCube;
+                    selectedBody = cubeBodies[cubeIndex];
+                    
+                    // Show details
+                    const linkData = selectedCube.userData.link;
+                    detailsPanel.querySelector('h2').textContent = linkData.title;
+                    detailsPanel.querySelector('p').textContent = `Click again to visit ${linkData.title}`;
+                    detailsPanel.querySelector('.visit-link').href = linkData.url;
+                    detailsPanel.style.opacity = '1';
+                    
+                    // Levitate the cube
+                    isTransitioning = true;
+                    const targetY = 20; // Height to levitate to
+                    const targetPosition = new THREE.Vector3(0, targetY, 0);
+                    
+                    // Disable physics temporarily
+                    selectedBody.type = CANNON.Body.KINEMATIC;
+                    
+                    // Animate the cube
+                    new TWEEN.Tween(selectedBody.position)
+                        .to({ x: 0, y: targetY, z: 0 }, 1000)
+                        .easing(TWEEN.Easing.Quadratic.Out)
+                        .onComplete(() => {
+                            isTransitioning = false;
+                        })
+                        .start();
+                }
+            } else if (!intersects.length && selectedCube) {
+                // Click outside, deselect cube
+                deselectCube();
+            }
+        }
+
+        function deselectCube() {
+            if (selectedCube && selectedBody) {
+                detailsPanel.style.opacity = '0';
+                
+                // Re-enable physics
+                selectedBody.type = CANNON.Body.DYNAMIC;
+                
+                // Reset cube position gradually
+                const originalY = 15;
+                new TWEEN.Tween(selectedBody.position)
+                    .to({ y: originalY }, 800)
+                    .easing(TWEEN.Easing.Quadratic.In)
+                    .onComplete(() => {
+                        selectedCube = null;
+                        selectedBody = null;
+                    })
+                    .start();
+            }
+        }
+
+        // Add TWEEN to the animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            TWEEN.update();
+
+            // Step physics world
+            world.step(1 / 60);
+
+            const time = Date.now() * 0.001;
+
+            // Sync physics bodies with Three.js meshes
+            for (let i = 0; i < cubes.length; i++) {
+                const cube = cubes[i];
+                const body = cubeBodies[i];
+                
+                if (body === selectedBody && !isTransitioning) {
+                    // Keep selected cube perfectly centered
+                    body.position.x = 0;
+                    body.position.z = 0;
+                    body.velocity.setZero();
+                    body.angularVelocity.setZero();
+                }
+                
+                cube.position.copy(body.position);
+                cube.quaternion.copy(body.quaternion);
+                
+                // Add floating animation only for non-selected cubes
+                if (body !== selectedBody && !isTransitioning) {
+                    const floatOffset = Math.sin(time + i) * 0.1;
+                    cube.rotation.x += 0.001;
+                    cube.rotation.z += 0.001;
+                    body.position.y += floatOffset * 0.01;
+                }
+                
+                // Add hover/selected effects
+                if (body === selectedBody) {
+                    cube.material.emissive.setHex(0x440044);
+                    cube.material.emissiveIntensity = 0.4;
+                    // Add slow rotation for selected cube
+                    cube.rotation.y += 0.02;
+                } else if (body === hoveredBody) {
+                    cube.material.emissive.setHex(0x220022);
+                    cube.material.emissiveIntensity = 0.2;
+                } else {
+                    cube.material.emissive.setHex(0x000000);
+                    cube.material.emissiveIntensity = 0;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Simplify mobile interaction to just handle clicks/taps
+        if (window.innerWidth <= 768) {
+            // Remove mousemove and touchmove listeners for mobile
+            document.removeEventListener('mousemove', handleInteraction);
+            document.removeEventListener('touchmove', handleInteraction);
+            
+            // Add a subtle rotation on hover instead of physics interaction
+            function handleMobileHover(event) {
+                const coords = getMouseCoordinates(event);
+                mouse.x = (coords.x / window.innerWidth) * 2 - 1;
+                mouse.y = -(coords.y / window.innerHeight) * 2 + 1;
+                
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(cubes);
+                
+                if (intersects.length > 0) {
+                    const intersectedCube = intersects[0].object;
+                    const linkData = intersectedCube.userData.link;
+                    
+                    // Show link label
+                    linkLabel.textContent = linkData.title;
+                    linkLabel.style.opacity = '1';
+                    linkLabel.style.left = coords.x + 20 + 'px';
+                    linkLabel.style.top = coords.y + 'px';
+                    
+                    // Add subtle rotation
+                    intersectedCube.rotation.y += 0.1;
+                } else {
+                    linkLabel.style.opacity = '0';
+                }
+            }
+            
+            document.addEventListener('touchstart', handleMobileHover);
+        }
+
+        // Resize event
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Add back the mouse/touch event listeners
+        document.addEventListener('mousemove', handleInteraction);
+        document.addEventListener('touchmove', handleInteraction, { passive: false });
+        document.addEventListener('click', handleClick);
+        document.addEventListener('touchend', handleClick);
+
+        // Modify the mobile-specific code to not remove the event listeners
+        if (window.innerWidth <= 768) {
+            // Add mobile hover handling without removing other listeners
+            document.addEventListener('touchstart', handleMobileHover);
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+</body>
+</html>

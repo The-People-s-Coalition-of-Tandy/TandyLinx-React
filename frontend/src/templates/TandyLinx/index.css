@@ -1,0 +1,6 @@
+@import '../shared/template-base.module.css';
+
+:global(.full-page) {
+    background-image: url('./assets/TandyLogo.png');
+}
+
