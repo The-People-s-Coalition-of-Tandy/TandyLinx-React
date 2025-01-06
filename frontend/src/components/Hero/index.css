@@ -2,11 +2,9 @@
     max-width: 1200px;
     width: 80%;
     margin: 0 auto;
-    height: 35rem;
-    border-radius: 20px;    
+    height: 100vh;
     background-size: cover;
     background-position: center;
-    padding: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,11 +66,28 @@
     transform: translateY(20px);
 }
 
+
+/* Buttons */
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: var(--button-color);
+    color: var(--button-text-color);
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .cta-button:hover {
+    background-color: var(--button-hover-color);
+  }
+
 @media (max-width: 768px) {
     .hero {
         width: 90%;
-        height: auto;
-        min-height: 25rem;
+        height: 100vh;
         padding: 1rem;
     }
 
@@ -87,3 +102,4 @@
         height: 60px;
     }
 }
+

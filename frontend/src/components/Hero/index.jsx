@@ -8,7 +8,7 @@ function Hero({slimeRef}) {
 
     const taglines = [
         "Links like you've never seen before.",
-        `"Express yourself through our unique templates."
+        `"Express yourself through our unique link templates."
         \n- julie bodian`,
         "Not just links, TandyLinx.",
         `"Links are formed karmically on the earth and then continue between death and a new birth. Those who are able to see into the spiritual world perceive how the dead person gradually makes more and more links"
@@ -25,7 +25,7 @@ function Hero({slimeRef}) {
                 setCurrentTagline((prev) => (prev + 1) % taglines.length);
                 setIsAnimating(false);
             }, 500); // Half of our transition time
-        }, 4000); // Change every 4 seconds
+        }, 5000); // Change every 4 seconds
 
         return () => clearInterval(interval);
     }, []);
@@ -33,11 +33,11 @@ function Hero({slimeRef}) {
     const handleMouseEnter = () => {
         setIsHovered(true);
         slimeRef.current.startTransition({
-            baseColor: [0.90, 0.02, 0.30],
-            roughness: 0.0,
+            secondaryColor: [0.8, 0.2, 0.91],
+            noiseFactor: 0.20,
             metalness: 1.0,
             duration: 500,
-            neighborThreshold: 0.02
+            neighborThreshold: 0.5
         });
     };
 

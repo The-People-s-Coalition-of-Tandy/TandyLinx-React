@@ -40,7 +40,7 @@ const HomePage = () => {
             simulationRef.current = new SlimeSimulation({
                 canvas: canvas,
                 imageUrl: businessPicture,
-                slimeType: 'modern',
+                slimeType: 'tar',
                 baseColor: [0.8, 0.2, 0.1]
             });
         };
@@ -84,7 +84,6 @@ const HomePage = () => {
 
     return (
         <div className="home-page">
-            <Header />
             <Hero slimeRef={simulationRef} />
             <Features />
             <canvas ref={canvasRef} id="canvas"></canvas>

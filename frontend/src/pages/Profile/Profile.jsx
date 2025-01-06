@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LinkContext } from '../../context/LinkContext';
 import { SlimeSimulation } from 'slime-simulation';
@@ -7,6 +7,7 @@ import styles from './index.module.css';
 const Profile = () => {
     const { userPages, setCurrentPageLinks, getLinksFromPage, setUserPages } = useContext(LinkContext);
     const navigate = useNavigate();
+    const [transitionToggle, setTransitionToggle] = useState(false);
 
     const handlePageClick = async (pageURL) => {
         const links = await getLinksFromPage(pageURL);
@@ -19,6 +20,28 @@ const Profile = () => {
 
     // Add debounced resize handler
     const resizeTimeoutRef = useRef(null);
+
+    function toggleTransition() {
+        if (transitionToggle) {
+            simulationRef.current.startTransition({
+                neighborThreshold: 0.6,
+                speed: 0.3,
+            });
+            console.log('transition 1');
+        } else {
+            simulationRef.current.startTransition({
+                secondaryColor: [0.2, .0, 0.0, 1.],
+                baseColor: [0.8, 0.2, 0.91],
+                duration: 800,
+                neighborThreshold: 0.99,
+                noiseFactor: 0.0,
+                roughness: 0.2,
+                metalness: 1.0,
+                speed: 0.2,
+            });
+        }
+        setTransitionToggle(!transitionToggle);
+    }
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -68,21 +91,21 @@ const Profile = () => {
         window.addEventListener('keydown', (event) => {
             if (event.key === 'r') {
                 simulationRef.current.startTransition({
-                    baseColor: [0.8, 0.411, 0.1],
-                    secondaryColor: [0.2, .0, 0.0, 1.],
-                    noiseFactor: 0.0,
-                    roughness: 0.2,
-                    metalness: 1.0,
-                    duration: 800,
-                    neighborThreshold: 0.2,
+                    neighborThreshold: 0.6,
+                    speed: 0.3,
                 });
             }
 
             if (event.key === 't') {
                 simulationRef.current.startTransition({
+                    secondaryColor: [0.2, .0, 0.0, 1.],
                     baseColor: [0.8, 0.2, 0.91],
                     duration: 800,
                     neighborThreshold: 0.99,
+                    noiseFactor: 0.0,
+                    roughness: 0.2,
+                    metalness: 1.0,
+                    speed: 0.2,
                 });
             }
         });

@@ -1,8 +1,36 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import './index.css';
 
 function Features() {
+    const [isVisible, setIsVisible] = useState(false);
+    const featuresRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.disconnect();
+                }
+            },
+            {
+                threshold: 0.1
+            }
+        );
+
+        if (featuresRef.current) {
+            observer.observe(featuresRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
     return (
-        <section id="features" className="features">
+        <section 
+            ref={featuresRef}
+            id="features" 
+            className={`features ${isVisible ? 'features-visible' : ''}`}
+        >
             <h2>Features</h2>
             <div className="features-grid">
                 <div className="feature-card">

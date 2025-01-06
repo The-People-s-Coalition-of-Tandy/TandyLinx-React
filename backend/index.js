@@ -53,6 +53,9 @@ app.use(cors({
     credentials: true
 }));
 
+// Add this after your other middleware
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
 function checkAuthenticated(req, res, next) {
     if (req.session.userId) {
         return next();
@@ -383,6 +386,11 @@ app.get('/api/public/pages/:pageURL', (req, res) => {
         console.error('Error fetching page:', err);
         res.status(500).json({ error: "Server error" });
     }
+});
+
+// Add this after your API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 app.listen(PORT, () => {
