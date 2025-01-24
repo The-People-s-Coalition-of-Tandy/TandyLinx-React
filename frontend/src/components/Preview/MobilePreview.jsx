@@ -1,20 +1,24 @@
 import React, { Suspense } from 'react';
 import { templates } from '../../templates/registry';
+import TemplateWrapper from '../../templates/TemplateWrapper';
 import './MobilePreview.css';
 
-const MobilePreview = ({ pageTitle, links, style }) => {
+const MobilePreview = ({ pageTitle, links, style, profilePhotoUrl }) => {
     const Template = React.lazy(async () => {
         const { folder } = templates[style];
         return import(`../../templates/${folder}`);
     });
 
     return (
-        <div className="mobile-preview-container">
-            <div className="mobile-preview-content">
-                <Suspense fallback={<div>Loading...</div>}>
-                    <Template pageTitle={pageTitle} links={links} />
-                </Suspense>
-            </div>
+        <div className="mobile-preview">
+            <Suspense fallback={<div>Loading...</div>}>
+                <TemplateWrapper 
+                    Template={Template} 
+                    pageTitle={pageTitle} 
+                    links={links}
+                    profilePhotoUrl={profilePhotoUrl}
+                />
+            </Suspense>
         </div>
     );
 };

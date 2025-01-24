@@ -1,10 +1,8 @@
 import express from "express";
-import nunjucks from "nunjucks";
 import Database from "better-sqlite3";
 import path, {
     dirname
 } from "path";
-import fs from "fs";
 import {
     fileURLToPath
 } from "url";
@@ -12,6 +10,8 @@ import session from 'express-session';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import multer from 'multer';
+import nunjucks from 'nunjucks';
 
 dotenv.config();
 
@@ -49,12 +49,32 @@ app.use(session({
 }));
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true
+    origin: 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Add this after your other middleware
+// Update the static file serving configuration
+app.use('/templates', express.static(path.join(__dirname, 'public/templates'), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        }
+    }
+}));
+
+// Update the frontend dist path
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Add this after your other middleware configurations
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// Configure nunjucks
+nunjucks.configure('templates', {
+    autoescape: true,
+    express: app
+});
 
 function checkAuthenticated(req, res, next) {
     if (req.session.userId) {
@@ -67,7 +87,7 @@ function checkAuthenticated(req, res, next) {
 // Convert profile route to API endpoint
 app.get("/api/profile", checkAuthenticated, (req, res) => {
     const userId = req.session.userId;
-    const query = db.prepare("SELECT username FROM users WHERE id = ?");
+    const query = db.prepare("SELECT username, profilePhotoUrl FROM users WHERE id = ?");
     const user = query.get(userId);
 
     const stmt = db.prepare("SELECT pageTitle, pageURL FROM links WHERE userId = ?");
@@ -75,6 +95,7 @@ app.get("/api/profile", checkAuthenticated, (req, res) => {
 
     res.json({
         username: user.username,
+        profilePhotoUrl: user.profilePhotoUrl,
         pages
     });
 });
@@ -388,9 +409,102 @@ app.get('/api/public/pages/:pageURL', (req, res) => {
     }
 });
 
-// Add this after your API routes
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/uploads/profiles')
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + path.extname(file.originalname))
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (extname && mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'));
+    }
+  }
+});
+
+// Add profile photo upload endpoint
+app.post('/api/upload-profile-photo', checkAuthenticated, upload.single('photo'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  const userId = req.session.userId;
+  const photoUrl = `/uploads/profiles/${req.file.filename}`;
+
+  try {
+    const updateStmt = db.prepare('UPDATE users SET profilePhotoUrl = ? WHERE id = ?');
+    updateStmt.run(photoUrl, userId);
+    
+    res.json({ 
+      success: true, 
+      photoUrl: photoUrl 
+    });
+  } catch (err) {
+    console.error('Error updating profile photo:', err);
+    res.status(500).json({ error: 'Failed to update profile photo' });
+  }
+});
+
+// Add endpoint to get profile photo
+app.get('/api/profile-photo', checkAuthenticated, (req, res) => {
+  const userId = req.session.userId;
+  
+  try {
+    const query = db.prepare('SELECT profilePhotoUrl FROM users WHERE id = ?');
+    const result = query.get(userId);
+    
+    res.json({ 
+      photoUrl: result?.profilePhotoUrl || null 
+    });
+  } catch (err) {
+    console.error('Error fetching profile photo:', err);
+    res.status(500).json({ error: 'Failed to fetch profile photo' });
+  }
+});
+
+// Add this after your API routes but before the catch-all
+app.get('/:pageURL', async (req, res) => {
+    const pageURL = req.params.pageURL;
+    
+    // Skip certain paths that should be handled by the frontend
+    if (['login', 'create', 'profile', 'edit'].includes(pageURL)) {
+        return next();
+    }
+    
+    const stmt = db.prepare("SELECT pageTitle, links, style FROM links WHERE pageURL = ?");
+    const page = stmt.get(pageURL);
+    
+    if (!page) {
+        return res.status(404).send('Page not found');
+    }
+
+    // Render the appropriate template based on style
+    const template = page.style || 'TandyLinx';
+    res.render(`${template}.html`, {
+        pageTitle: page.pageTitle,
+        links: JSON.parse(page.links)
+    });
+});
+
+// Catch-all route for the React app (admin interface)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 app.listen(PORT, () => {

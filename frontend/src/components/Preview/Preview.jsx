@@ -1,27 +1,24 @@
-import React, { Suspense, useEffect } from 'react';
-import { templates } from '../../templates/registry';
-import TemplateWrapper from '../../templates/TemplateWrapper';
+import React from 'react';
 import './Preview.css';
 
 const Preview = ({ pageTitle, links, style }) => {
-    const Template = React.lazy(async () => {
-        const { folder } = templates[style];
-        return import(`../../templates/${folder}`);
-    });
-
+    // Use the development or production URL based on environment
+    const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+    const previewUrl = `${baseUrl}/_preview?title=${encodeURIComponent(pageTitle)}&style=${style}&links=${encodeURIComponent(JSON.stringify(links))}`;
 
     return (
         <div className="preview-container">
-            <div className="preview-header">Preview</div>
+            <div className="preview-header"></div>
             <div className="preview-content">
                 <div className="preview-frame-container">
                     <div className="preview-frame">
                         <div className="preview-scale-container">
-                            <div className="preview-viewport-context">
-                                <Suspense fallback={<div>Loading...</div>}>
-                                    <TemplateWrapper Template={Template} pageTitle={pageTitle} links={links} />
-                                </Suspense>
-                            </div>
+                            <iframe
+                                src={previewUrl}
+                                className="preview-iframe"
+                                title="Template Preview"
+                                sandbox="allow-scripts allow-same-origin"
+                            />
                         </div>
                     </div>
                 </div>

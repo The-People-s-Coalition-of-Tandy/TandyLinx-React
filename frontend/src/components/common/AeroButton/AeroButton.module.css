@@ -1,0 +1,53 @@
+.aeroButton {
+    /* Base properties */
+    --bottom-glow: radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.7), transparent);
+    --button-color: oklch(75% 0.1 245); /* Default color definition */
+    --button-background: oklch(from var(--button-color) l c h / 0.4);
+    --bg-dark: oklch(from var(--button-color) calc(l - 0.3) c h / 0.35);
+    --button-foreground: oklch(from var(--button-color) calc(l - 0.3) calc(c - 0.15) h);
+
+    background-color: var(--button-background);
+    background: var(--bottom-glow), linear-gradient(to bottom, var(--bg-dark), var(--button-background));
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--button-background);
+    border-radius: 9999px;
+    color: var(--button-foreground);
+    cursor: pointer;
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lunasima", sans-serif;
+    font-weight: 600;
+    margin: 1em 1ex;
+    padding: 1ex 1em;
+    position: relative;
+    text-shadow: 0 2px 0.5em #0003;
+    transition: all 300ms;
+}
+
+/* Color variations */
+.aeroButton.blue   { --button-color: oklch(50% 0.2 245); }
+.aeroButton.green  { --button-color: oklch(50% 0.2 145); }
+.aeroButton.red    { --button-color: oklch(50% 0.2 345); }
+.aeroButton.yellow { --button-color: oklch(50% 0.2 45); }
+.aeroButton.purple { --button-color: oklch(50% 0.2 305); }
+.aeroButton.orange { --button-color: oklch(50% 0.2 45); }
+.aeroButton.pink   { --button-color: oklch(50% 0.2 325); }
+.aeroButton.gray   { --button-color: oklch(50% 0.2 225); }
+.aeroButton.white  { --button-color: oklch(50% 0.2 245); }
+
+.aeroButton::after {
+    content: "";
+    position: absolute;
+    top: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 40%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
+    border-radius: 9999px;
+    transition: background 400ms;
+}
+.aeroButton:hover, .aeroButton:focus {
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+.aeroButton:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}

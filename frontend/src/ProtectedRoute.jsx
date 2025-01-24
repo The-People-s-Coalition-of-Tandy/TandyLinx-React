@@ -1,19 +1,24 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading, initialized, checkAuth } = useAuth();
   const location = useLocation();
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (!initialized && !loading) {
-      checkAuth();
+      checkAuth().then(() => {
+        setIsReady(true);
+      });
+    } else if (initialized) {
+      setIsReady(true);
     }
   }, [initialized, loading, checkAuth]);
 
-  if (!initialized || loading) {
-    return <div>Loading...</div>;
+  if (!isReady) {
+    return null;
   }
 
   if (!user) {

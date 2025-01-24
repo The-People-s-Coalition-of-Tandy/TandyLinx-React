@@ -27,10 +27,13 @@ video {
 
 .pcotLogo {
     height: 150px;
+    width: 150px;
     display: block;
     margin-left: auto;
     margin-right: auto;
     filter: brightness(85%);
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 header {

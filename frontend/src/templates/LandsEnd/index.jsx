@@ -6,8 +6,9 @@ import tandyLogoSpiro from './assets/TandyLogo.png';
 import elieExplosion from './assets/elieExplosionIcon.gif';
 import tandyLinx from '../shared/assets/tandyLinx1.png';
 
-const LandsEnd = ({ pageTitle, links }) => {
+const LandsEnd = ({ pageTitle, links, profilePhotoUrl }) => {
   const mainRef = useRef(null);
+  const videoRef = useRef(null);
   
   useEffect(() => {
     const main = mainRef.current;
@@ -43,16 +44,24 @@ const LandsEnd = ({ pageTitle, links }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.log("Video autoplay failed:", error);
+      });
+    }
+  }, []);
+
   return (
-    <div className={`${styles.landsEndTemplate} ${templateBase.templateBase}`}>
-      <video autoPlay muted loop className={styles.backgroundVideo}>
+    <div className={`${templateBase.templateBase} ${styles.templateBase}`}>
+      <video ref={videoRef} autoPlay muted loop className={styles.video}>
         <source src={landEndVideo} type="video/mp4" />
       </video>
       
       <main className={styles.main} ref={mainRef}>
         <img 
-          src={tandyLogoSpiro}
-          alt="People's Coalition of Tandy Logo"
+          src={profilePhotoUrl || tandyLogoSpiro}
+          alt="Profile Photo"
           className={styles.pcotLogo}
         />
         <br />

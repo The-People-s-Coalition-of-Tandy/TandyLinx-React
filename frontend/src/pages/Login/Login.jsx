@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './Login.css';
+import styles from './Login.module.css';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -37,26 +37,28 @@ const Login = () => {
   }
 
   return (
-    <div className="login-container">
-      <h1>Login</h1>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
+    <div className={styles.content}>
+      <div className={styles.loginContainer}>
+        <h1>Login</h1>
+        {error && <p className={styles.error}>{error}</p>}
+        <form onSubmit={handleSubmit} className={styles.loginForm}>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            required
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+      </div>
     </div>
   );
 };

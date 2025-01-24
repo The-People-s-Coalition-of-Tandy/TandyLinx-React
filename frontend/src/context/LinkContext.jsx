@@ -5,8 +5,6 @@ import debounce from 'lodash.debounce';
 
 export const LinkContext = createContext();
 
-const API_URL = 'http://localhost:3000/api';
-
 export const LinkProvider = ({ children }) => {
     const [userPages, setUserPages] = useState([]);
     const [currentPageLinks, setCurrentPageLinks] = useState([]);
@@ -17,9 +15,12 @@ export const LinkProvider = ({ children }) => {
     const fetchUserPages = useCallback(async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_URL}/get-user-links`, {
+            const response = await fetch('/api/get-user-links', {
                 credentials: 'include',
-                validateStatus: status => status === 200 || status === 401
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
             });
             
             if (response.ok) {
@@ -29,9 +30,7 @@ export const LinkProvider = ({ children }) => {
                 setUserPages([]);
             }
         } catch (error) {
-            if (!error.response || error.response.status !== 401) {
-                console.error('Error fetching pages:', error);
-            }
+            console.error('Error fetching pages:', error);
             setUserPages([]);
         } finally {
             setIsLoading(false);
@@ -51,7 +50,7 @@ export const LinkProvider = ({ children }) => {
 
     const getLinksFromPage = async (pageURL) => {
         try {
-            const response = await axios.get(`${API_URL}/get-page-links/${pageURL}`, {
+            const response = await axios.get(`/api/get-page-links/${pageURL}`, {
                 withCredentials: true
             });
             const links = response.data.links ? JSON.parse(response.data.links) : [];
@@ -65,7 +64,7 @@ export const LinkProvider = ({ children }) => {
     const savePageChanges = async (pageURL, changes) => {
         try {
             await axios.put(
-                `${API_URL}/pages/${pageURL}`,
+                `/api/pages/${pageURL}`,
                 changes,
                 { withCredentials: true }
             );
@@ -86,7 +85,7 @@ export const LinkProvider = ({ children }) => {
         console.log('Saving changes immediately:', changes);
         try {
             await axios.put(
-                `${API_URL}/pages/${pageURL}`,
+                `/api/pages/${pageURL}`,
                 changes,
                 { withCredentials: true }
             );
