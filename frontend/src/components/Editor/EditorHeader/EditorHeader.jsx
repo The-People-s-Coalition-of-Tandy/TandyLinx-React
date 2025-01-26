@@ -1,8 +1,9 @@
 import React from 'react';
 import ProfilePhotoUpload from '../ProfilePhotoUpload/ProfilePhotoUpload';
 import PageSettingsModal from '../PageSettingsModal/PageSettingsModal';
-import { faPaintBrush } from '@fortawesome/free-solid-svg-icons';
+import { faPaintBrush, faHome, faShare, faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate } from 'react-router-dom';
 import './EditorHeader.css';
 
 const EditorHeader = ({ 
@@ -16,7 +17,7 @@ const EditorHeader = ({
     onShowSettings,
     children
 }) => {
-    
+    const navigate = useNavigate();
 
     return (
         <>
@@ -43,6 +44,17 @@ const EditorHeader = ({
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className="header-orbs">
+                    <button className="header-orb" onClick={() => navigate('/profile')}>
+                        <FontAwesomeIcon icon={faHome} />
+                    </button>
+                    <button className="header-orb">
+                        <FontAwesomeIcon icon={faShare} />
+                    </button>
+                    <button className="header-orb">
+                        <FontAwesomeIcon icon={faCog} />
+                    </button>
                 </div>
             </div>
 
