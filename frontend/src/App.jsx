@@ -5,6 +5,7 @@ import { routes } from './routes/routes.jsx';
 import { Aurora } from './components/Aurora/Aurora';
 import { AnimatePresence } from 'framer-motion';
 import './App.css';
+import { ProfilePhotoProvider } from './context/ProfilePhotoContext';
 
 function AppRoutes() {
   return (
@@ -20,14 +21,16 @@ function AppRoutes() {
 
 function App() {
   return (
-    <HelmetProvider>
-      <Router>
-        <Aurora />
-        <Suspense fallback={null}>
-          <AppRoutes />
-        </Suspense>
-      </Router>
-    </HelmetProvider>
+    <ProfilePhotoProvider>
+      <HelmetProvider>
+        <Router>
+          <Aurora />
+          <Suspense fallback={null}>
+            <AppRoutes />
+          </Suspense>
+        </Router>
+      </HelmetProvider>
+    </ProfilePhotoProvider>
   );
 }
 

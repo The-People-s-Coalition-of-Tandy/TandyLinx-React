@@ -60,6 +60,10 @@ export const Title = () => {
             }
         };
 
+        const themeChangeEvent = new CustomEvent('themeChange', {
+            detail: { theme: 'plain' }
+        });
+
         document.fonts.ready.then(() => {
             const tl = gsap.timeline();
             
@@ -100,30 +104,36 @@ export const Title = () => {
                 opacity: 1,
                 stagger: 0.15,
                 ease: "elastic.out(1, 0.5)",
-                transformOrigin: "center center"
+                transformOrigin: "center center",
+                onComplete: () => {
+                    window.dispatchEvent(themeChangeEvent);
+                }
             }, "-=0.5")
-            .to(`.${styles.link}`, {
-                y: -15,
-                duration: 2.5,
-                ease: "sine.inOut",
-                stagger: {
-                    each: 0.5,
-                    repeat: -1,
-                    yoyo: true
-                },
-                rotation: 2
-            }, "<")
-            .to(`.${styles.link}`, {
-                y: 5,
-                duration: 2.5,
-                ease: "sine.inOut",
-                stagger: {
-                    each: 0.5,
-                    repeat: -1,
-                    yoyo: true
-                },
-                rotation: -2
-            }, "<1");
+            .add(() => {
+                gsap.to(`.${styles.link}`, {
+                    y: -15,
+                    duration: 2.5,
+                    ease: "sine.inOut",
+                    stagger: {
+                        each: 0.5,
+                        repeat: -1,
+                        yoyo: true
+                    },
+                    rotation: 2
+                });
+                
+                gsap.to(`.${styles.link}`, {
+                    y: 5,
+                    duration: 2.5,
+                    ease: "sine.inOut",
+                    stagger: {
+                        each: 0.5,
+                        repeat: -1,
+                        yoyo: true
+                    },
+                    rotation: -2
+                }, "<1");
+            });
         });
     }, []);
 

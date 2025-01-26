@@ -17,6 +17,7 @@ const PageSettingsModal = ({
     const [url, setUrl] = useState(currentPageURL || '');
     const [urlStatus, setUrlStatus] = useState({ isAvailable: true, isChecking: false });
     const [topOffset, setTopOffset] = useState(0);
+    const [urlError, setUrlError] = useState('');
 
     useEffect(() => {
         setTitle(initialTitle);
@@ -47,6 +48,29 @@ const PageSettingsModal = ({
         } catch (error) {
             console.error('Error checking URL:', error);
             setUrlStatus({ isAvailable: false, isChecking: false });
+        }
+    };
+
+    const validateURL = (value) => {
+        // Only allow alphanumeric characters and hyphens
+        return /^[a-zA-Z0-9-]+$/.test(value);
+    };
+
+    const handleURLChange = (e) => {
+        const newUrl = e.target.value;
+        setUrl(newUrl);
+        
+        if (newUrl === currentPageURL) {
+            setUrlError('');
+            return;
+        }
+        
+        if (!validateURL(newUrl)) {
+            setUrlError('URL can only contain letters, numbers, and hyphens');
+            setUrlStatus({ isAvailable: false, isChecking: false });
+        } else {
+            setUrlError('');
+            checkURL(newUrl);
         }
     };
 
@@ -90,12 +114,9 @@ const PageSettingsModal = ({
                         <input
                             type="text"
                             value={url}
-                            onChange={(e) => {
-                                setUrl(e.target.value);
-                                checkURL(e.target.value);
-                            }}
+                            onChange={handleURLChange}
                         />
-                        {url !== currentPageURL && (
+                        {url !== currentPageURL && !urlError && (
                             <span className={`url-status ${
                                 urlStatus.isChecking ? 'checking' : 
                                 urlStatus.isAvailable ? 'available' : 'unavailable'
@@ -105,13 +126,14 @@ const PageSettingsModal = ({
                             </span>
                         )}
                     </div>
+                    {urlError && <div className="url-error">{urlError}</div>}
                 </div>
                 <div className="modal-actions">
                     <AeroButton onClick={onClose} color="red">Cancel</AeroButton>
                     <AeroButton
                         color="blue"
                         onClick={handleSave}
-                        disabled={!urlStatus.isAvailable && url !== currentPageURL}
+                        disabled={(!urlStatus.isAvailable && url !== currentPageURL) || !!urlError}
                     >
                         Save Changes
                     </AeroButton>

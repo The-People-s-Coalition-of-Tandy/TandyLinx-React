@@ -1,51 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { templates } from '../../templates/registry';
-import '../../templates/shared/template-base.css';
+import axios from 'axios';
 
 const TemplatePage = () => {
-  const [Template, setTemplate] = useState(null);
+  const { pageURL } = useParams();
+  const [pageData, setPageData] = useState(null);
   const [error, setError] = useState(null);
-  
-  // Get data from URL params for preview mode
-  const searchParams = new URLSearchParams(window.location.search);
-  const pageTitle = searchParams.get('title');
-  const style = searchParams.get('style');
-  const links = JSON.parse(searchParams.get('links') || '[]');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const loadTemplate = async () => {
+    const loadPage = async () => {
       try {
-        const templateStyle = templates[style] ? style : 'TandyLinx';
-        const { folder } = templates[templateStyle];
-        
-        const module = await import(`../../templates/${folder}`);
-        setTemplate(() => module.default);
+        const response = await axios.get(`/api/public/pages/${pageURL}`);
+        if (!response.ok) {
+          throw new Error('Page not found');
+        }
+        setPageData(response.data);
       } catch (error) {
         setError(error.message);
-        console.error('Error loading template:', error);
+        console.error('Error loading page:', error);
       }
     };
 
-    loadTemplate();
-  }, [style]);
+    loadPage();
+  }, [pageURL]);
 
   if (error) return <div>Error: {error}</div>;
-  if (!Template) return <div>Loading...</div>;
+  if (!pageData) return <div>Loading...</div>;
 
-  return (
-    <>
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={`Links for ${pageTitle}`} />
-      </Helmet>
-      <Template 
-        pageTitle={pageTitle}
-        links={links}
-      />
-    </>
-  );
+  // Redirect to the server-rendered template
+  window.location.href = `/${pageURL}`;
+  return null;
 };
 
 export default TemplatePage;

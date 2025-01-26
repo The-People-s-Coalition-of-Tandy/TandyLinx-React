@@ -45,8 +45,8 @@
 }
 
 .header-left {
-  width: 64px;
-  height: 64px;
+  width: 100px;
+  height: 100px;
   position: absolute;
   left: -12px;
   top: -12px;
@@ -230,11 +230,10 @@
   }
   
   .header-left {
-    width: 52px;
-    height: 52px;
-    left: 50%;
-    top: -26px;
-    transform: translateX(-50%);
+    /* width: 52px; */
+    /* height: 52px; */
+    top: -30px;
+    transform: scale(0.75);
   }
 
   .pageName {
@@ -244,7 +243,7 @@
   }
 
   .pageURL {
-    font-size: 0.75rem;
+    font-size: 0.6rem;
     text-align: center;
   }
   
@@ -283,9 +282,9 @@
   }
 
   .header-left {
-    width: 48px;
-    height: 48px;
-    top: -24px;
+    /* width: 48px; */
+    /* height: 48px; */
+    /* top: -56px; */
   }
 
   .pageName {

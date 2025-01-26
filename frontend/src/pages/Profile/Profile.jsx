@@ -69,9 +69,9 @@ const Profile = () => {
                     </div>
                     <div className={styles.headerRight}>
                         <div className={styles.headerButtons}>
-                            <a href="/create" className={styles.createButton}>
+                            <AeroButton color="blue" onClick={() => navigate('/browser')}>
                                 + Create New Page
-                            </a>
+                            </AeroButton>
                             <button 
                                 className={styles.signOutButton}
                                 onClick={handleSignOut}

@@ -12,6 +12,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import multer from 'multer';
 import nunjucks from 'nunjucks';
+import { templates } from './templates/registry.js';
 
 dotenv.config();
 
@@ -48,26 +49,38 @@ app.use(session({
     }
 }));
 
+// Move this right after express middleware setup, before any routes
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.NODE_ENV === 'development' 
+        ? ['http://localhost:5173', 'http://localhost:3000']
+        : process.env.FRONTEND_URL,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Update the static file serving configuration
+// Serve frontend static files first
+app.use(express.static(path.join(__dirname, 'dist')));
+app.use('/assets', express.static(path.join(__dirname, 'dist/assets')));
+
 app.use('/templates', express.static(path.join(__dirname, 'public/templates'), {
     setHeaders: (res, path) => {
         if (path.endsWith('.css')) {
             res.setHeader('Content-Type', 'text/css');
+        } else if (path.endsWith('.mp4')) {
+            res.setHeader('Content-Type', 'video/mp4');
+        } else if (path.endsWith('.png')) {
+            res.setHeader('Content-Type', 'image/png');
+        } else if (path.endsWith('.gif')) {
+            res.setHeader('Content-Type', 'image/gif');
+        } else if (path.endsWith('.ico')) {
+            res.setHeader('Content-Type', 'image/x-icon');
+        } else if (path.endsWith('.jpg')) {
+            res.setHeader('Content-Type', 'image/jpeg');
         }
     }
 }));
 
-// Update the frontend dist path
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-// Add this after your other middleware configurations
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Configure nunjucks
@@ -105,15 +118,29 @@ app.get("/api/profile", checkAuthenticated, (req, res) => {
 // app.get('/register' route can be removed as frontend will handle the form
 app.post('/api/register', async (req, res) => {
     const { username, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Validate input
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
 
     try {
+        // Check if username already exists
+        const checkStmt = db.prepare("SELECT EXISTS(SELECT 1 FROM users WHERE username = ?) AS exist");
+        const exists = checkStmt.get(username).exist;
+        
+        if (exists) {
+            return res.status(400).json({ error: 'Username already exists' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
         const insert = db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
         insert.run(username, hashedPassword);
+        
         res.json({ success: true, message: 'Registration successful' });
     } catch (error) {
-        console.error(error.message);
-        res.status(400).json({ error: 'User already exists or other error' });
+        console.error('Registration error:', error);
+        res.status(500).json({ error: 'Server error during registration' });
     }
 });
 
@@ -240,7 +267,7 @@ app.get("/api/check-username", (req, res) => {
 
 // Convert create/edit routes to API endpoints
 app.post("/api/pages", checkAuthenticated, (req, res) => {
-    const { pageURL, pageTitle } = req.body;
+    const { pageURL, pageTitle, style } = req.body;
     const userId = req.session.userId;
 
     // Input validation
@@ -251,6 +278,11 @@ app.post("/api/pages", checkAuthenticated, (req, res) => {
     // URL format validation
     if (!/^[a-zA-Z0-9-]+$/.test(pageURL)) {
         return res.status(400).json({ error: 'Invalid URL format' });
+    }
+
+    // Style validation
+    if (style && !templates[style]) {
+        return res.status(400).json({ error: 'Invalid template style' });
     }
 
     const checkStmt = db.prepare("SELECT EXISTS(SELECT 1 FROM links WHERE pageURL = ?) AS exist");
@@ -264,12 +296,11 @@ app.post("/api/pages", checkAuthenticated, (req, res) => {
         const insertStmt = db.prepare(
             "INSERT INTO links (pageURL, pageTitle, links, style, userId) VALUES (?, ?, ?, ?, ?)"
         );
-        // Initialize with empty links array and default style
         insertStmt.run(
             pageURL, 
             pageTitle, 
             JSON.stringify([]), // empty links array
-            'TandyLinx',         // default style
+            style || 'TandyLinx',  // Use provided style or fallback to default
             userId
         );
         
@@ -277,7 +308,8 @@ app.post("/api/pages", checkAuthenticated, (req, res) => {
             success: true, 
             page: {
                 pageURL,
-                pageTitle
+                pageTitle,
+                style
             }
         });
     } catch (err) {
@@ -478,8 +510,8 @@ app.get('/api/profile-photo', checkAuthenticated, (req, res) => {
   }
 });
 
-// Add this after your API routes but before the catch-all
-app.get('/:pageURL', async (req, res) => {
+// Move this block before the catch-all route
+app.get('/:pageURL', async (req, res, next) => {
     const pageURL = req.params.pageURL;
     
     // Skip certain paths that should be handled by the frontend
@@ -487,24 +519,50 @@ app.get('/:pageURL', async (req, res) => {
         return next();
     }
     
-    const stmt = db.prepare("SELECT pageTitle, links, style FROM links WHERE pageURL = ?");
-    const page = stmt.get(pageURL);
-    
-    if (!page) {
-        return res.status(404).send('Page not found');
-    }
+    try {
+        let pageData;
+        // For normal viewing, get from database
+        const stmt = db.prepare(`
+            SELECT l.pageTitle, l.links, l.style, l.userId, u.profilePhotoUrl 
+            FROM links l
+            LEFT JOIN users u ON l.userId = u.id
+            WHERE l.pageURL = ?
+        `);
+        pageData = stmt.get(pageURL);
+        
+        if (!pageData) {
+            return next();
+        }
 
-    // Render the appropriate template based on style
-    const template = page.style || 'TandyLinx';
-    res.render(`${template}.html`, {
-        pageTitle: page.pageTitle,
-        links: JSON.parse(page.links)
-    });
+        // Get template info from registry
+        const templateInfo = templates[pageData.style || 'TandyLinx'];
+        
+        if (!templateInfo) {
+            console.error(`Template ${pageData.style} not found in registry`);
+            return res.status(500).send('Template not found');
+        }
+
+        // Render the template with profile photo
+        res.render(templateInfo.template, {
+            pageTitle: pageData.pageTitle,
+            links: JSON.parse(pageData.links || '[]'),
+            preview: false,
+            profilePhotoUrl: pageData.profilePhotoUrl || null
+        });
+    } catch (error) {
+        console.error('Error rendering template:', error);
+        next(error);
+    }
 });
 
-// Catch-all route for the React app (admin interface)
+// Add before the catch-all route
+app.get('/api/templates', (req, res) => {
+    res.json(templates);
+});
+
+// Keep this as the last route
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
 app.listen(PORT, () => {

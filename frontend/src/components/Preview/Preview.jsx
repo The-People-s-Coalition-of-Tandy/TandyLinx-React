@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
+import { LinkContext } from '../../context/LinkContext';
+import { useProfilePhoto } from '../../context/ProfilePhotoContext';
 import './Preview.css';
 
-const Preview = ({ pageTitle, links, style }) => {
-    // Use the development or production URL based on environment
-    const baseUrl = import.meta.env.VITE_APP_URL || window.location.origin;
-    const previewUrl = `${baseUrl}/_preview?title=${encodeURIComponent(pageTitle)}&style=${style}&links=${encodeURIComponent(JSON.stringify(links))}`;
+const Preview = ({ pageURL, style, isFullPreview }) => {
+    const iframeRef = useRef(null);
+    const { currentPageLinks } = useContext(LinkContext);
+    const { currentPhotoUrl } = useProfilePhoto();
+    
+    // Force refresh when style changes
+    useEffect(() => {
+        console.log('style changed', style);
+        if (iframeRef.current) {
+            const timestamp = new Date().getTime(); // Add timestamp to force refresh
+            iframeRef.current.src = `/${pageURL}?t=${timestamp}`;
+        }
+    }, [pageURL, currentPageLinks, currentPhotoUrl, style, isFullPreview]);
 
     return (
         <div className="preview-container">
@@ -13,11 +24,11 @@ const Preview = ({ pageTitle, links, style }) => {
                 <div className="preview-frame-container">
                     <div className="preview-frame">
                         <div className="preview-scale-container">
-                            <iframe
-                                src={previewUrl}
+                            <iframe 
+                                ref={iframeRef}
+                                src={`/${pageURL}`}
+                                title="Preview"
                                 className="preview-iframe"
-                                title="Template Preview"
-                                sandbox="allow-scripts allow-same-origin"
                             />
                         </div>
                     </div>

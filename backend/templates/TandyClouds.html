@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pageTitle }}</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    
+    <!-- Custom font -->
+    <link rel="preload" href="/templates/shared/fonts/linotype-aroma-extra-light.ttf" as="font" type="font/ttf" crossorigin fetchpriority="high">
+    
+    <!-- Inline critical CSS -->
+    <style>
+        /* Base styles */
+        @font-face {
+            font-family: 'linotype';
+            src: url(/templates/shared/fonts/linotype-aroma-extra-light.ttf) format('truetype');
+            font-display: block;
+            font-weight: 200;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            color: black;
+            letter-spacing: 0.05em;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Layout containers */
+        .content {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+            gap: 2rem;
+        }
+
+        .interface {
+            width: 100%;
+            max-width: 800px; /* Constrain width for better readability */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem; /* Increased spacing between title and links */
+        }
+
+        /* Title styles */
+        h1 {
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            color: rgba(0, 0, 0, 0.8);
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.2);
+            text-align: center;
+            margin: 2rem 0;
+            padding: 0 1rem;
+        }
+
+        .title-tandy,
+        .title-linx {
+            display: block;
+            font-family: 'linotype', Arial, sans-serif;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        .title-tandy {
+            transform: translateY(-0.2em);
+        }
+
+        .title-linx {
+            opacity: 0;
+            transform: translateY(-100%);
+            visibility: hidden;
+        }
+
+        /* Links container */
+        .nav-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 0 1rem;
+        }
+
+        .bubble-link {
+            width: 100%;
+            height: auto;
+            min-height: 60px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            /* background-image: url(/templates/TandyClouds/assets/images/buttonposter.png); */
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .bubble-link:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .bubble-link:hover .link-content {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .link-content {
+            width: 100%;
+            min-height: 60px;
+            padding: 0.8rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: rgb(0, 0, 0);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.658);
+            background-image: url(/templates/TandyClouds/assets/images/buttonposter.png);
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* background: rgba(255, 255, 255, 0.15); */
+            /* backdrop-filter: blur(8px); */
+            /* -webkit-backdrop-filter: blur(8px); */
+            border-radius: 12px;
+
+            /* border: 1px solid rgba(255, 255, 255, 0.2); */
+            /* box-shadow:  */
+                /* 0 4px 15px rgba(0, 0, 0, 0.05), */
+                /* inset 0 0 20px rgba(255, 255, 255, 0.2); */
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Modern shine effect */
+        .link-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .bubble-link:hover .link-content::before {
+            left: 100%;
+        }
+
+        .link-content span {
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            text-align: center;
+            z-index: 1;
+            /* background: linear-gradient(
+                90deg,
+                rgba(0, 0, 0, 0.8),
+                rgba(0, 0, 0, 0.6)
+            ); */
+            /* -webkit-background-clip: text; */
+            /* -webkit-text-fill-color: transparent; */
+            /* text-shadow: 0 1px 2px rgba(255, 255, 255, 0.1); */
+        }
+
+        /* Add subtle glow effect */
+        .bubble-link::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.2)
+            );
+            filter: blur(15px);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .bubble-link:hover::after {
+            opacity: 1;
+        }
+
+        /* The shine effect */
+        .link i {
+            font-size: 1.8em;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        .link span {
+            font-size: 0.85em;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+            animation: floatText 3s ease-in-out infinite;
+            animation-delay: -1.5s;
+        }
+
+        @keyframes bubble-anim {
+            0% {
+                transform: scale(1);
+            }
+            20% {
+                transform: scaleY(0.95) scaleX(1.05);
+            }
+            48% {
+                transform: scaleY(1.1) scaleX(0.9);
+            }
+            68% {
+                transform: scaleY(0.98) scaleX(1.02);
+            }
+            80% {
+                transform: scaleY(1.02) scaleX(0.98);
+            }
+            97%, 100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(-2px); }
+            50% { transform: translateY(2px); }
+        }
+
+        @keyframes floatText {
+            0%, 100% { transform: translateY(2px); }
+            50% { transform: translateY(-2px); }
+        }
+
+        /* Shadow effect */
+        .link .shadow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle,
+                rgba(0, 0, 0, 0.4),
+                rgba(0, 0, 0, 0.1) 40%,
+                rgba(0, 0, 0, 0) 50%
+            );
+            transform: rotateX(90deg) translateZ(-160px);
+            z-index: -2;
+        }
+
+        /* Particles */
+        .particles-container {
+            position: absolute;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            contain: strict;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            object-fit: contain;
+            will-change: transform;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .nav-container {
+                gap: 1rem;
+            }
+
+            .link-content {
+                min-height: 50px;
+                padding: 0.6rem 1.5rem;
+            }
+
+            .link-content span {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* For very small screens */
+        @media (max-width: 360px) {
+            .bubble-link {
+                width: 110px;
+                height: 110px;
+            }
+
+            .link-content span {
+                font-size: 0.75em;
+            }
+        }
+
+        .bubble-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+
+    <!-- Deferred resources -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print" onload="this.media='all'">
+</head>
+<body>
+    <canvas id="glCanvas"></canvas>
+    <div class="content">
+        <div class="interface">
+            <div class="particles-container"></div>
+            <h1>
+                <span class="title-tandy">{{pageTitle}}</span>
+                <span class="title-linx"><div style="width: 100%; height: 50px; border-top: 2px solid black; margin-top: 10px;"></div></span>
+            </h1>
+            <div class="nav-container">
+                {% for link in links %}
+                <div class="bubble-link">
+                    <canvas class="bubble-canvas"></canvas>
+                    <a href="{{ link.url }}" class="link-content">
+                        <span>{{ link.name }}</span>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- WebGL Shaders -->
+    <script id="vertexShader" type="x-shader/x-vertex">
+        attribute vec4 aPosition;
+        void main() {
+            gl_Position = aPosition;
+        }
+    </script>
+
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        precision mediump float;
+        
+        uniform float uTime;
+        uniform vec2 uResolution;
+        uniform vec4 uSpheres[15];
+        uniform vec4 uGlowingSpheres[45];
+        uniform bool uAnimateColors;  // New uniform for toggle
+        uniform float uWaves[48];  // 8 waves * 6 components each
+
+        float getWaveLine(vec2 pixel, float z, float thickness, float noiseScale) {
+            vec2 center = uResolution.xy * 0.5;
+            float angle = -0.2; // Slight upward angle for all lines
+            
+            // Rotate pixel around center
+            vec2 rotated = pixel - center;
+            rotated = vec2(
+                rotated.x * cos(angle) - rotated.y * sin(angle),
+                rotated.x * sin(angle) + rotated.y * cos(angle)
+            );
+            rotated += center;
+            
+            // More noise for thinner lines
+            float noiseAmount = mix(0.5, 2.0, 1.0 - thickness / 50.0);
+            
+            // Base wave with varying noise based on thickness
+            float y = center.y + 
+                sin(rotated.x * 0.003 + uTime * 0.2) * thickness * 3.0 +
+                sin(rotated.x * 0.007 + uTime * 0.1) * thickness * noiseAmount * noiseScale;
+            
+            float dist = abs(rotated.y - y);
+            
+            // Create blur based on z-depth
+            float blurAmount = mix(2.0, 20.0, z / 1000.0);
+            return smoothstep(thickness + blurAmount, thickness - blurAmount, dist);
+        }
+
+        // Audio-inspired wave function
+        float getAudioWave(vec2 pixel, float z, float freq, float amp) {
+            vec2 center = uResolution.xy * 0.8;
+            float angle = 1.2;
+            
+            vec2 rotated = pixel - center;
+            rotated = vec2(
+                rotated.x * cos(angle) - rotated.y * sin(angle),
+                rotated.x * sin(angle) + rotated.y * cos(angle)
+            );
+            rotated += center;
+            
+            float wave = sin(rotated.x * freq + uTime) * amp +
+                        sin(rotated.x * freq * 0.5 + uTime * 1.5) * amp * 0.5;
+            
+            float y = center.y + wave;
+            float dist = abs(rotated.y - y);
+            float thickness = mix(2.0, 8.0, z / 1000.0);
+            
+            return smoothstep(thickness + 1.0, thickness - 1.0, dist);
+        }
+
+        float getSphere(vec2 pixel, vec4 sphere) {
+            float dist = length(pixel - sphere.xy);
+            
+            // Create a more intense blur based on z-depth
+            float blurAmount = mix(5.0, 50.0, sphere.z / 1000.0);
+            float size = sphere.w;
+            
+            // Approximate Gaussian blur with multiple smoothsteps
+            float blur1 = smoothstep(size + blurAmount, size - blurAmount, dist);
+            float blur2 = smoothstep(size + blurAmount * 0.7, size - blurAmount * 0.7, dist);
+            float blur3 = smoothstep(size + blurAmount * 0.4, size - blurAmount * 0.4, dist);
+            
+            // Combine the blurs with different weights
+            return (blur1 * 0.4 + blur2 * 0.35 + blur3 * 0.25);
+        }
+        float getSphereGlow(vec2 pixel, vec4 sphere) {
+            vec2 pos = vec2(sphere.x, sphere.y);
+            float size = sphere.w * 0.05;  // Reduced size multiplier for tighter glow
+            float z = sphere.z;
+            
+            float dist = length(pixel - pos);
+            float glow = pow(size / dist, 1.5);  // Adjusted power for smoother falloff
+            float depthFactor = 1.0 - (z / 1000.0);
+            
+            return glow * depthFactor * 0.3;  // Reduced intensity multiplier
+        }
+
+        vec3 getVibrantColor(float index) {
+            // Create 6 different vibrant colors
+            float normalizedIndex = mod(index, 6.0);
+            
+            if (normalizedIndex < 1.0) return vec3(1.0, 0.0, 1.0); // Magenta
+            if (normalizedIndex < 2.0) return vec3(0.0, 1.0, 1.0); // Cyan
+            if (normalizedIndex < 3.0) return vec3(1.0, 0.0, 0.0); // Red
+            if (normalizedIndex < 4.0) return vec3(0.0, 1.0, 0.0); // Green
+            if (normalizedIndex < 5.0) return vec3(0.0, 0.0, 1.0); // Blue
+            return vec3(1.0, 0.5, 0.0); // Orange
+        }
+
+        // Add these new functions at the top of the shader
+        float random(vec2 st) {
+            return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+        }
+
+        vec2 hash(vec2 p) {
+            p = vec2(dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)));
+            return -1.0 + 2.0*fract(sin(p)*43758.5453123);
+        }
+
+        float noise(vec2 p) {
+            const float K1 = 0.366025404;
+            const float K2 = 0.211324865;
+            
+            vec2 i = floor(p + (p.x+p.y)*K1);
+            vec2 a = p - i + (i.x+i.y)*K2;
+            vec2 o = (a.x>a.y) ? vec2(1.0,0.0) : vec2(0.0,1.0);
+            vec2 b = a - o + K2;
+            vec2 c = a - 1.0 + 2.0*K2;
+            
+            vec3 h = max(0.5-vec3(dot(a,a), dot(b,b), dot(c,c)), 0.0);
+            vec3 n = h*h*h*h*vec3(dot(a,hash(i+0.0)), dot(b,hash(i+o)), dot(c,hash(i+1.0)));
+            
+            return dot(n, vec3(70.0));
+        }
+
+        float fbm(vec2 p) {
+            float f = 0.0;
+            float w = 0.5;
+            float freq = 1.0;
+            for (int i = 0; i < 5; i++) {
+                f += w * noise(p * freq);
+                freq *= 2.0;
+                w *= 0.5;
+            }
+            return f;
+        }
+
+        vec4 getSkyAndClouds(vec2 pixel) {
+            vec2 uv = pixel.xy / uResolution.xy;
+            
+            // Sky gradient
+            vec3 skyTop = vec3(0.4, 0.6, 1.0);  // Blue
+            vec3 skyBottom = vec3(0.8, 0.9, 1.0);  // Light blue
+            vec3 skyColor = mix(skyBottom, skyTop, uv.y);
+            
+            // Cloud layer
+            float time = uTime * 0.1;
+            vec2 cloudUV = uv * vec2(1.0, 2.0) + vec2(time * 0.1, 0.0);
+            float cloud = fbm(cloudUV * 3.0);
+            cloud = smoothstep(0.0, 0.8, cloud);
+            
+            // Add some variation to cloud color
+            vec3 cloudColor = vec3(1.0);
+            vec3 finalColor = mix(skyColor, cloudColor, cloud * 0.7);
+            
+            return vec4(finalColor, 1.0);
+        }
+
+        vec3 getRainbowColor(float t) {
+            t = fract(t * 4.0);
+            if (t < 0.166) return mix(vec3(1.0, 0.0, 0.2), vec3(1.0, 0.5, 0.0), t * 6.0);  // Brighter red to orange
+            if (t < 0.333) return mix(vec3(1.0, 0.5, 0.0), vec3(1.0, 1.0, 0.0), (t - 0.166) * 6.0);  // Orange to yellow
+            if (t < 0.5) return mix(vec3(1.0, 1.0, 0.0), vec3(0.0, 1.0, 0.2), (t - 0.333) * 6.0);    // Yellow to green
+            if (t < 0.666) return mix(vec3(0.0, 1.0, 0.2), vec3(0.0, 0.5, 1.0), (t - 0.5) * 6.0);    // Green to blue
+            if (t < 0.833) return mix(vec3(0.0, 0.5, 1.0), vec3(0.7, 0.0, 1.0), (t - 0.666) * 6.0);  // Blue to purple
+            return mix(vec3(0.7, 0.0, 1.0), vec3(1.0, 0.0, 0.2), (t - 0.833) * 6.0);                 // Purple to red
+        }
+
+        void main() {
+            vec2 pixel = gl_FragCoord.xy;
+            
+            // Get sky and clouds background
+            vec4 backgroundColor = getSkyAndClouds(pixel);
+            
+            // Create radial gradient from center
+            vec2 normalizedPos = pixel / uResolution;
+            vec2 center = vec2(0.5, 0.5);
+            float radialGradient = distance(normalizedPos, center) * 2.0;
+            
+            float diagonal = abs((normalizedPos.x - normalizedPos.y));
+            float cornerDarkness = smoothstep(0.0, 1.0, diagonal);
+            
+            float gradientValue = mix(radialGradient, cornerDarkness, 0.7);
+            gradientValue = smoothstep(0.0, 1.2, gradientValue);
+            
+            // Create monochromatic color palette
+            vec4 brightColor = vec4(1.0, 1.0, 1.0, 1.0);     // Pure white
+            vec4 darkColor = vec4(0.8, 0.8, 0.8, 1.0);    // Very light gray
+            
+            // Background color
+            vec4 bgColor = mix(darkColor, brightColor, gradientValue);
+            
+            // Process regular spheres
+            float sphereIntensity = 0.0;
+            for(int i = 0; i < 15; i++) {
+                sphereIntensity += getSphere(pixel, uSpheres[i]);
+            }
+
+            
+            // Process waves with white colors
+            vec4 waveColor = vec4(1.0, 1.0, 1.0, 0.0);
+            // rainbow color based on position
+            vec3 rainbow = getRainbowColor(pixel.y / uResolution.y);
+             waveColor.rgb = mix(waveColor.rgb, rainbow, 1.- pixel.x/uResolution.x );
+
+            //float transitionProgress = mod(uTime, 2.0) / 2.0; // 5 second cycle
+
+            //float transitionEdge = transitionProgress * (uResolution.x + 200.0) - 100.0; // Add some padding
+            //float fadeWidth = 400.0; // Width of the transition fade
+            //float fadeProgress = smoothstep(0.0, 1.0, (pixel.x - transitionEdge) / fadeWidth);
+            //fadeProgress = clamp(fadeProgress, 0.0, 1.0);
+            //waveColor.rgb = mix(waveColor.rgb, rainbow, clamp(1.0 - pixel.x/uResolution.x - fadeProgress, 0.0, 1.0));
+            
+            // Larger waves in back
+            float wave = getWaveLine(pixel, 900.0, 45.0, 1.0);
+            waveColor.a += wave * 0.1;
+            
+            wave = getWaveLine(pixel, 800.0, 40.0, 1.2);
+            waveColor.a += wave * 0.15;
+            
+            wave = getWaveLine(pixel, 700.0, 35.0, 1.4);
+            waveColor.a += wave * 0.2;
+            
+            // Medium waves in middle
+            wave = getWaveLine(pixel, 500.0, 30.0, 1.6);
+            waveColor.a += wave * 0.25;
+            
+            wave = getWaveLine(pixel, 400.0, 25.0, 1.8);
+            waveColor.a += wave * 0.3;
+            
+            // Smaller waves in front
+            wave = getWaveLine(pixel, 300.0, 20.0, 2.0);
+            waveColor.a += wave * 0.35;
+            
+            wave = getWaveLine(pixel, 200.0, 15.0, 2.2);
+            waveColor.a += wave * 0.4;
+            
+            wave = getWaveLine(pixel, 100.0, 10.0, 2.4);
+            waveColor.a += wave * 0.45;
+
+            // Add audio waves
+            float waveIntensity = 0.0;
+            vec3 audioWaveColor = vec3(0.0);
+            for(float i = 0.0; i < 20.0; i++) {
+                float z = 200.0 + i * 10.0;
+                float freq = 0.003 - (i * 0.00005);
+                float amp = 80.0 - (i * 5.0);
+                float wave = getAudioWave(pixel, z, freq, amp) * 0.15;
+                
+                // Get rainbow color based on index
+                vec3 waveColor = getRainbowColor(i / 20.0);
+                
+                waveIntensity += wave;
+                audioWaveColor += wave * waveColor;
+            }
+            
+            // Modify the final color blending
+            vec4 finalColor = backgroundColor;
+            
+            // Add spheres with increased contrast
+            finalColor = mix(finalColor, brightColor, sphereIntensity * 0.7);
+            
+            // Add waves with slightly increased opacity
+            finalColor = mix(finalColor, waveColor, waveColor.a * 0.4);
+            
+            // Modify the audio wave blending
+            finalColor = mix(finalColor, vec4(audioWaveColor, 0.9), waveIntensity * 0.5);
+            
+            // Handle glowing spheres with vibrant colors
+            vec3 totalGlow = vec3(0.0);
+            float sphereGlow = 0.0;
+            for(int i = 0; i < 45; i++) {  // Process all possible glowing spheres
+                vec4 sphere = uGlowingSpheres[i];
+                // Only process if the sphere is active (not at -1000,-1000)
+                if (sphere.x > -999.0) {  // Check if it's an active particle
+                    float glow = getSphereGlow(pixel, sphere);
+                    sphereGlow = max(sphereGlow, glow);
+                    vec3 vibrantColor = getVibrantColor(float(i));
+                    totalGlow += glow * vibrantColor * 1.5;  // Increased intensity for better visibility
+                }
+            }
+            
+            // Add glowing spheres on top
+            finalColor = mix(finalColor, brightColor, sphereGlow * 0.6);
+            finalColor = vec4(finalColor.rgb + totalGlow, 1.0);
+            
+            gl_FragColor = finalColor;
+        }
+    </script>
+
+    <!-- Application Scripts -->
+    <script src="/templates/TandyClouds/main.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            // Add font loading check
+            document.fonts.ready.then(() => {
+                const tl = gsap.timeline();
+                const particlesContainer = document.querySelector('.particles-container');
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                function createParticleBurst() {
+                    const particleCount = 16;
+                    const images = [
+                        '/templates/TandyClouds/assets/icons/join.ICO',
+                        '/templates/TandyClouds/assets/icons/join.ICO',
+                        '/templates/TandyClouds/assets/icons/PCoTandyLogo.ico',
+                        '/templates/TandyClouds/assets/icons/pcotandylogo3.ico',
+                    ];
+                    const colors = [
+                        '#9575CD', // Light purple
+                    ];
+                    
+                    const title = document.querySelector('h1');
+                    const titleRect = title.getBoundingClientRect();
+                    const centerX = titleRect.left + (titleRect.width / 2);
+                    const centerY = titleRect.top + (titleRect.height / 2);
+                    
+                    // Get container bounds for clamping
+                    const container = document.querySelector('.particles-container');
+                    const containerRect = container.getBoundingClientRect();
+                    
+                    for (let i = 0; i < particleCount; i++) {
+                        const particle = document.createElement('img');
+                        particle.className = 'particle';
+                        particle.src = images[Math.floor(Math.random() * images.length)];
+                        const color = colors[Math.floor(Math.random() * colors.length)];
+                        particle.style.filter = `drop-shadow(0 0 8px ${color})`;
+                        particlesContainer.appendChild(particle);
+                        
+                        const startAngle = (i / particleCount) * Math.PI * 2;
+                        const startRadius = gsap.utils.random(0, 0); // Initial radius around text
+                        const endRadius = gsap.utils.random(100, 200);  // Final radius
+                        const size = gsap.utils.random(35, 50);
+                        
+                        // Calculate starting position on the radius
+                        const startX = centerX + Math.cos(startAngle) * startRadius;
+                        const startY = centerY + Math.sin(startAngle) * startRadius;
+                        
+                        // Clamp the end positions to stay within container bounds
+                        const clampX = (x) => Math.min(Math.max(x, containerRect.left), containerRect.right - size);
+                        const clampY = (y) => Math.min(Math.max(y, containerRect.top), containerRect.bottom - size);
+                        
+                        const endX = clampX(centerX + Math.cos(startAngle) * endRadius);
+                        const endY = clampY(centerY + Math.sin(startAngle) * endRadius);
+                        
+                        gsap.set(particle, {
+                            width: size,
+                            height: size,
+                            x: startX,
+                            y: startY,
+                            opacity: 1,
+                            scale: 0
+                        });
+                        
+                        gsap.to(particle, {
+                            duration: gsap.utils.random(1.5, 2.5), // Slightly reduced max duration
+                            x: endX,
+                            y: endY,
+                            rotation: gsap.utils.random(-180, 180),
+                            opacity: 0,
+                            scale: gsap.utils.random(0.8, 2),  // Slightly reduced max scale
+                            ease: 'power2.out',
+                            onComplete: () => particle.remove()
+                        });
+                    }
+                }
+                
+                // Update animation timeline
+                tl.set(['.title-tandy', '.title-linx'], { 
+                    opacity: 0
+                })
+                .set('.title-linx', {
+                    visibility: 'visible'
+                })
+                .set('.title-tandy', { 
+                    x: window.innerWidth < 768 ? 0 : '1.5em',
+                    y: '-0.2em'
+                })
+                .to('.title-tandy', {
+                    opacity: 1,
+                    duration: 0.8,
+                    x: 0,
+                    ease: "power2.out",
+                    clearProps: "x"
+                })
+                .to('.title-linx', {
+                    duration: 1.2,
+                    y: 0,
+                    opacity: 1,
+                    ease: "elastic.out(0.5, 0.3)",
+                    transformOrigin: "center bottom"
+                }, "=0")
+                .to('.title-tandy', {
+                    duration: 1.5,
+                    y: 0,
+                    ease: "elastic.out(1.9, 0.45)",
+                    transformOrigin: "center bottom",
+                    onStart: createParticleBurst
+                }, "<+=0.125")
+                .to('.bubble-link', {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.6,
+                    stagger: 0.1,
+                    ease: "power2.out"
+                }, "-=0.2");
+            });
+        });
+
+        // Add index to each link for staggered animations
+        document.querySelectorAll('.bubble-link').forEach((link, index) => {
+            link.style.setProperty('--link-index', index);
+        });
+
+        // Optional: Pause animations on reduced motion preference
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.querySelectorAll('.bubble-link').forEach(link => {
+                link.style.animation = 'none';
+            });
+        }
+    </script>
+
+    <!-- Just load Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</body>
+</html>

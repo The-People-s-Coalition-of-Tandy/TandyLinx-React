@@ -5,7 +5,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import EditLink from '../../components/Editor/EditLink/EditLink';
 import Preview from '../../components/Preview/Preview';
-import MobilePreview from '../../components/Preview/MobilePreview';
 import TemplateBrowser from '../../components/TemplateBrowser/TemplateBrowser';
 import EditorHeader from '../../components/Editor/EditorHeader/EditorHeader';
 import './Editor.css';
@@ -205,7 +204,7 @@ const Editor = () => {
                 />
             </div>
 
-            <Preview pageTitle={pageTitle} links={currentPageLinks} style={currentTemplate} />
+            <Preview pageURL={pageURL} />
 
             <AeroButton onClick={() => setShowPreview(true)} className="preview-button" color="green">
                 Preview
@@ -213,7 +212,12 @@ const Editor = () => {
 
             <div className={`preview-modal ${showPreview ? 'open' : ''}`}>
                 <button className="close-preview" onClick={() => setShowPreview(false)}>×</button>
-                <MobilePreview pageTitle={pageTitle} links={currentPageLinks} style={currentTemplate} />
+                <Preview 
+                    pageTitle={pageTitle} 
+                    links={currentPageLinks} 
+                    style={currentTemplate}
+                    pageURL={pageURL} 
+                />
             </div>
         </div>
     );

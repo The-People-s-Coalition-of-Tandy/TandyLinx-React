@@ -25,6 +25,7 @@
 .modal-content::before {
     content: '';
     position: absolute;
+    pointer-events: none;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
@@ -127,4 +128,10 @@
 .save-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.url-error {
+    color: #ff0000;
+    font-size: 0.85em;
+    margin-top: 4px;
 } 

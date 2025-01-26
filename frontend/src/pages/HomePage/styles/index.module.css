@@ -11,7 +11,7 @@ body {
     width: 100%;
     overflow: hidden;
     font-family: 'Inter', sans-serif;
-    color: white;
+    color: black;
     letter-spacing: 0.05em;
 }
 
@@ -51,7 +51,7 @@ canvas {
     text-transform: uppercase;
     letter-spacing: 0.15em;
     opacity: 0.95;
-    text-shadow: 0 0 20px rgba(255, 192, 235, 0.5);
+    /* text-shadow: 0 0 20px rgba(255, 192, 235, 0.5); */
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -101,7 +101,7 @@ canvas {
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: white;
+    color: rgb(0, 0, 0);
     backdrop-filter: blur(10px);
     transition: all 0.4s ease;
     will-change: transform;

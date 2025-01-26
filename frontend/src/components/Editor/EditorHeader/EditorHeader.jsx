@@ -1,11 +1,9 @@
-import { useState } from 'react';
+import React from 'react';
 import ProfilePhotoUpload from '../ProfilePhotoUpload/ProfilePhotoUpload';
 import PageSettingsModal from '../PageSettingsModal/PageSettingsModal';
-import { faCog, faPaintBrush } from '@fortawesome/free-solid-svg-icons';
+import { faPaintBrush } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './EditorHeader.css';
-import { useNavigate } from 'react-router-dom';
-import AeroButton from '../../common/AeroButton/AeroButton';
 
 const EditorHeader = ({ 
     currentPageURL, 
@@ -18,7 +16,7 @@ const EditorHeader = ({
     onShowSettings,
     children
 }) => {
-    const navigate = useNavigate();
+    
 
     return (
         <>

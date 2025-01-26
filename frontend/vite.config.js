@@ -9,12 +9,13 @@ export default defineConfig({
     emptyOutDir: true
   },
   server: {
+    port: 5173,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
-        withCredentials: true
+        ws: true
       },
       '/uploads': {
         target: 'http://localhost:3000',

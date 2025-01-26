@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { templates } from '../../templates/registry';
 import styles from './TemplateBrowser.module.css';
 import Preview from '../Preview/Preview';
 
@@ -9,7 +8,9 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
   const [previewTemplate, setPreviewTemplate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingStatus, setLoadingStatus] = useState('Connecting to Template Service...');
-
+  const [templates, setTemplates] = useState({});
+  const [hasCompletedAnimation, setHasCompletedAnimation] = useState(false);
+  
   const handleOverlayClick = (e) => {
     if (e.target.className === styles.browserOverlay) {
       onClose();
@@ -17,7 +18,22 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
   };
 
   useEffect(() => {
-    // Simulate dial-up connection
+    const fetchTemplates = async () => {
+      try {
+        const response = await axios.get('/api/templates');
+        if (response.data) {
+          setTemplates(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch templates:', error);
+        setHasCompletedAnimation(true);
+      }
+    };
+
+    fetchTemplates();
+  }, []);
+
+  useEffect(() => {
     const statusMessages = [
       'Dialing template service...',
       'Connecting to remote server...',
@@ -34,7 +50,10 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
       
       if (currentMessage >= statusMessages.length) {
         clearInterval(interval);
-        setTimeout(() => setIsLoading(false), 1000);
+        setTimeout(() => {
+          setHasCompletedAnimation(true);
+          setIsLoading(false);
+        }, 1000);
       }
     }, 1300);
 
@@ -62,7 +81,7 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <h2>Choose a Template</h2>
         
-        {isLoading ? (
+        {isLoading && !hasCompletedAnimation ? (
           <div className={styles.loadingOverlay}>
             <div className={styles.loadingText}>{loadingStatus}</div>
             <div className={styles.dialupSound}>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import EditIcon from '../../common/EditIcon/EditIcon';
 import './ProfilePhotoUpload.css';
+import { useProfilePhoto } from '../../../context/ProfilePhotoContext';
 
 const DEFAULT_PROFILE_PHOTO = './assets/images/default-profile.png'; // Replace with your actual default photo URL
 
@@ -13,7 +14,7 @@ const SUPPORTED_FILE_TYPES = [
 ];
 
 const ProfilePhotoUpload = () => {
-  const [currentPhotoUrl, setCurrentPhotoUrl] = useState(null);
+  const { currentPhotoUrl, setCurrentPhotoUrl } = useProfilePhoto();
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
 

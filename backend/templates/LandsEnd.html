@@ -2,28 +2,24 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="./templates/LandsEnd/flashlight.css">
+    <link rel="stylesheet" href="/templates/LandsEnd/flashlight.css">
     <title>{{ pageTitle }}</title>
-    <link rel="icon" href="./assets/images/PCoTandyLogo.ico">
+    <link rel="icon" href="/templates/shared/images/PCoTandyLogo.ico">
     
 </head>
 
 <body>
     <video autoplay muted loop id="myVideo">
-        <source src="./templates/LandsEnd/shortlandsend.mp4" type="video/mp4">
+        <source src="/templates/LandsEnd/shortlandsend.mp4" type="video/mp4">
     </video>
     <main id="main">
 
-        <img src="./assets/images/TandyLogoSpiro.png" alt="People's Coalition of Tandy Logo"
+        <img src="/templates/shared/TandyLogoSpiro.png" alt="People's Coalition of Tandy Logo"
             class="pcot-logo"><br>
         <header>
             <p>
                 Welcome to
                     <span class="release-name">{{ pageTitle }}</span>
-                <!-- <br><br>
-                a new song by
-                <b><a style="color: white; text-underline-offset: 3px;" href="https://kotc.life/">
-                        Ko T.C.</a></b> -->
                 <br>
             </p>
         </header>
@@ -33,10 +29,10 @@
             {% endfor %}
         </div>
         <footer>
-            <img src="./assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
-            <a href="https://www.pcotandy.org"> <img class="tandyLinx" src="./assets/images/tandyLinx1.png"
+            <img src="/templates/shared/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+            <a href="https://www.pcotandy.org"> <img class="tandyLinx" src="/templates/shared/tandyLinx1.png"
                     alt="Tandy Linx logo"></a>
-            <img src="./assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+            <img src="/templates/shared/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
         </footer>
         <div class="cover"></div>
     </main>
