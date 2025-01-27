@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './TemplateBrowser.module.css';
 import Preview from '../Preview/Preview';
+import TemplateGrid from '../TemplateGrid/TemplateGrid';
 
 const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose, pageURL }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(currentTemplate);
@@ -81,58 +82,17 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <h2>Choose a Template</h2>
         
-        {isLoading && !hasCompletedAnimation ? (
-          <div className={styles.loadingOverlay}>
-            <div className={styles.loadingText}>{loadingStatus}</div>
-            <div className={styles.dialupSound}>
-              <div className={styles.dialupBar} />
-              <div className={styles.dialupStatus}>
-                {Math.floor(Math.random() * 5.2 + 2.8).toFixed(1)}kb/s
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.templateGrid}>
-            {Object.entries(templates).map(([key, template]) => (
-              <div 
-                key={key}
-                className={`${styles.templateCard} ${selectedTemplate === key ? styles.selected : ''}`}
-                onClick={() => setSelectedTemplate(key)}
-              >
-                <div className={styles.thumbnailWrapper}>
-                  <img 
-                    src={template.thumbnail} 
-                    alt={`${template.name} template preview`} 
-                    className={styles.thumbnail}
-                  />
-                </div>
-                <div className={styles.templateInfo}>
-                  <h3>{template.name}</h3>
-                  <div className={styles.buttonGroup}>
-                    <button 
-                      className={styles.previewButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPreviewTemplate(key);
-                      }}
-                    >
-                      Preview
-                    </button>
-                    <button 
-                      className={styles.selectButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelect(key);
-                      }}
-                    >
-                      {currentTemplate === key ? 'Current Template' : 'Select'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <TemplateGrid
+          isLoading={isLoading}
+          hasCompletedAnimation={hasCompletedAnimation}
+          loadingStatus={loadingStatus}
+          templates={templates}
+          selectedTemplate={selectedTemplate}
+          onTemplateSelect={setSelectedTemplate}
+          onPreviewClick={setPreviewTemplate}
+          onSelectClick={handleSelect}
+          selectButtonText={(key) => currentTemplate === key ? 'Current Template' : 'Select'}
+        />
       </div>
 
       {previewTemplate && (

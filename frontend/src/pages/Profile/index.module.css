@@ -259,6 +259,24 @@
   background: var(--card-background, rgba(255, 255, 255, 0.1));
   border-radius: 12px;
   margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.emptyState h2 {
+  margin: 0;
+  color: white;
+}
+
+.emptyState p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.emptyState button {
+  margin-top: 1rem;
 }
 
 @media (max-width: 768px) {
@@ -337,7 +355,7 @@
     left: -16px;
 }
 
-.pageCard > div:first-child::after {
+/* .pageCard > div:first-child::after {
   content: '';
   position: absolute;
   bottom: 10px;
@@ -357,7 +375,7 @@
     inset 2px 2px 4px rgba(255,255,255,0.3),
     0 0 10px rgba(77, 255, 74, 0.4);
   z-index: 1;
-}
+} */
 
 .signOutButton {
     background-color: rgba(255, 255, 255, 0.1);
@@ -392,4 +410,56 @@
         width: 100%;
         gap: 0.5rem;
     }
+}
+
+.emptyStateContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+
+.emptyStateContent::before {
+    content: '+';
+    position: absolute;
+    top: -2rem;
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.2);
+    font-weight: 300;
+}
+
+.emptyStateContent .pageTitle {
+    font-size: 1.5rem;
+    margin: 0;
+    color: white;
+    text-align: center;
+}
+
+.emptyStateContent .pageURL {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.emptyStateContent::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    background-image: url(/assets/images/orb5.png);
+    filter: brightness(1) hue-rotate(45deg);
+    background-size: cover;
+    transform: scale(1);
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+}
+
+.emptyStateContent:hover::after {
+    opacity: 1;
+    transform: scale(1.1);
+    transition: opacity 0.4s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.475);
 }

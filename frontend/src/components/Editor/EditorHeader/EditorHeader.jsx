@@ -24,7 +24,7 @@ const EditorHeader = ({
             <div className="editor-header">
                 <div className="editor-header-top">
                     <div className="header-left">
-                        <ProfilePhotoUpload />
+                        <ProfilePhotoUpload pageUrl={currentPageURL} />
                     </div>
                     <div className="header-right">
                         <div className='pageNames'>

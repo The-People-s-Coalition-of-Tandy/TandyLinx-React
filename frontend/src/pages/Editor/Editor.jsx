@@ -10,6 +10,7 @@ import EditorHeader from '../../components/Editor/EditorHeader/EditorHeader';
 import './Editor.css';
 import AeroButton from '../../components/common/AeroButton/AeroButton';
 import DeleteConfirmModal from '../../components/Editor/DeleteConfirmModal/DeleteConfirmModal';
+import { useProfilePhoto } from '../../context/ProfilePhotoContext';
 
 const Editor = () => {
     const { 
@@ -18,6 +19,7 @@ const Editor = () => {
         getLinksFromPage,
         savePageChangesImmediate 
     } = useContext(LinkContext);
+    const { setCurrentPagePhotoUrl } = useProfilePhoto();
     const [isLoading, setIsLoading] = useState(true);
     const [pageTitle, setPageTitle] = useState('');
     const [currentTemplate, setCurrentTemplate] = useState('TandyLinx');
@@ -27,6 +29,14 @@ const Editor = () => {
     const navigate = useNavigate();
     const [deleteModalState, setDeleteModalState] = useState({ isOpen: false, linkIndex: null });
     const [showSettings, setShowSettings] = useState(false);
+
+    const themeChangeEvent = new CustomEvent('themeChange', {
+        detail: { theme: 'plain' }
+    });
+
+    useEffect(() => {
+        window.dispatchEvent(themeChangeEvent);
+    }, []);
 
     useEffect(() => {
         const fetchPageData = async () => {
@@ -38,10 +48,12 @@ const Editor = () => {
                 const links = response.data?.links ? JSON.parse(response.data.links) : [];
                 const title = response.data?.pageTitle || '';
                 const style = response.data?.style || 'TandyLinx';
+                const photoUrl = response.data?.pagePhotoUrl;
                 
                 setCurrentPageLinks(links);
                 setPageTitle(title);
                 setCurrentTemplate(style);
+                setCurrentPagePhotoUrl(photoUrl);
                 setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching page data:', error);
@@ -51,7 +63,7 @@ const Editor = () => {
         };
 
         fetchPageData();
-    }, [pageURL, setCurrentPageLinks]);
+    }, [pageURL, setCurrentPageLinks, setCurrentPagePhotoUrl]);
 
     useEffect(() => {
         const editor = document.querySelector('.editor');
@@ -61,20 +73,6 @@ const Editor = () => {
             editor?.classList.remove('no-scroll');
         }
     }, [deleteModalState.isOpen, showSettings]);
-
-    const handleTemplateChange = async (e) => {
-        const newTemplate = e.target.value;
-        setCurrentTemplate(newTemplate);
-        try {
-            await axios.put(`/api/pages/${pageURL}`, 
-                { style: newTemplate },
-                { withCredentials: true }
-            );
-        } catch (error) {
-            console.error('Failed to update template:', error);
-            setCurrentTemplate(currentTemplate);
-        }
-    };
 
     const onDragEnd = async (result) => {
         if (!result.destination) return;
@@ -169,7 +167,6 @@ const Editor = () => {
                     onTitleChange={setPageTitle}
                     onURLChange={handleURLChange}
                     currentTemplate={currentTemplate}
-                    onTemplateChange={handleTemplateChange}
                     onBrowseTemplates={() => setShowTemplateBrowser(true)}
                     showSettings={showSettings}
                     onShowSettings={handleShowSettings}
@@ -204,7 +201,7 @@ const Editor = () => {
                 />
             </div>
 
-            <Preview pageURL={pageURL} />
+            <Preview pageURL={pageURL} style={currentTemplate} pageTitle={pageTitle} />
 
             <AeroButton onClick={() => setShowPreview(true)} className="preview-button" color="green">
                 Preview

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import EditIcon from '../../common/EditIcon/EditIcon';
 import './ProfilePhotoUpload.css';
@@ -13,25 +13,38 @@ const SUPPORTED_FILE_TYPES = [
   'image/gif'
 ];
 
-const ProfilePhotoUpload = () => {
-  const { currentPhotoUrl, setCurrentPhotoUrl } = useProfilePhoto();
+const ProfilePhotoUpload = ({ pageUrl }) => {
+  const { currentPhotoUrl, setCurrentPhotoUrl, setCurrentPagePhotoUrl } = useProfilePhoto();
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    fetchCurrentPhoto();
-  }, []);
-
-  const fetchCurrentPhoto = async () => {
+  const fetchCurrentPhoto = useCallback(async () => {
+    console.log('Fetching photo for pageUrl:', pageUrl);
+    if (isUploading) return;
+    
     try {
-      const response = await axios.get('/api/profile-photo', {
+      const response = await axios.get(`/api/pages/${pageUrl}/photo`, {
         withCredentials: true
       });
-      setCurrentPhotoUrl(response.data.photoUrl);
+      if (response.data.photoUrl) {
+        console.log('Setting currentPhotoUrl to:', response.data.photoUrl);
+        setCurrentPhotoUrl(response.data.photoUrl);
+      }
     } catch (error) {
-      console.error('Error fetching profile photo:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching profile photo:', error);
+      }
     }
-  };
+  }, [pageUrl, isUploading, setCurrentPhotoUrl]);
+
+  useEffect(() => {
+    if (pageUrl) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Fetching photo due to pageUrl change:', pageUrl);
+      }
+      fetchCurrentPhoto();
+    }
+  }, [pageUrl, fetchCurrentPhoto]);
 
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
@@ -47,14 +60,18 @@ const ProfilePhotoUpload = () => {
     
     setIsUploading(true);
     try {
-      const response = await axios.post('/api/upload-profile-photo', formData, {
+      const response = await axios.post(`/api/pages/${pageUrl}/photo`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
       
-      setCurrentPhotoUrl(response.data.photoUrl);
+      if (response.data.photoUrl) {
+        // Update both photo URLs to trigger Preview refresh
+        setCurrentPhotoUrl(response.data.photoUrl);
+        setCurrentPagePhotoUrl(response.data.photoUrl);
+      }
     } catch (error) {
       console.error('Error uploading photo:', error);
       const errorMessage = error.response?.data?.message || 'Failed to upload photo. Please try again.';
@@ -72,11 +89,17 @@ const ProfilePhotoUpload = () => {
     <div className="profile-photo-upload">
       <div className="photo-preview">
         <div className="photo-content" onClick={handlePhotoClick}>
-          {currentPhotoUrl ? (
-            <img src={currentPhotoUrl} alt="Profile" />
-          ) : (
-            <img src={DEFAULT_PROFILE_PHOTO} alt="Default Profile" />
-          )}
+          <img 
+            src={currentPhotoUrl || '/assets/images/default-profile.png'} 
+            alt="Profile" 
+            onError={(e) => {
+              e.target.onError = null;
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Error loading profile image, falling back to default');
+              }
+              e.target.src = '/assets/images/default-profile.png';
+            }}
+          />
         </div>
         <label htmlFor="photo-upload" className="edit-overlay">
           <EditIcon />

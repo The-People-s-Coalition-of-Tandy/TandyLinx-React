@@ -4,11 +4,20 @@ import { LinkContext } from '../../context/LinkContext';
 import styles from './index.module.css';
 import AeroButton from '../../components/common/AeroButton/AeroButton';
 import { useAuth } from '../../context/AuthContext';
+import { useEffect } from 'react';
 
 const Profile = () => {
     const { userPages, setCurrentPageLinks, getLinksFromPage, setUserPages } = useContext(LinkContext);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+
+    const themeChangeEvent = new CustomEvent('themeChange', {
+        detail: { theme: 'sunset' }
+    });
+
+    useEffect(() => {
+        window.dispatchEvent(themeChangeEvent);
+    }, []);
 
     const handlePageClick = async (pageURL) => {
         const links = await getLinksFromPage(pageURL);
@@ -88,9 +97,20 @@ const Profile = () => {
                     {userPages.length > 0 ? (
                         userPages.map(renderPageCard)
                     ) : (
-                        <div className={styles.emptyState}>
-                            <h2>No pages yet</h2>
-                            <p>Create your first page to get started!</p>
+                        <div className={styles.pageCardWrapper}>
+                            <div className={styles.pageCard}>
+                                <div className={styles.emptyStateContent}>
+                                    <h2 className={styles.pageTitle}>Create Your First Page</h2>
+                                    <div className={styles.pageURL}>
+                                        linx.pcotandy.org/your-page
+                                    </div>
+                                    <div className={styles.cardActions}>
+                                        <AeroButton color="blue" onClick={() => navigate('/browser')}>
+                                            + Create New Page
+                                        </AeroButton>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

@@ -1,22 +1,24 @@
-import React, { useEffect, useRef, useContext } from 'react';
+import React, { useEffect, useRef, useContext, useState } from 'react';
 import { LinkContext } from '../../context/LinkContext';
 import { useProfilePhoto } from '../../context/ProfilePhotoContext';
 import './Preview.css';
 
-const Preview = ({ pageURL, style, isFullPreview }) => {
-    const iframeRef = useRef(null);
+const Preview = ({ pageURL, pageTitle, style, isFullPreview }) => {
     const { currentPageLinks } = useContext(LinkContext);
-    const { currentPhotoUrl } = useProfilePhoto();
+    const { currentPagePhotoUrl } = useProfilePhoto();
+    const keyCounter = useRef(0);
+    const [isLoading, setIsLoading] = useState(true);
     
-    // Force refresh when style changes
     useEffect(() => {
-        console.log('style changed', style);
-        if (iframeRef.current) {
-            const timestamp = new Date().getTime(); // Add timestamp to force refresh
-            iframeRef.current.src = `/${pageURL}?t=${timestamp}`;
-        }
-    }, [pageURL, currentPageLinks, currentPhotoUrl, style, isFullPreview]);
-
+        keyCounter.current += 1;
+        setIsLoading(true);
+    }, [pageURL, pageTitle, style, isFullPreview, currentPageLinks, currentPagePhotoUrl]);
+    
+    const handleLoad = (e) => {
+        setIsLoading(false);
+        e.target.classList.add('loaded');
+    };
+    
     return (
         <div className="preview-container">
             <div className="preview-header"></div>
@@ -24,11 +26,15 @@ const Preview = ({ pageURL, style, isFullPreview }) => {
                 <div className="preview-frame-container">
                     <div className="preview-frame">
                         <div className="preview-scale-container">
+                            <div className={`preview-loader ${isLoading ? 'visible' : ''}`}>
+                                <div className="loader-spinner" />
+                            </div>
                             <iframe 
-                                ref={iframeRef}
+                                key={keyCounter.current}
                                 src={`/${pageURL}`}
                                 title="Preview"
                                 className="preview-iframe"
+                                onLoad={handleLoad}
                             />
                         </div>
                     </div>

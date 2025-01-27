@@ -8,6 +8,7 @@ const Registration = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +31,10 @@ const Registration = () => {
       }
 
       if (data.success) {
-        navigate('/login');
+        // Force a check of authentication status
+        await checkAuth(true);
+        // Redirect to profile page
+        navigate('/profile');
       } else {
         setError(data.error || 'Registration failed');
       }

@@ -3,17 +3,26 @@ import axios from 'axios';
 import { PageSettingsModal } from './PageSettingsModal';
 import Preview from '../../components/Preview/Preview';
 import styles from './index.module.css';
+import TemplateGrid from '../../components/TemplateGrid/TemplateGrid';
+import { useNavigate } from 'react-router-dom';
+
 const Browser = () => {
     const [previewTemplate, setPreviewTemplate] = useState(null);
-    const [pageTitle, setPageTitle] = useState('');
-    const [pageURL, setPageURL] = useState('');
-    const [links, setLinks] = useState([]);
     const [templates, setTemplates] = useState({});
     const [showPageSettingsModal, setShowPageSettingsModal] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [loadingStatus, setLoadingStatus] = useState('Connecting to Template Service...');
     const [hasCompletedAnimation, setHasCompletedAnimation] = useState(false);
+    const navigate = useNavigate();
+
+    const themeChangeEvent = new CustomEvent('themeChange', {
+      detail: { theme: 'midnight' }
+    });
+
+    useEffect(() => {
+        window.dispatchEvent(themeChangeEvent);
+    }, []);
 
     useEffect(() => {
         const fetchTemplates = async () => {
@@ -22,6 +31,7 @@ const Browser = () => {
         };
         fetchTemplates();
     }, []);
+
   useEffect(() => {
     const statusMessages = [
       'Dialing template service...',
@@ -56,11 +66,12 @@ const Browser = () => {
     };
 
     const handleOverlayClick = () => {
-        setShowPageSettingsModal(true);
+      navigate(-1);
     };
 
     const onClose = () => {
         setShowPageSettingsModal(false);
+        setSelectedTemplate(null);
     };
 
     const onSave = () => {
@@ -71,106 +82,55 @@ const Browser = () => {
     return (
         <>
          <div className={styles.browserOverlay} onClick={handleOverlayClick}>
-      <div className={styles.browserContent}>
+      <div className={styles.browserContent} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <h2>Choose a Template</h2>
         
-        {isLoading && !hasCompletedAnimation ? (
-          <div className={styles.loadingOverlay}>
-            <div className={styles.loadingText}>{loadingStatus}</div>
-            <div className={styles.dialupSound}>
-              <div className={styles.dialupBar} />
-              <div className={styles.dialupStatus}>
-                {Math.floor(Math.random() * 5.2 + 2.8).toFixed(1)}kb/s
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.templateGrid}>
-            {Object.entries(templates).map(([key, template]) => (
-              <div 
-                key={key}
-                className={`${styles.templateCard} ${selectedTemplate === key ? styles.selected : ''}`}
-                onClick={() => setSelectedTemplate(key)}
-              >
-                <div className={styles.thumbnailWrapper}>
-                  <img 
-                    src={template.thumbnail} 
-                    alt={`${template.name} template preview`} 
-                    className={styles.thumbnail}
-                  />
-                </div>
-                <div className={styles.templateInfo}>
-                  <h3>{template.name}</h3>
-                  <div className={styles.buttonGroup}>
-                    <button 
-                      className={styles.previewButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPreviewTemplate(key);
-                      }}
-                    >
-                      Preview
-                    </button>
-                    <button 
-                      className={styles.selectButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelect(key);
-                      }}
-                    >
-                      'Select'
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <TemplateGrid
+          isLoading={isLoading}
+          hasCompletedAnimation={hasCompletedAnimation}
+          loadingStatus={loadingStatus}
+          templates={templates}
+          selectedTemplate={selectedTemplate}
+          onTemplateSelect={setSelectedTemplate}
+          onPreviewClick={setPreviewTemplate}
+          onSelectClick={handleTemplateSelect}
+        />
       </div>
 
       {previewTemplate && (
-        <div className={styles.previewModal}>
+        <div 
+          className={styles.previewModal} 
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              e.stopPropagation();
+              setPreviewTemplate(null);
+            }
+          }}
+        >
           <button 
             className={styles.closePreviewButton} 
-            onClick={() => setPreviewTemplate(null)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreviewTemplate(null);
+            }}
           >
             ×
           </button>
           <Preview 
-            pageTitle={pageTitle}
-            links={links}
+            pageURL={`preview/${previewTemplate}`}
             style={previewTemplate}
             isFullPreview={true}
           />
         </div>
       )}
     </div>
-            {showPageSettingsModal && <PageSettingsModal template={templates[selectedTemplate]} />}
-            <div>
-                {Object.entries(templates).map(([key, template]) => (
-                    <div
-        key={key}
-      >
-        <img 
-          src={template.thumbnail} 
-          alt={template.name} 
-        />
-        <div>
-          <h3>{template.name}</h3>
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleTemplateSelect(key);
-            }}
-          >
-            Use This Template
-          </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {showPageSettingsModal && (
+                <PageSettingsModal 
+                    template={templates[selectedTemplate]} 
+                    onClose={onClose}
+                />
+            )}
         </>
     );
 };

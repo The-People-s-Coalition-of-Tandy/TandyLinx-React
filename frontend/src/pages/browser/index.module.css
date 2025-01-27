@@ -226,4 +226,71 @@
     90% { width: 85%; }
     95% { width: 95%; }
     100% { width: 100%; }
+  }
+  
+  .pageSettingsModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #c0c0c0;
+    border: 2px outset #808080;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    z-index: 2002;
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+  }
+  
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .modalTitle {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .modalInput {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 4px;
+    border: 2px inset #808080;
+    background: white;
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+  }
+  
+  .modalButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  
+  .modalButton {
+    padding: 4px 12px;
+    border: 2px outset #808080;
+    background: #c0c0c0;
+    font-family: 'MS Sans Serif', Arial, sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  
+  .modalButton:active {
+    border-style: inset;
+    padding: 5px 11px 3px 13px;
+  }
+  
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2001;
   } 

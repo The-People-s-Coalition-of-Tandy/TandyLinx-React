@@ -5,10 +5,10 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="./templates/Embroidery/style.css">
-    <link rel="icon" type="image/x-icon"  href="./templates/Embroidery/assets/cover.png">
+    <link rel="stylesheet" href="/templates/Embroidery/style.css">
+    <link rel="icon" type="image/x-icon"  href="/templates/Embroidery/assets/cover.png">
     <title>{{ pageTitle }}</title>
-    <script src="./templates/Embroidery/p5.min.js"></script>
+    <script src="/templates/Embroidery/p5.min.js"></script>
 
 </head>
 
@@ -18,10 +18,10 @@
         <!-- <img src="../Assets/TandyIconSpiro200x200.png" alt="People's Coalition of Tandy Logo"
             class="pcot-logo"><br> -->
             <div class="links" id="album_cover">
-                <img src="./templates/Embroidery/assets/cover-min.png" alt="Album Cover" id="album_cover_img"></div>
+                <img src="{{profilePhotoUrl}}" alt="Album Cover" id="album_cover_img"></div>
         
 
-        <header id="welcome_to">Welcome to the <br> <a href="https://youtu.be/2zfUIc63BZo">{{pageTitle}}</a><br> Tandy Link Tree</header>
+        <header id="welcome_to">Welcome to the <br> {{pageTitle}}<br> Tandy Link Tree</header>
 
         <div class="links" id="links_container">
             {% for link in links %}
@@ -32,17 +32,17 @@
         <footer>
             <section>
                 <center>
-                <img class="explosion" src="./assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
-                <a href="https://tandylinx.pcotandy.org/" target="_blank"> <img class="tandyLinx" src="./assets/images/tandyLinx1.png"
+                <img class="explosion" src="/assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+                <a href="https://tandylinx.pcotandy.org/" target="_blank"> <img class="tandyLinx" src="/assets/images/tandyLinx1.png"
                         alt="Tandy Linx logo"></a>
-                <img class="explosion" src="./assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
+                <img class="explosion" src="/assets/images/elieExplosionIcon.gif" alt="Gif of pixel fireworks">
                </center>
             </section>
         </footer>
     </main>
     
-    <script src="./templates/Embroidery/sketch.js"></script>
-    <script src="./templates/Embroidery/wheat.js"></script>
+    <script src="/templates/Embroidery/sketch.js"></script>
+    <script src="/templates/Embroidery/wheat.js"></script>
     <div id="spacer"></div>
     
 </body>

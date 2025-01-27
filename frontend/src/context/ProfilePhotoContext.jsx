@@ -4,9 +4,15 @@ const ProfilePhotoContext = createContext();
 
 export const ProfilePhotoProvider = ({ children }) => {
     const [currentPhotoUrl, setCurrentPhotoUrl] = useState(null);
+    const [currentPagePhotoUrl, setCurrentPagePhotoUrl] = useState(null);
 
     return (
-        <ProfilePhotoContext.Provider value={{ currentPhotoUrl, setCurrentPhotoUrl }}>
+        <ProfilePhotoContext.Provider value={{ 
+            currentPhotoUrl, 
+            setCurrentPhotoUrl,
+            currentPagePhotoUrl,
+            setCurrentPagePhotoUrl
+        }}>
             {children}
         </ProfilePhotoContext.Provider>
     );

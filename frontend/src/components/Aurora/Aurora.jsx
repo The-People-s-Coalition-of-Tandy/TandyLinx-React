@@ -537,10 +537,13 @@ export const Aurora = () => {
             }
         }
         if (canvasRef.current) {
+            console.log('Setting up Aurora and event listeners');
             animationRef.current = new ShaderAnimation(canvasRef.current);
             
             const handleThemeChange = (event) => {
+                console.log('Theme change event received:', event.detail);
                 if (animationRef.current) {
+                    console.log('Starting uniform animation');
                     animationRef.current.startUniformAnimation(
                         animationRef.current.colorThemes[event.detail.theme], 
                         2000
@@ -549,8 +552,10 @@ export const Aurora = () => {
             };
 
             window.addEventListener('themeChange', handleThemeChange);
+            console.log('Theme change event listener added');
 
             return () => {
+                console.log('Cleaning up Aurora event listeners');
                 window.removeEventListener('themeChange', handleThemeChange);
                 if (animationRef.current) {
                     animationRef.current.cleanup();

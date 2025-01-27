@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import styles from './index.module.css';
 
-export const PageSettingsModal = ({ template }) => {
+export const PageSettingsModal = ({ template, onClose }) => {
     const [pageTitle, setPageTitle] = useState('');
     const [pageURL, setPageURL] = useState('');
     const navigate = useNavigate();
@@ -11,8 +12,6 @@ export const PageSettingsModal = ({ template }) => {
     
     const createPage = async () => {
         if (user) {
-            console.log(template.key);
-            console.log(template);
             try {
                 const response = await axios.post('/api/pages', {
                     pageTitle,
@@ -33,10 +32,32 @@ export const PageSettingsModal = ({ template }) => {
     };
 
     return (
-        <div>
-            <input type="text" placeholder="Page Title" value={pageTitle} onChange={(e) => setPageTitle(e.target.value)} />
-            <input type="text" placeholder="Page URL" value={pageURL} onChange={(e) => setPageURL(e.target.value)} />
-            <button onClick={createPage}>Save</button>
-        </div>
+        <>
+            <div className={styles.modalOverlay} onClick={onClose} />
+            <div className={styles.pageSettingsModal}>
+                <div className={styles.modalHeader}>
+                    <h2 className={styles.modalTitle}>Page Settings</h2>
+                    <button className={styles.closeButton} onClick={onClose}>×</button>
+                </div>
+                <input
+                    type="text"
+                    className={styles.modalInput}
+                    placeholder="Page Title"
+                    value={pageTitle}
+                    onChange={(e) => setPageTitle(e.target.value)}
+                />
+                <input
+                    type="text"
+                    className={styles.modalInput}
+                    placeholder="Page URL"
+                    value={pageURL}
+                    onChange={(e) => setPageURL(e.target.value)}
+                />
+                <div className={styles.modalButtons}>
+                    <button className={styles.modalButton} onClick={onClose}>Cancel</button>
+                    <button className={styles.modalButton} onClick={createPage}>Create Page</button>
+                </div>
+            </div>
+        </>
     );
 };

@@ -49,7 +49,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: #f0f0f0;
+    background: #363636;
     z-index: 1000;
     display: none;
     overflow: auto;
@@ -125,7 +125,7 @@
     width: 314px;
     position: relative;
     flex: none;
-    background: white;
+    background: #363636;
     border-radius: 40px;
     box-shadow: 0 0 0 10px #1a1a1a, 0 0 30px rgba(0,0,0,0.2);
     overflow: hidden;
@@ -197,7 +197,7 @@
         width: 100%;
         border-radius: 0;
         box-shadow: none;
-        background: transparent;
+        background: #363636;
     }
 
     .preview-modal .preview-frame {
@@ -219,6 +219,6 @@
     }
 
     .preview-modal .preview-container {
-        background: white;
+        background: #363636;
     }
 } 

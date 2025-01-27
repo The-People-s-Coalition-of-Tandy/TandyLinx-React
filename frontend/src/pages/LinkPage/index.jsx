@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 
 const TemplatePage = () => {
   const { pageURL } = useParams();
   const [pageData, setPageData] = useState(null);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const loadPage = async () => {

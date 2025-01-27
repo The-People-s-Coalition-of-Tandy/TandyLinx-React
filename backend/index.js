@@ -16,8 +16,6 @@ import { templates } from './templates/registry.js';
 
 dotenv.config();
 
-console.log("DB_PATH", process.env.DB_PATH);
-
 const DB_PATH = process.env.DB_PATH || '/app/Database/tandylinx.db';
 console.log('Connecting to database at:', DB_PATH);
 
@@ -25,6 +23,8 @@ const db = new Database(DB_PATH, {
     fileMustExist: true
 });
 const app = express();
+
+const DEFAULT_PROFILE_PHOTO = '/assets/images/default-profile.png';
 
 // ES Module fix for __dirname
 const __filename = fileURLToPath(
@@ -62,6 +62,9 @@ app.use(cors({
 // Serve frontend static files first
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use('/assets', express.static(path.join(__dirname, 'dist/assets')));
+
+// Add this after other middleware setup
+app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 
 app.use('/templates', express.static(path.join(__dirname, 'public/templates'), {
     setHeaders: (res, path) => {
@@ -105,10 +108,11 @@ app.get("/api/profile", checkAuthenticated, (req, res) => {
 
     const stmt = db.prepare("SELECT pageTitle, pageURL FROM links WHERE userId = ?");
     const pages = stmt.all(userId);
+    const profilePhotoUrl = user.profilePhotoUrl || '/assets/images/default-profile.png';
 
     res.json({
         username: user.username,
-        profilePhotoUrl: user.profilePhotoUrl,
+        profilePhotoUrl: profilePhotoUrl,
         pages
     });
 });
@@ -135,9 +139,18 @@ app.post('/api/register', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const insert = db.prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-        insert.run(username, hashedPassword);
+        const result = insert.run(username, hashedPassword);
         
-        res.json({ success: true, message: 'Registration successful' });
+        // Create session for the new user
+        req.session.userId = result.lastInsertRowid;
+        
+        res.json({ 
+            success: true, 
+            user: {
+                id: result.lastInsertRowid,
+                username: username
+            }
+        });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ error: 'Server error during registration' });
@@ -444,7 +457,7 @@ app.get('/api/public/pages/:pageURL', (req, res) => {
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'public/uploads/profiles')
+    cb(null, 'public/uploads/pages')
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
@@ -493,7 +506,7 @@ app.post('/api/upload-profile-photo', checkAuthenticated, upload.single('photo')
   }
 });
 
-// Add endpoint to get profile photo
+// Update the profile photo endpoint
 app.get('/api/profile-photo', checkAuthenticated, (req, res) => {
   const userId = req.session.userId;
   
@@ -502,7 +515,7 @@ app.get('/api/profile-photo', checkAuthenticated, (req, res) => {
     const result = query.get(userId);
     
     res.json({ 
-      photoUrl: result?.profilePhotoUrl || null 
+      photoUrl: result?.profilePhotoUrl || DEFAULT_PROFILE_PHOTO 
     });
   } catch (err) {
     console.error('Error fetching profile photo:', err);
@@ -510,31 +523,26 @@ app.get('/api/profile-photo', checkAuthenticated, (req, res) => {
   }
 });
 
-// Move this block before the catch-all route
+// Update the page render endpoint
 app.get('/:pageURL', async (req, res, next) => {
     const pageURL = req.params.pageURL;
     
-    // Skip certain paths that should be handled by the frontend
     if (['login', 'create', 'profile', 'edit'].includes(pageURL)) {
         return next();
     }
     
     try {
-        let pageData;
-        // For normal viewing, get from database
         const stmt = db.prepare(`
-            SELECT l.pageTitle, l.links, l.style, l.userId, u.profilePhotoUrl 
+            SELECT l.pageTitle, l.links, l.style, l.userId, l.pagePhotoUrl 
             FROM links l
-            LEFT JOIN users u ON l.userId = u.id
             WHERE l.pageURL = ?
         `);
-        pageData = stmt.get(pageURL);
+        const pageData = stmt.get(pageURL);
         
         if (!pageData) {
             return next();
         }
 
-        // Get template info from registry
         const templateInfo = templates[pageData.style || 'TandyLinx'];
         
         if (!templateInfo) {
@@ -542,12 +550,11 @@ app.get('/:pageURL', async (req, res, next) => {
             return res.status(500).send('Template not found');
         }
 
-        // Render the template with profile photo
         res.render(templateInfo.template, {
             pageTitle: pageData.pageTitle,
             links: JSON.parse(pageData.links || '[]'),
             preview: false,
-            profilePhotoUrl: pageData.profilePhotoUrl || null
+            profilePhotoUrl: pageData.pagePhotoUrl || DEFAULT_PROFILE_PHOTO
         });
     } catch (error) {
         console.error('Error rendering template:', error);
@@ -555,9 +562,104 @@ app.get('/:pageURL', async (req, res, next) => {
     }
 });
 
+app.get('/preview/:template', (req, res) => {
+    const template = req.params.template;
+
+    const pageData = {
+        pageTitle: 'Tandylinx',
+        links: JSON.stringify([{
+            "url": "https://www.google.com",
+            "name": "Google"
+        },
+        {
+            "url": "https://www.facebook.com",
+            "name": "Facebook"
+        },
+        {
+            "url": "https://www.twitter.com",
+            "name": "Twitter"
+        },
+        {
+            "url": "https://www.instagram.com",
+            "name": "Instagram"
+        }
+    ]),
+        profilePhotoUrl: '/assets/images/default-profile.png'
+    }
+
+    const templateInfo = templates[template || 'TandyLinx'];
+    try {
+        if (!templateInfo) {
+            console.error(`Template ${template} not found in registry`);
+            return res.status(500).send('Template not found');
+        }
+
+    res.render(templateInfo.template, {
+        pageTitle: pageData.pageTitle,
+        links: JSON.parse(pageData.links || '[]'),
+        preview: true,
+        profilePhotoUrl: pageData.pagePhotoUrl || DEFAULT_PROFILE_PHOTO
+    });
+} catch (error) {
+    console.error('Error rendering template:', error);
+    next(error);
+}
+
+});
+
+// Add endpoint to update page photo
+app.post('/api/pages/:pageURL/photo', 
+    checkAuthenticated, 
+    checkPageOwnership,
+    upload.single('photo'), 
+    async (req, res) => {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const pageURL = req.params.pageURL;
+        const userId = req.session.userId;
+        const photoUrl = `/uploads/pages/${req.file.filename}`;
+
+        try {
+            const updateStmt = db.prepare('UPDATE links SET pagePhotoUrl = ? WHERE pageURL = ? AND userId = ?');
+            const result = updateStmt.run(photoUrl, pageURL, userId);
+            
+            if (result.changes === 0) {
+                return res.status(404).json({ error: 'Page not found or unauthorized' });
+            }
+            
+            res.json({ 
+                success: true, 
+                photoUrl: photoUrl 
+            });
+        } catch (err) {
+            console.error('Error updating page photo:', err);
+            res.status(500).json({ error: 'Failed to update page photo' });
+        }
+    }
+);
+
 // Add before the catch-all route
 app.get('/api/templates', (req, res) => {
     res.json(templates);
+});
+
+// Add endpoint to get page photo
+app.get('/api/pages/:pageURL/photo', (req, res) => {
+  const pageURL = req.params.pageURL;
+  
+  try {
+    const query = db.prepare('SELECT pagePhotoUrl FROM links WHERE pageURL = ?');
+    const result = query.get(pageURL);
+    
+    res.json({ 
+      photoUrl: result?.pagePhotoUrl || '/assets/images/default-profile.png'
+    });
+  } catch (err) {
+    console.error('Error fetching page photo:', err);
+    res.status(500).json({ error: 'Failed to fetch page photo' });
+  }
 });
 
 // Keep this as the last route
