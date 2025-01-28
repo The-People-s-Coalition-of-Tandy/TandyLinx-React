@@ -568,20 +568,20 @@ app.get('/preview/:template', (req, res) => {
     const pageData = {
         pageTitle: 'Tandylinx',
         links: JSON.stringify([{
-            "url": "https://www.google.com",
-            "name": "Google"
+            "url": "https://www.pcotandy.org",
+            "name": "A Craestal"
         },
         {
-            "url": "https://www.facebook.com",
-            "name": "Facebook"
+            "url": "https://www.pcotandy.org",
+            "name": "Grayking's Dance"
         },
         {
-            "url": "https://www.twitter.com",
-            "name": "Twitter"
+            "url": "https://www.pcotandy.org",
+            "name": "The internet"
         },
         {
-            "url": "https://www.instagram.com",
-            "name": "Instagram"
+            "url": "https://www.pcotandy.org",
+            "name": "is ours"
         }
     ]),
         profilePhotoUrl: '/assets/images/default-profile.png'

@@ -10,11 +10,28 @@
     max-width: 400px;
 }
 
+.preview-container.desktop-mode {
+    max-width: 100%;
+}
+
 .preview-header {
-    /* padding: 12px; */
-    /* background: #f0f0f0; */
-    /* border-bottom: 1px solid #ddd; */
-    font-weight: 500;
+    padding: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.preview-mode-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.preview-mode-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .preview-content {
@@ -94,6 +111,10 @@
 }
 
 @media (max-width: 1024px) {
+    .preview-header {
+        display: none;
+    }
+
     .preview-button {
         display: flex;
         align-items: center;
@@ -102,6 +123,22 @@
 
     .preview-container:not(.preview-modal .preview-container) {
         display: none;
+    }
+
+    .preview-modal .preview-container {
+        background: #363636;
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+        display: flex !important;
+    }
+
+    .preview-modal .preview-content {
+        padding: 0;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
     }
 }
 
@@ -120,6 +157,12 @@
     overflow: hidden;
 }
 
+.preview-scale-container.desktop {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+}
+
 .preview-frame-container {
     height: 681px;
     width: 314px;
@@ -131,18 +174,13 @@
     overflow: hidden;
 }
 
-@media (max-width: 1024px) {
-    .preview-frame-container {
-        height: 100%;
-        width: 100%;
-        border-radius: 0;
-        box-shadow: none;
-    }
-
-    .preview-scale-container {
-        width: 100%;
-        height: 100%;
-    }
+.preview-frame-container.desktop {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    background: white;
 }
 
 .preview-frame {
@@ -152,6 +190,10 @@
     border-radius: 40px;
     background: white;
     overflow: hidden;
+}
+
+.preview-frame.desktop {
+    border-radius: 8px;
 }
 
 /* .preview-frame-container::before {

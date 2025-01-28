@@ -24,7 +24,7 @@ export const Title = () => {
                 particle.className = styles.particle;
                 particle.src = images[Math.floor(Math.random() * images.length)];
                 const color = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.filter = `drop-shadow(0 0 8px ${color})`;
+                // particle.style.filter = `drop-shadow(0 0 8px ${color})`;
                 particlesContainerRef.current.appendChild(particle);
                 
                 const startAngle = (i / particleCount) * Math.PI * 2;
@@ -61,7 +61,11 @@ export const Title = () => {
         };
 
         const themeChangeEvent = new CustomEvent('themeChange', {
-            detail: { theme: 'plain' }
+            detail: { theme: 'rainbowSky', duration: 1200, easingFunction: "linear" }
+        });
+
+        const rainbowEvent = new CustomEvent('themeChange', {
+            detail: { theme: 'rainbowOnly', duration: 2000, easingFunction: "linear" }
         });
 
         document.fonts.ready.then(() => {
@@ -96,43 +100,37 @@ export const Title = () => {
                 y: 0,
                 ease: "elastic.out(1.9, 0.45)",
                 transformOrigin: "center bottom",
-                onStart: createParticleBurst
+                onStart: () => {
+                    createParticleBurst();
+                    setTimeout(() => {
+                        window.dispatchEvent(rainbowEvent);
+                    }, 300);
+
+                    setTimeout(() => {
+                        window.dispatchEvent(themeChangeEvent);
+                    }, 3000);
+                }
             }, "<+=0.125")
             .to(`.${styles.link}`, {
-                duration: 0.8,
+                duration: 0.5,
                 scale: 1,
                 opacity: 1,
-                stagger: 0.15,
-                ease: "elastic.out(1, 0.5)",
-                transformOrigin: "center center",
-                onComplete: () => {
-                    window.dispatchEvent(themeChangeEvent);
-                }
-            }, "-=0.5")
+                stagger: 0.1,
+                ease: "back.out(1.7)",
+                transformOrigin: "center center"
+            }, "+=0.55")
             .add(() => {
-                gsap.to(`.${styles.link}`, {
-                    y: -15,
-                    duration: 2.5,
-                    ease: "sine.inOut",
-                    stagger: {
-                        each: 0.5,
+                const links = document.querySelectorAll(`.${styles.link}`);
+                links.forEach((link, i) => {
+                    gsap.to(link, {
+                        y: -8,
+                        duration: 1.5,
+                        ease: "sine.inOut",
                         repeat: -1,
-                        yoyo: true
-                    },
-                    rotation: 2
+                        yoyo: true,
+                        delay: i * 0.2
+                    });
                 });
-                
-                gsap.to(`.${styles.link}`, {
-                    y: 5,
-                    duration: 2.5,
-                    ease: "sine.inOut",
-                    stagger: {
-                        each: 0.5,
-                        repeat: -1,
-                        yoyo: true
-                    },
-                    rotation: -2
-                }, "<1");
             });
         });
     }, []);

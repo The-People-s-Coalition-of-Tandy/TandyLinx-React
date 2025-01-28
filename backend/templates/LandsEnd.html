@@ -9,19 +9,17 @@
 </head>
 
 <body>
-    <video autoplay muted loop id="myVideo">
-        <source src="/templates/LandsEnd/shortlandsend.mp4" type="video/mp4">
-    </video>
+    <div class="container">
+        <video autoplay muted loop id="myVideo">
+            <source src="/templates/LandsEnd/shortlandsend.mp4" type="video/mp4">
+        </video>
     <main id="main">
 
-        <img src="/templates/shared/TandyLogoSpiro.png" alt="People's Coalition of Tandy Logo"
+        <img src="{{ profilePhotoUrl }}" alt="People's Coalition of Tandy Logo"
             class="pcot-logo"><br>
         <header>
-            <p>
-                Welcome to
+
                     <span class="release-name">{{ pageTitle }}</span>
-                <br>
-            </p>
         </header>
         <div class="links">
             {% for link in links %}
@@ -36,6 +34,7 @@
         </footer>
         <div class="cover"></div>
     </main>
+    </div>
     <svg>
         <defs>
             <filter id="turbulence-1">

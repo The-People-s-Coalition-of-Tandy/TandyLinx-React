@@ -8,6 +8,7 @@ const Preview = ({ pageURL, pageTitle, style, isFullPreview }) => {
     const { currentPagePhotoUrl } = useProfilePhoto();
     const keyCounter = useRef(0);
     const [isLoading, setIsLoading] = useState(true);
+    const [isDesktopMode, setIsDesktopMode] = useState(false);
     
     useEffect(() => {
         keyCounter.current += 1;
@@ -18,14 +19,26 @@ const Preview = ({ pageURL, pageTitle, style, isFullPreview }) => {
         setIsLoading(false);
         e.target.classList.add('loaded');
     };
+
+    const togglePreviewMode = () => {
+        setIsDesktopMode(!isDesktopMode);
+    };
     
     return (
-        <div className="preview-container">
-            <div className="preview-header"></div>
+        <div className={`preview-container ${isDesktopMode ? 'desktop-mode' : ''}`}>
+            <div className="preview-header">
+                <button 
+                    className="preview-mode-toggle"
+                    onClick={togglePreviewMode}
+                    title={isDesktopMode ? "Switch to Mobile View" : "Switch to Desktop View"}
+                >
+                    {isDesktopMode ? "📱" : "🖥️"}
+                </button>
+            </div>
             <div className="preview-content">
-                <div className="preview-frame-container">
-                    <div className="preview-frame">
-                        <div className="preview-scale-container">
+                <div className={`preview-frame-container ${isDesktopMode ? 'desktop' : ''}`}>
+                    <div className={`preview-frame ${isDesktopMode ? 'desktop' : ''}`}>
+                        <div className={`preview-scale-container ${isDesktopMode ? 'desktop' : ''}`}>
                             <div className={`preview-loader ${isLoading ? 'visible' : ''}`}>
                                 <div className="loader-spinner" />
                             </div>

@@ -69,9 +69,13 @@ const Browser = () => {
       navigate(-1);
     };
 
-    const onClose = () => {
+    const onClosePageSettings = () => {
         setShowPageSettingsModal(false);
         setSelectedTemplate(null);
+    };
+
+    const onCloseBrowser = () => {
+        navigate(-1);
     };
 
     const onSave = () => {
@@ -83,7 +87,7 @@ const Browser = () => {
         <>
          <div className={styles.browserOverlay} onClick={handleOverlayClick}>
       <div className={styles.browserContent} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.closeButton} onClick={onClose}>×</button>
+        <button className={styles.closeButton} onClick={onCloseBrowser}>×</button>
         <h2>Choose a Template</h2>
         
         <TemplateGrid
@@ -128,7 +132,7 @@ const Browser = () => {
             {showPageSettingsModal && (
                 <PageSettingsModal 
                     template={templates[selectedTemplate]} 
-                    onClose={onClose}
+                    onClose={onClosePageSettings}
                 />
             )}
         </>

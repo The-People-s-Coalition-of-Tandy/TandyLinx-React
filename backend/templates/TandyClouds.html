@@ -11,14 +11,22 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     
     <!-- Custom font -->
-    <link rel="preload" href="/templates/shared/fonts/linotype-aroma-extra-light.ttf" as="font" type="font/ttf" crossorigin fetchpriority="high">
+    <link rel="preload" href="/assets/fonts/LinotypeAroma.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
+    <link rel="preload" href="/assets/fonts/Redaction_50-bold.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
     
     <!-- Inline critical CSS -->
     <style>
         /* Base styles */
         @font-face {
             font-family: 'linotype';
-            src: url(/templates/shared/fonts/linotype-aroma-extra-light.ttf) format('truetype');
+            src: url(/assets/fonts/LinotypeAroma.woff2) format('woff2');
+            font-display: block;
+            font-weight: 200;
+        }
+
+        @font-face {
+            font-family: 'redaction35';
+            src: url(/assets/fonts/Redaction_50-bold.woff2) format('woff2');
             font-display: block;
             font-weight: 200;
         }
@@ -52,6 +60,7 @@
             padding: 2rem 1rem;
             box-sizing: border-box;
             gap: 2rem;
+            overflow: visible;
         }
 
         .interface {
@@ -62,17 +71,19 @@
             flex-direction: column;
             align-items: center;
             gap: 3rem; /* Increased spacing between title and links */
+            overflow: visible;
         }
 
         /* Title styles */
         h1 {
-            font-size: clamp(1.8rem, 6vw, 3rem);
+            font-size: clamp(2rem, 6vw, 3rem);
             font-weight: 300;
             letter-spacing: 0.02em;
             color: rgba(0, 0, 0, 0.8);
             text-shadow: 0 2px 4px rgba(255, 255, 255, 0.2);
             text-align: center;
             margin: 2rem 0;
+            margin-bottom: 0;
             padding: 0 1rem;
         }
 
@@ -100,181 +111,75 @@
             max-width: 600px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
             gap: 1.5rem;
-            padding: 0 1rem;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            overflow: visible;
+            position: relative;
+            z-index: 1;
         }
 
         .bubble-link {
             width: 100%;
-            height: auto;
-            min-height: 60px;
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
             perspective: 1000px;
-            /* background-image: url(/templates/TandyClouds/assets/images/buttonposter.png); */
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .bubble-link:hover {
-            transform: translateY(-2px) scale(1.02);
-        }
-
-        .bubble-link:hover .link-content {
-            background: rgba(255, 255, 255, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+            z-index: 1;
         }
 
         .link-content {
-            width: 100%;
+            width: 160px;
+            margin: 0 auto;
             min-height: 60px;
             padding: 0.8rem 2rem;
             display: flex;
+            text-align: center;
             align-items: center;
             justify-content: center;
             text-decoration: none;
             color: rgb(0, 0, 0);
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.658);
             background-image: url(/templates/TandyClouds/assets/images/buttonposter.png);
             background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
-            /* background: rgba(255, 255, 255, 0.15); */
-            /* backdrop-filter: blur(8px); */
-            /* -webkit-backdrop-filter: blur(8px); */
             border-radius: 12px;
-
-            /* border: 1px solid rgba(255, 255, 255, 0.2); */
-            /* box-shadow:  */
-                /* 0 4px 15px rgba(0, 0, 0, 0.05), */
-                /* inset 0 0 20px rgba(255, 255, 255, 0.2); */
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Modern shine effect */
-        .link-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
-            transition: 0.5s;
-        }
-
-        .bubble-link:hover .link-content::before {
-            left: 100%;
-        }
-
-        .link-content span {
+            transition: transform 0.3s ease;
+            font-family: 'redaction35', Arial, sans-serif;
+            
+            /* Improved text readability */
             font-size: 1.2rem;
-            font-weight: 400;
-            letter-spacing: 0.02em;
-            text-align: center;
-            z-index: 1;
-            /* background: linear-gradient(
-                90deg,
-                rgba(0, 0, 0, 0.8),
-                rgba(0, 0, 0, 0.6)
-            ); */
-            /* -webkit-background-clip: text; */
-            /* -webkit-text-fill-color: transparent; */
-            /* text-shadow: 0 1px 2px rgba(255, 255, 255, 0.1); */
-        }
-
-        /* Add subtle glow effect */
-        .bubble-link::after {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            background: linear-gradient(
-                45deg,
-                rgba(255, 255, 255, 0.1),
-                rgba(255, 255, 255, 0.2)
-            );
-            filter: blur(15px);
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .bubble-link:hover::after {
-            opacity: 1;
-        }
-
-        /* The shine effect */
-        .link i {
-            font-size: 1.8em;
-            margin-bottom: 0.5rem;
-            opacity: 0.8;
-            position: relative;
-            z-index: 1;
-            animation: floatIcon 3s ease-in-out infinite;
-        }
-
-        .link span {
-            font-size: 0.85em;
             font-weight: 500;
-            position: relative;
-            z-index: 1;
-            animation: floatText 3s ease-in-out infinite;
-            animation-delay: -1.5s;
+            text-shadow: 
+                -1px -1px 0 rgba(236, 236, 236, 0.7),
+                1px -1px 0 rgba(236, 236, 236, 0.7),
+                -1px 1px 0 rgba(236, 236, 236, 0.7),
+                1px 1px 0 rgba(236, 236, 236, 0.7),
+                0 0 8px rgba(236, 236, 236, 0.9);
+            letter-spacing: 0.03em;
+            color: rgb(47, 47, 47);
+            transform-style: preserve-3d;
+            will-change: transform;
+            backface-visibility: hidden;
+            transform-origin: center center -50px; /* Add depth to rotation origin */
+            perspective: 800px; /* Add perspective for better 3D effect */
         }
 
-        @keyframes bubble-anim {
-            0% {
-                transform: scale(1);
-            }
-            20% {
-                transform: scaleY(0.95) scaleX(1.05);
-            }
-            48% {
-                transform: scaleY(1.1) scaleX(0.9);
-            }
-            68% {
-                transform: scaleY(0.98) scaleX(1.02);
-            }
-            80% {
-                transform: scaleY(1.02) scaleX(0.98);
-            }
-            97%, 100% {
-                transform: scale(1);
-            }
+        /* Hover effect */
+        .link-content:hover {
+            transform: 
+                translateY(-2px) 
+                rotateX(5deg) 
+                rotateY(-5deg) 
+                scale(1.02);
         }
 
-        @keyframes floatIcon {
-            0%, 100% { transform: translateY(-2px); }
-            50% { transform: translateY(2px); }
-        }
-
-        @keyframes floatText {
-            0%, 100% { transform: translateY(2px); }
-            50% { transform: translateY(-2px); }
-        }
-
-        /* Shadow effect */
-        .link .shadow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(
-                circle,
-                rgba(0, 0, 0, 0.4),
-                rgba(0, 0, 0, 0.1) 40%,
-                rgba(0, 0, 0, 0) 50%
-            );
-            transform: rotateX(90deg) translateZ(-160px);
-            z-index: -2;
+        .link-content:active {
+            transform: 
+                translateY(1px) 
+                rotateX(2deg) 
+                rotateY(-2deg) 
+                scale(0.98);
         }
 
         /* Particles */
@@ -296,43 +201,6 @@
             will-change: transform;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .nav-container {
-                gap: 1rem;
-            }
-
-            .link-content {
-                min-height: 50px;
-                padding: 0.6rem 1.5rem;
-            }
-
-            .link-content span {
-                font-size: 0.95rem;
-            }
-        }
-
-        /* For very small screens */
-        @media (max-width: 360px) {
-            .bubble-link {
-                width: 110px;
-                height: 110px;
-            }
-
-            .link-content span {
-                font-size: 0.75em;
-            }
-        }
-
-        .bubble-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100% !important;
-            height: 100% !important;
-            pointer-events: none;
-            z-index: 1;
-        }
     </style>
 
     <!-- Deferred resources -->
@@ -352,9 +220,8 @@
             <div class="nav-container">
                 {% for link in links %}
                 <div class="bubble-link">
-                    <canvas class="bubble-canvas"></canvas>
                     <a href="{{ link.url }}" class="link-content">
-                        <span>{{ link.name }}</span>
+                       {{ link.name }}
                     </a>
                 </div>
                 {% endfor %}
@@ -695,7 +562,7 @@
                         particle.className = 'particle';
                         particle.src = images[Math.floor(Math.random() * images.length)];
                         const color = colors[Math.floor(Math.random() * colors.length)];
-                        particle.style.filter = `drop-shadow(0 0 8px ${color})`;
+                        
                         particlesContainer.appendChild(particle);
                         
                         const startAngle = (i / particleCount) * Math.PI * 2;
@@ -775,6 +642,23 @@
                     stagger: 0.1,
                     ease: "power2.out"
                 }, "-=0.2");
+            });
+
+            // Enhanced 3D floating animation with more Z-depth
+            document.querySelectorAll('.link-content').forEach((link, index) => {
+                gsap.to(link, {
+                    rotateX: "random(-15, 15)", 
+                    rotateY: "random(-20, 20)",
+                    rotateZ: "random(-8, 8)",
+                    y: "random(-10, 10)",
+                    z: "random(-100, 100)", // Much more dramatic Z movement
+                    scale: "random(0.95, 1.05)", // Subtle scale change for depth
+                    duration: "random(3, 4)",
+                    ease: "sine.inOut",
+                    repeat: -1,
+                    yoyo: true,
+                    delay: index * 0.3,
+                });
             });
         });
 

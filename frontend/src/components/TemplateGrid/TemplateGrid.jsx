@@ -21,13 +21,6 @@ const TemplateGrid = ({
     }
   }, [isLoading, hasCompletedAnimation]);
 
-  console.log('Loading state:', { // Debug log
-    shouldShow: shouldShowLoading(),
-    isLoading,
-    hasCompletedAnimation,
-    showLoadingScreen
-  });
-
   return (
     <>
       {showLoadingScreen ? (

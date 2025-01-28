@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import styles from './Login.module.css';
+import AeroButton from '../../components/common/AeroButton/AeroButton';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -10,6 +11,14 @@ const Login = () => {
   const { login, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const themeChangeEvent = new CustomEvent('themeChange', {
+    detail: { theme: 'midnight', duration: 800, easingFunction: "linear" }
+  });
+
+  useEffect(() => {
+    window.dispatchEvent(themeChangeEvent);
+  }, []);
 
   // Get the redirect path from state, or default to /profile
   const from = location.state?.from?.pathname || '/profile';
@@ -56,8 +65,11 @@ const Login = () => {
             placeholder="Password"
             required
           />
-          <button type="submit">Login</button>
+          <AeroButton type="submit">Login</AeroButton>
         </form>
+        <p className={styles.registerLink}>
+          Don't have an account? <Link to="/register">Register here</Link>
+        </p>
       </div>
     </div>
   );

@@ -39,7 +39,7 @@
   font-family: var(--header-font);
   padding: 1rem 2rem;
   margin: 0;
-  position: sticky;
+  /* position: sticky; */
   top: 0;
   z-index: 10;
 }
@@ -418,15 +418,23 @@
     align-items: center;
     gap: 1rem;
     position: relative;
+    padding: 2rem;
 }
 
 .emptyStateContent::before {
     content: '+';
     position: absolute;
-    top: -2rem;
-    font-size: 3rem;
+    top: 10px;
+    left: 10px;
+    font-size: 2rem;
     color: rgba(255, 255, 255, 0.2);
     font-weight: 300;
+    z-index: 1;
+}
+
+.pageCard:hover .emptyStateContent::before {
+    color: rgba(255, 255, 255, 0.4);
+    transition: color 0.2s ease;
 }
 
 .emptyStateContent .pageTitle {
@@ -442,24 +450,13 @@
     margin-bottom: 1rem;
 }
 
+/* Remove the orb image */
 .emptyStateContent::after {
-    content: '';
-    position: absolute;
-    top: 4px;
-    right: 8px;
-    width: 36px;
-    height: 36px;
-    background-image: url(/assets/images/orb5.png);
-    filter: brightness(1) hue-rotate(45deg);
-    background-size: cover;
-    transform: scale(1);
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0.5;
+    display: none;
 }
 
-.emptyStateContent:hover::after {
-    opacity: 1;
-    transform: scale(1.1);
-    transition: opacity 0.4s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.475);
+/* Add a subtle hover effect */
+.pageCard:hover .emptyStateContent {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
 }

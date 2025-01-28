@@ -29,6 +29,7 @@ const Editor = () => {
     const navigate = useNavigate();
     const [deleteModalState, setDeleteModalState] = useState({ isOpen: false, linkIndex: null });
     const [showSettings, setShowSettings] = useState(false);
+    const [previewMode, setPreviewMode] = useState('desktop');
 
     const themeChangeEvent = new CustomEvent('themeChange', {
         detail: { theme: 'plain' }
@@ -146,6 +147,10 @@ const Editor = () => {
         setShowSettings(show);
     };
 
+    const togglePreviewMode = () => {
+        setPreviewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop');
+    };
+
     if (isLoading) return <div className="editor loading">Loading...</div>;
 
     return (
@@ -170,6 +175,8 @@ const Editor = () => {
                     onBrowseTemplates={() => setShowTemplateBrowser(true)}
                     showSettings={showSettings}
                     onShowSettings={handleShowSettings}
+                    previewMode={previewMode}
+                    onTogglePreviewMode={togglePreviewMode}
                 />
 
                 <div className="editor-actions">
@@ -201,7 +208,12 @@ const Editor = () => {
                 />
             </div>
 
-            <Preview pageURL={pageURL} style={currentTemplate} pageTitle={pageTitle} />
+            <Preview 
+                pageURL={pageURL} 
+                style={currentTemplate} 
+                pageTitle={pageTitle}
+                viewportMode={previewMode} 
+            />
 
             <AeroButton onClick={() => setShowPreview(true)} className="preview-button" color="green">
                 Preview

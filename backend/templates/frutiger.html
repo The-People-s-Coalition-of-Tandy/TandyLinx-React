@@ -5,6 +5,11 @@
     <!-- <link rel="stylesheet" href="/templates/frutiger/frutiger.css"> -->
      <style>
 
+        @font-face {
+            font-family: "Frutiger";
+            src: url('/assets/fonts/Joy Kim.otf') format('opentype');
+        }
+
         html, body {
             margin: 0;
             padding: 0;
@@ -14,25 +19,76 @@
 
         body {
             background: linear-gradient(135deg, #a7d9f5, #e8f6ff, #d4e4ff);
-            color: #205475;
-            font-family: "Lucida Grande", "Lucida Sans Unicode", "Lunasima", sans-serif;
+            color: #ffffff;
+            font-family: "Frutiger";
             min-height: 100vh;
-            /* background-image: url('/templates/frutiger/assets/fs125.jpg'); */
-            background-image: url('/templates/frutiger/assets/ge060_350a.jpg');
-            /* background-image: url('/templates/frutiger/assets/hj171_350a.jpg'); */
-            /* background-image: url('/templates/frutiger/assets/hj195_350a.jpg'); */
+            background-image: url('/templates/frutiger/assets/ge163_350a.jpg');
             background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+        }
+
+        .big-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         h1 {
             text-align: center;
-            font-size: 2.5rem;
-            margin: 2rem 0;
-            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
-            letter-spacing: 0.5px;
+            font-size: clamp(1.2rem, 4vw, 2.8rem);
+            margin: 0.25rem 0;
+            color: rgb(0, 0, 0);
+            mix-blend-mode: color-burn;
+            text-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.2),
+                0 4px 8px rgba(124, 194, 66, 0.3);
+            letter-spacing: 1px;
+            font-weight: 600;
+            word-break: break-word;
+            max-width: 100%;
+            padding: 0 0.75rem;
+            box-sizing: border-box;
+        }
+
+        .title-profile {
+            width: fit-content;
+            max-width: 90%;
+            gap: 15px;
+            margin: 2rem auto 1rem auto;
+            margin-bottom: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(to bottom, rgba(108, 162, 64, 0.9), rgba(124, 194, 66, 0.122));
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        .title-profile::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/templates/frutiger/assets/ge060_350a.jpg');
+            background-size: cover;
+            border-radius: 24px;
+            opacity: 0.1;
+            z-index: 1;
         }
 
         .container {
+            margin-top: 2rem;
             background: linear-gradient(to bottom, rgba(108, 162, 64, 0.9), rgba(124, 194, 66, 0.122));
             backdrop-filter: blur(10px);
             border-radius: 24px;
@@ -48,6 +104,7 @@
             gap: 1rem;
             align-items: start;
             z-index: 2;
+            position: relative;
         }
 
         .container > * {
@@ -61,14 +118,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('/templates/frutiger/assets/fs125.jpg');
+            background-image: url('/templates/frutiger/assets/ge060_350a.jpg');
             background-size: cover;
             border-radius: 24px;
             opacity: 0.1;
             z-index: 1;
         }
 
-        .container::after {
+        .container::after, .title-profile::after {
             content: "";
             position: absolute;
             top: 0;
@@ -140,46 +197,9 @@
 }
 
 .glossy-image {
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    width: 80px;
     position: relative;
-
-}
-
-.profile-photo-container {
-    margin-bottom: 1rem;
-    width: fit-content;
-    margin: 0 auto;
-    position: relative;
-    padding: 1rem;
-}
-
-
-
-
-
-/* .profile-photo-container::after{
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.797), rgba(255, 255, 255, 0.047));
-} */
-
-/* make a glassy sphere */
-.profile-photo-container::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.797), rgba(255, 255, 255, 0.047));
-    border-radius: 50%;
-    z-index: 1;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
 }
 
 @media screen and (max-width: 768px) {
@@ -188,24 +208,236 @@
         width: 90%;
         box-sizing: border-box;
     }
+    
+    .title-profile {
+        margin: 1rem auto 0.5rem auto;
+        margin-bottom: 0px;
+        padding: 0.75rem 1rem;
+        gap: 10px;
+    }
+    
+    .glossy-image {
+        width: 60px;
+    }
+    
+    h1 {
+        font-size: clamp(1rem, 3.5vw, 2rem);
+        letter-spacing: 0.5px;
+        padding: 0 0.5rem;
+    }
+}
+
+/* Add these new styles */
+.light-warp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(
+        circle 800px at var(--x, 50%) var(--y, 50%),
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(124, 194, 66, 0.4) 20%,
+        rgba(124, 194, 66, 0.2) 40%,
+        transparent 70%
+    );
+    z-index: 1;
+    mix-blend-mode: overlay;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
 }
      </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ pageTitle }}</title>
 </head>
 <body>
-    <h1>{{ pageTitle }}</h1>
+    <!-- Add canvas element right after body opening -->
+    <canvas id="warpCanvas"></canvas>
 
-    {% if profilePhotoUrl %}
+    <div class="big-container">
+    <div class="title-profile">
+        {% if profilePhotoUrl %}
     <div class="profile-photo-container">
         <img src="{{ profilePhotoUrl }}" alt="Profile Photo" class="glossy-image">
     </div>
     {% endif %}
+        <h1>{{ pageTitle }}</h1>
+    </div>
+        <img src="/templates/frutiger/assets/pipe.png" height="30px" alt="Chrome Cylinder" class="connector">
+    
 
     <div class="container"> 
         {% for link in links %}
             <a class="aeroButton" href="{{ link.url }}">{{ link.name }}</a>
         {% endfor %}
     </div>
+
+    </div>
+<script>
+    const canvas = document.getElementById('warpCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    
+    let waves = [];
+    let isMoving = false;
+    let moveTimeout;
+    
+    const bgImage = new Image();
+    bgImage.src = '/templates/frutiger/assets/fs125.jpg';
+    
+    let isFirstMove = true;
+    let lastX = null, lastY = null;
+    
+    // Add these variables for random waves
+    let lastRandomWave = 0;
+    const RANDOM_WAVE_INTERVAL = 3000; // Increased to 3 seconds
+    
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    
+    function addWave(x, y, velocity, isMobile = false) {
+        waves.push({
+            x,
+            y,
+            // Slower velocity for mobile
+            velocity: isMobile ? Math.min(Math.max(velocity, 1), 4) : Math.min(Math.max(velocity, 5), 15),
+            radius: 0,
+            // Gentler amplitude for mobile
+            amplitude: isMobile ? 40 : 40,
+            // Slower decay for mobile
+            decay: isMobile ? 0.99 : 0.98
+        });
+        
+        if (waves.length > 10) {
+            waves.shift();
+        }
+    }
+    
+    function updateMousePosition(e) {
+        const x = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const y = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+        
+        if (isFirstMove) {
+            lastX = x;
+            lastY = y;
+            isFirstMove = false;
+            return;
+        }
+        
+        const dx = x - lastX;
+        const dy = y - lastY;
+        const velocity = Math.sqrt(dx * dx + dy * dy);
+        
+        clearTimeout(moveTimeout);
+        
+        if (!isMoving && velocity > 1) {
+            addWave(x, y, velocity);
+            isMoving = true;
+        }
+        
+        moveTimeout = setTimeout(() => {
+            isMoving = false;
+        }, 50);
+        
+        lastX = x;
+        lastY = y;
+    }
+    
+    let time = 0;
+    function animate() {
+        time += 0.01;
+        
+        // Add random waves on mobile
+        addRandomWave();
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        waves = waves.filter(wave => {
+            wave.radius += wave.velocity;
+            wave.amplitude *= wave.decay;
+            return wave.amplitude > 0.1;
+        });
+        
+        for(let x = 0; x < width; x += 20) {
+            for(let y = 0; y < height; y += 20) {
+                let totalDisplacementX = 0;
+                let totalDisplacementY = 0;
+                
+                waves.forEach(wave => {
+                    const dx = x - wave.x;
+                    const dy = y - wave.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    const distanceFromWave = Math.abs(distance - wave.radius);
+                    if (distanceFromWave < 50) {
+                        const waveIntensity = (1 - distanceFromWave / 50) * wave.amplitude;
+                        const angle = Math.atan2(dy, dx);
+                        
+                        totalDisplacementX += Math.cos(angle) * waveIntensity;
+                        totalDisplacementY += Math.sin(angle) * waveIntensity;
+                    }
+                });
+                
+                ctx.drawImage(
+                    bgImage,
+                    x, y, 20, 20,
+                    x + totalDisplacementX,
+                    y + totalDisplacementY,
+                    20, 20
+                );
+            }
+        }
+        
+        requestAnimationFrame(animate);
+    }
+    
+    bgImage.onload = () => {
+        resize();
+        animate();
+    };
+    
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', updateMousePosition);
+    window.addEventListener('touchmove', updateMousePosition);
+    
+    function addRandomWave() {
+        if (window.innerWidth > 768) return;
+        
+        const now = Date.now();
+        if (now - lastRandomWave < RANDOM_WAVE_INTERVAL) return;
+        
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        const velocity = 3 + Math.random() * 3; // Reduced velocity range for mobile (3-6)
+        
+        addWave(x, y, velocity, true);
+        lastRandomWave = now;
+    }
+    
+    // Modify device orientation handler
+    window.addEventListener('deviceorientation', (e) => {
+        if (window.innerWidth <= 768) {
+            const velocity = Math.sqrt(e.gamma * e.gamma + e.beta * e.beta) * 0.05; // Reduced multiplier
+            const x = ((e.gamma || 0) / 60 + 0.5) * width;
+            const y = ((e.beta || 0) / 60 + 0.5) * height;
+            currentMouseX = x;
+            currentMouseY = y;
+            
+            if (velocity > 1.5) { // Increased threshold
+                addWave(x, y, velocity, true);
+            }
+        }
+    });
+</script>
 </body>
 </html>

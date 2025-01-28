@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { LinkContext } from '../../context/LinkContext';
 import styles from './index.module.css';
 
 export const PageSettingsModal = ({ template, onClose }) => {
@@ -9,6 +10,7 @@ export const PageSettingsModal = ({ template, onClose }) => {
     const [pageURL, setPageURL] = useState('');
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { setUserPages } = useContext(LinkContext);
     
     const createPage = async () => {
         if (user) {
@@ -21,6 +23,11 @@ export const PageSettingsModal = ({ template, onClose }) => {
                     withCredentials: true
                 });
                 if (response.status === 200) {
+                    setUserPages(prevPages => [...prevPages, {
+                        pageTitle,
+                        pageURL,
+                        style: template.name
+                    }]);
                     navigate(`/${pageURL}/edit`);
                 }
             } catch (error) {

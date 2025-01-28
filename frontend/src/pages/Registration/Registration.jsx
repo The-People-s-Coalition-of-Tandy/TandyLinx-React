@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Registration.module.css';
+import AeroButton from '../../components/common/AeroButton/AeroButton';
 
 const Registration = () => {
   const [username, setUsername] = useState('');
@@ -9,6 +10,14 @@ const Registration = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { checkAuth } = useAuth();
+
+  const themeChangeEvent = new CustomEvent('themeChange', {
+    detail: { theme: 'midnight' }
+  });
+
+  useEffect(() => {
+    window.dispatchEvent(themeChangeEvent);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,10 +73,10 @@ const Registration = () => {
             placeholder="Password"
             required
           />
-          <button type="submit">Register</button>
+          <AeroButton type="submit">Register</AeroButton>
         </form>
         <p className={styles.loginLink}>
-          Already have an account? <a href="/login">Login here</a>
+          Already have an account? <Link to="/login">Login here</Link>
         </p>
       </div>
     </div>

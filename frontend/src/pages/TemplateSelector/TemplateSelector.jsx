@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { LinkContext } from '../../context/LinkContext';
 import styles from './TemplateSelector.module.css';
 import Preview from '../../components/Preview/Preview';
 
@@ -19,6 +20,7 @@ const TemplateSelector = () => {
   const [urlStatus, setUrlStatus] = useState({ isAvailable: true, isChecking: false });
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { setUserPages } = useContext(LinkContext);
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -129,6 +131,12 @@ const TemplateSelector = () => {
       });
       
       if (response.data.success) {
+        // Update userPages with the new page
+        setUserPages(prevPages => [...prevPages, {
+          pageTitle,
+          pageURL,
+          style: selectedTemplate
+        }]);
         navigate(`/${pageURL}/edit`);
       }
     } catch (error) {

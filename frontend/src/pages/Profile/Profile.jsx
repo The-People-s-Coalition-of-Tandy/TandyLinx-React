@@ -1,15 +1,17 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LinkContext } from '../../context/LinkContext';
 import styles from './index.module.css';
 import AeroButton from '../../components/common/AeroButton/AeroButton';
 import { useAuth } from '../../context/AuthContext';
 import { useEffect } from 'react';
+import DeleteConfirmModal from '../../components/Editor/DeleteConfirmModal/DeleteConfirmModal';
 
 const Profile = () => {
     const { userPages, setCurrentPageLinks, getLinksFromPage, setUserPages } = useContext(LinkContext);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [deleteModalState, setDeleteModalState] = useState({ isOpen: false, pageURL: null });
 
     const themeChangeEvent = new CustomEvent('themeChange', {
         detail: { theme: 'sunset' }
@@ -27,24 +29,28 @@ const Profile = () => {
 
     const handleDelete = async (pageURL, e) => {
         e.stopPropagation();
-        if (window.confirm('Are you sure you want to delete this page?')) {
-            try {
-                const response = await fetch(`/api/pages/${pageURL}`, {
-                    method: 'DELETE',
-                    credentials: 'include'
-                });
+        setDeleteModalState({ isOpen: true, pageURL });
+    };
 
-                if (!response.ok) {
-                    throw new Error('Failed to delete page');
-                }
+    const handleDeleteConfirm = async () => {
+        const pageURL = deleteModalState.pageURL;
+        try {
+            const response = await fetch(`/api/pages/${pageURL}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
 
-                // Remove the page from the local state
-                setUserPages(prev => prev.filter(page => page.pageURL !== pageURL));
-            } catch (err) {
-                console.error('Error deleting page:', err);
-                alert('Failed to delete page');
+            if (!response.ok) {
+                throw new Error('Failed to delete page');
             }
+
+            // Remove the page from the local state
+            setUserPages(prev => prev.filter(page => page.pageURL !== pageURL));
+        } catch (err) {
+            console.error('Error deleting page:', err);
+            alert('Failed to delete page');
         }
+        setDeleteModalState({ isOpen: false, pageURL: null });
     };
 
     const handleSignOut = async () => {
@@ -81,12 +87,12 @@ const Profile = () => {
                             <AeroButton color="blue" onClick={() => navigate('/browser')}>
                                 + Create New Page
                             </AeroButton>
-                            <button 
-                                className={styles.signOutButton}
+                            <AeroButton 
+                                color="red"
                                 onClick={handleSignOut}
                             >
                                 Sign Out
-                            </button>
+                            </AeroButton>
                         </div>
                     </div>
                 </div>
@@ -115,6 +121,12 @@ const Profile = () => {
                     )}
                 </div>
             </div>
+            <DeleteConfirmModal 
+                isOpen={deleteModalState.isOpen}
+                onClose={() => setDeleteModalState({ isOpen: false, pageURL: null })}
+                onConfirm={handleDeleteConfirm}
+                message="Delete this page?"
+            />
         </>
     );
 };

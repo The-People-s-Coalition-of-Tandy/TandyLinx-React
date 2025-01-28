@@ -5,6 +5,13 @@
     font-weight: 200;
 }
 
+@font-face {
+    font-family: 'frutiger';
+    src: url(/assets/fonts/Frutiger.woff) format('woff');
+    font-display: block;
+    font-weight: 200;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -65,8 +72,13 @@ canvas {
 .titleLinx {
     display: block;
     font-family: 'linotype', Arial, sans-serif;
+    /* font-family: 'frutiger', Arial, sans-serif; */
     opacity: 0;
     will-change: transform, opacity;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .titleTandy {
@@ -93,31 +105,122 @@ canvas {
 }
 
 .link {
+    position: relative;
     width: 120px;
     height: 120px;
     border-radius: 50%;
     display: flex;
     flex-direction: column;
+    gap: 10px;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     color: rgb(0, 0, 0);
-    backdrop-filter: blur(10px);
-    transition: all 0.4s ease;
+    /* backdrop-filter: blur(10px); */
     will-change: transform;
     text-align: center;
     text-transform: uppercase;
-    background-color: rgba(255, 255, 255, 0.1);
+    /* background-color: rgba(255, 255, 255, 0.1); */
     letter-spacing: 0.1em;
     opacity: 0;
-    transform: scale(0);
+    transform: scale(0) translateZ(0);
     padding: 10px;
+    -webkit-transform: scale(0) translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: transform 0.3s ease;
+}
+
+.link:hover {
+    transform: scale(1.05) !important;
+    transition: transform 0.3s ease;
+    filter: brightness(1.1);
 }
 
 .link svg {
     font-size: 1.8em;
     margin-bottom: 0.5rem;
     opacity: 0.9;
+}
+
+@keyframes bubble {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    33% {
+        transform: scale(1.05) rotate(2deg);
+    }
+    66% {
+        transform: scale(0.95) rotate(-2deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    z-index: 9999;
+    pointer-events: none;
+    bottom: 0;
+    right: 0;
+}
+
+.background img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    -webkit-mask-image: linear-gradient(to top, 
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.8) 20%,
+        rgba(0, 0, 0, 0.8) 50%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(to top, 
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 0.8) 20%,
+        rgba(0, 0, 0, 0.8) 50%,
+        rgba(0, 0, 0, 0) 100%
+    );
+
+    animation: fadeIn 1s 1s linear backwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.linkBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    z-index: -1;
+    pointer-events: none;
+    animation: bubble 6s ease-in-out infinite;
+}
+
+.linkBackgroundLarge {
+    width: 110%;
+    height: 110%;
+    top: -5%;
+    left: -5%;
+    animation-duration: 7s;
 }
 
 /* Particles */
@@ -149,10 +252,17 @@ canvas {
         width: 100px;
         height: 100px;
         font-size: 0.8rem;
+        backdrop-filter: none;
+        /* background-color: rgba(255, 255, 255, 0.15); */
+        transform: scale(0) translateZ(0);
+        -webkit-transform: scale(0) translateZ(0);
     }
 
     .link svg {
         font-size: 1.5em;
+        margin-bottom: 0.3rem;
+        transform: translateY(-2px) translateZ(0);
+        -webkit-transform: translateY(-2px) translateZ(0);
     }
 
     .interface {

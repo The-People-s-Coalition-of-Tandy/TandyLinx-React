@@ -5,6 +5,7 @@ import { routes } from './routes/routes.jsx';
 import { Aurora } from './components/Aurora/Aurora';
 import { AnimatePresence } from 'framer-motion';
 import './App.css';
+import './styles/safari-overrides.css';
 import { ProfilePhotoProvider } from './context/ProfilePhotoContext';
 
 function AppRoutes() {

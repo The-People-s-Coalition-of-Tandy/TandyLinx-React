@@ -5,18 +5,6 @@ import { vertexShaderSource, fragmentShaderSource } from './shaders';
 export const Aurora = () => {
     const canvasRef = useRef(null);
     const animationRef = useRef(null);
-    
-    
-    // og colors
-    // float colorPhase = uAnimateColors ? sin(uTime * 0.5) * 0.5 + 0.5 : 0.0;
-    // vec4 brightColor = mix(vec4(1.0, 0.4, 0.8, 1.0), vec4(0.4, 0.8, 1.0, 1.0), colorPhase);
-    // vec4 darkColor = mix(vec4(0.15, 0.0, 0.1, 1.0), vec4(0.0, 0.1, 0.15, 1.0), colorPhase);
-    // vec4 bgColor = mix(darkColor, brightColor, gradientValue);
-
-    // vec4 waveColor = mix(
-    //     vec4(1.0, 0.6, 0.9, getWaveLines(pixel)),
-    //     vec4(0.6, 0.9, 1.0, getWaveLines(pixel)),
-    //     colorPhase
 
     useEffect(() => {
         class ShaderAnimation {
@@ -106,7 +94,8 @@ export const Aurora = () => {
                         waveColor: [0.9, 0.0, 0.9],
                         audioWaveColor: [0.9, 0.9, 0.9, 0.9],
                         cloudAlpha: 1.0,
-                        bgMix: 0.0
+                        bgMix: 0.0,
+                        rainbowTransition: 0.0
                     },
                     pink: {
                         skyTop: [0.4, 0.6, 1.0],
@@ -117,7 +106,8 @@ export const Aurora = () => {
                         waveColor: [1.0, 0.6, 0.9],
                         audioWaveColor: [0.9, 0.5, 0.7, 0.9],
                         cloudAlpha: 1.0,
-                        bgMix: 0.5
+                        bgMix: 0.5,
+                        rainbowTransition: 0.0
                     },
                     sunset: {
                         skyTop: [0.8, 0.3, 0.1],      // Orange-red
@@ -128,7 +118,8 @@ export const Aurora = () => {
                         waveColor: [1.0, 0.7, 0.4],
                         audioWaveColor: [1.0, 0.6, 0.3, 0.9],
                         cloudAlpha: 0.0,
-                        bgMix: 0.5
+                        bgMix: 0.5,
+                        rainbowTransition: 0.0
                     },
                     midnight: {
                         skyTop: [0.05, 0.05, 0.2],    // Deep blue
@@ -139,7 +130,8 @@ export const Aurora = () => {
                         waveColor: [0.4, 0.5, 1.0],
                         audioWaveColor: [0.5, 0.6, 1.0, 0.9],
                         cloudAlpha: 1.0,
-                        bgMix: 0.5
+                        bgMix: 0.5,
+                        rainbowTransition: 0.0
                     },
                     forest: {
                         skyTop: [0.2, 0.4, 0.2],      // Forest green
@@ -150,7 +142,8 @@ export const Aurora = () => {
                         waveColor: [0.5, 0.9, 0.6],
                         audioWaveColor: [1.0, 0.9, 0.0, 0.9],
                         cloudAlpha: 0.0,
-                        bgMix: 0.5
+                        bgMix: 0.5,
+                        rainbowTransition: 0.0
                     },
                     cyberpunk: {
                         skyTop: [0.2, 0.0, 0.4],      // Deep purple
@@ -161,7 +154,8 @@ export const Aurora = () => {
                         waveColor: [0.0, 1.0, 1.0],
                         audioWaveColor: [1.0, 0.2, 1.0, 0.9],
                         cloudAlpha: 0.0,
-                        bgMix: 0.5
+                        bgMix: 0.5,
+                        rainbowTransition: 0.0
                     },
                     plain: {
                         skyTop: [0.4, 0.6, 1.0],      // Light blue
@@ -172,20 +166,71 @@ export const Aurora = () => {
                         waveColor: [1.0, 1.0, 1.0],
                         audioWaveColor: [1.0, 1.0, 1.0, 0.7],
                         cloudAlpha: 1.0,
-                        bgMix: 0.0
+                        bgMix: 0.0,
+                        rainbowTransition: 0.0
+                    },
+                    rainbowSky: {
+                        skyTop: [0.4, 0.6, 1.0],      // Light blue
+                        skyBottom: [0.8, 0.9, 1.0],  // Very light blue
+                        brightColor: [1.0, 1.0, 1.0, 1.0],
+                        bgGradientLight: [1.0, 1.0, 1.0, 0.0],
+                        bgGradientDark: [0.8, 0.8, 0.8, 0.0],
+                        waveColor: [1.0, 1.0, 1.0],
+                        audioWaveColor: [1.0, 1.0, 1.0, 0.7],
+                        cloudAlpha: 1.0,
+                        bgMix: 0.0,
+                        rainbowTransition: 1.0
+                    },
+                    rainbowWave: {
+                        skyTop: [1.0, 1.0, 1.0],      // Light blue
+                        skyBottom: [1.0, 1.0, 1.0],  // Very light blue
+                        brightColor: [1.0, 1.0, 1.0, 1.0],
+                        bgGradientLight: [1.0, 1.0, 1.0, 0.0],
+                        bgGradientDark: [0.8, 0.8, 0.8, 0.0],
+                        waveColor: [1.0, 1.0, 1.0],
+                        audioWaveColor: [1.0, 1.0, 1.0, 0.7],
+                        cloudAlpha: 1.0,
+                        bgMix: 0.0,
+                        rainbowTransition: 1.0
+                    },
+                    fullWhite: {
+                        skyTop: [1.0, 1.0, 1.0],      // Light blue
+                        skyBottom: [1.0, 1.0, 1.0],  // Very light blue
+                        brightColor: [1.0, 1.0, 1.0, 1.0],
+                        bgGradientLight: [1.0, 1.0, 1.0, 0.0],
+                        bgGradientDark: [1.0, 1.0, 1.0, 0.0],
+                        waveColor: [1.0, 1.0, 1.0],
+                        audioWaveColor: [1.0, 1.0, 1.0, 1.0],
+                        cloudAlpha: 1.0,
+                        bgMix: 0.0,
+                        rainbowTransition: 0.0
+                    },
+                    rainbowOnly: {
+                        skyTop: [1.0, 1.0, 1.0],      // Light blue
+                        skyBottom: [1.0, 1.0, 1.0],  // Very light blue
+                        brightColor: [1.0, 1.0, 1.0, 1.0],
+                        bgGradientLight: [1.0, 1.0, 1.0, 0.0],
+                        bgGradientDark: [1.0, 1.0, 1.0, 0.0],
+                        waveColor: [1.0, 1.0, 1.0],
+                        audioWaveColor: [1.0, 1.0, 1.0, 1.0],
+                        cloudAlpha: 1.0,
+                        bgMix: 0.0,
+                        rainbowTransition: 1.0
                     }
                 };
             }
 
             initParticles() {
                 this.spheres = Array(15).fill(0).map((_, i) => new Particle(i, {
+                    startTimeOffset: i * 0.2,  // Add staggered start times
                     sizeMultiplier: 150,
                     minSize: 15,
-                    isGlowing: false
+                    isGlowing: false,
+                    speedMultiplier: 0.8  // Ensure consistent speed
                 }));
 
-                this.glowingSpheres = Array(15).fill(0).map((_, i) => new Particle(i, {
-                    startTimeOffset: 2,
+                this.glowingSpheres = Array(45).fill(0).map((_, i) => new Particle(i, {
+                    startTimeOffset: 0.5,
                     sizeMultiplier: 80,
                     minSize: 8,
                     isGlowing: true,
@@ -193,7 +238,7 @@ export const Aurora = () => {
                 }));
 
                 this.sphereData = new Float32Array(15 * 4);
-                this.glowingSphereData = new Float32Array(15 * 4);
+                this.glowingSphereData = new Float32Array(45 * 4);
             }
 
             setupEventListeners() {
@@ -216,30 +261,41 @@ export const Aurora = () => {
                 });
 
                 window.addEventListener('keypress', (e) => {
-                    const themeTransitionDuration = 2000; // 2 seconds
+                    console.log(e.duration);
+                    const themeTransitionDuration = e.duration || 2000; // 2 seconds
 
                     switch(e.key.toLowerCase()) {
-                        case '1':
-                            this.startUniformAnimation(this.colorThemes.pink, themeTransitionDuration);
-                            break;
-                        case '2':
-                            this.startUniformAnimation(this.colorThemes.sunset, themeTransitionDuration);
-                            break;
-                        case '3':
-                            this.startUniformAnimation(this.colorThemes.midnight, themeTransitionDuration);
-                            break;
-                        case '4':
-                            this.startUniformAnimation(this.colorThemes.forest, themeTransitionDuration);
-                            break;
-                        case '5':
-                            this.startUniformAnimation(this.colorThemes.cyberpunk, themeTransitionDuration);
-                            break;
-                        case '6':
-                            this.startUniformAnimation(this.colorThemes.plain, themeTransitionDuration);
-                            break;
-                        case 'c':
-                            this.animateColors = !this.animateColors;
-                            break;
+                        // case '1':
+                        //     this.startUniformAnimation(this.colorThemes.pink, themeTransitionDuration);
+                        //     break;
+                        // case '2':
+                        //     this.startUniformAnimation(this.colorThemes.sunset, themeTransitionDuration);
+                        //     break;
+                        // case '3':
+                        //     this.startUniformAnimation(this.colorThemes.midnight, themeTransitionDuration);
+                        //     break;
+                        // case '4':
+                        //     this.startUniformAnimation(this.colorThemes.forest, themeTransitionDuration);
+                        //     break;
+                        // case '5':
+                        //     this.startUniformAnimation(this.colorThemes.cyberpunk, themeTransitionDuration);
+                        //     break;
+                        // case '6':
+                        //     this.startUniformAnimation(this.colorThemes.plain, themeTransitionDuration);
+                        //     break;
+                        // case '7':
+                        //     this.startUniformAnimation(this.colorThemes.rainbowSky, themeTransitionDuration);
+                        //     break;
+                        // case '8':
+                        //     this.startUniformAnimation(this.colorThemes.rainbowWhite, themeTransitionDuration);
+                        //     break;
+                        // case 'c':
+                        //     this.animateColors = !this.animateColors;
+                        //     break;
+                        // case 'd':
+                        //     this.ditherEnabled = !this.ditherEnabled;
+                        //     this.gl.uniform1i(this.uEnableDither, this.ditherEnabled);
+                        //     break;
                     }
                 });
 
@@ -250,6 +306,11 @@ export const Aurora = () => {
 
             createShader(type, source) {
                 const shader = this.gl.createShader(type);
+                if (!shader) {
+                    console.error('Failed to create shader');
+                    return null;
+                }
+                
                 this.gl.shaderSource(shader, source);
                 this.gl.compileShader(shader);
 
@@ -272,13 +333,23 @@ export const Aurora = () => {
                     fragmentShaderSource
                 );
 
+                if (!vertexShader || !fragmentShader) {
+                    console.error('Failed to create shaders');
+                    return;
+                }
+
                 this.program = this.gl.createProgram();
+                if (!this.program) {
+                    console.error('Failed to create shader program');
+                    return;
+                }
+
                 this.gl.attachShader(this.program, vertexShader);
                 this.gl.attachShader(this.program, fragmentShader);
                 this.gl.linkProgram(this.program);
 
                 if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
-                    console.error('Shader program failed to link');
+                    console.error('Shader program failed to link:', this.gl.getProgramInfoLog(this.program));
                     return;
                 }
 
@@ -293,6 +364,7 @@ export const Aurora = () => {
                 this.uResolution = this.gl.getUniformLocation(this.program, 'uResolution');
                 this.colorToggleLocation = this.gl.getUniformLocation(this.program, 'uAnimateColors');
                 this.uMouse = this.gl.getUniformLocation(this.program, 'uMouse');
+                this.uEnableDither = this.gl.getUniformLocation(this.program, 'uEnableDither');
 
                 this.animatedUniforms = {
                     skyTop: {
@@ -344,6 +416,11 @@ export const Aurora = () => {
                         A: this.gl.getUniformLocation(this.program, 'uBgMix.A'),
                         B: this.gl.getUniformLocation(this.program, 'uBgMix.B'),
                         type: 'float'
+                    },
+                    rainbowTransition: {
+                        A: this.gl.getUniformLocation(this.program, 'uRainbowTransition.A'),
+                        B: this.gl.getUniformLocation(this.program, 'uRainbowTransition.B'),
+                        type: 'float'
                     }
                 };
 
@@ -361,16 +438,21 @@ export const Aurora = () => {
                 this.gl.uniform4f(this.animatedUniforms.bgGradientDark.B, 1.0, 1.0, 1.0, 1.0);
                 this.gl.uniform4f(this.animatedUniforms.brightColor.A, 1.0, 1.0, 1.0, 1.0);
                 this.gl.uniform4f(this.animatedUniforms.brightColor.B, 1.0, 1.0, 1.0, 1.0);
-                this.gl.uniform3f(this.animatedUniforms.waveColor.A, 0.75, 0.75, 0.75);
-                this.gl.uniform3f(this.animatedUniforms.waveColor.B, 0.75, 0.75, 0.75);
-                this.gl.uniform4f(this.animatedUniforms.audioWaveColor.A, 0.95, 0.95, 0.95, 0.95);
-                this.gl.uniform4f(this.animatedUniforms.audioWaveColor.B, 0.95, 0.95, 0.95, 0.95);
+                this.gl.uniform3f(this.animatedUniforms.waveColor.A, 1.0, 1.0, 1.0);
+                this.gl.uniform3f(this.animatedUniforms.waveColor.B, 1.0, 1.0, 1.0);
+                this.gl.uniform4f(this.animatedUniforms.audioWaveColor.A, 1.0, 1.0, 1.0, 1.0);
+                this.gl.uniform4f(this.animatedUniforms.audioWaveColor.B, 1.0, 1.0, 1.0, 1.0);
                 this.gl.uniform1f(this.animatedUniforms.cloudAlpha.A, 1.0);
                 this.gl.uniform1f(this.animatedUniforms.cloudAlpha.B, 1.0);
                 this.gl.uniform1f(this.animatedUniforms.bgMix.A, 0.0);
                 this.gl.uniform1f(this.animatedUniforms.bgMix.B, 0.0);
+                this.gl.uniform1f(this.animatedUniforms.rainbowTransition.A, 0.0);
+                this.gl.uniform1f(this.animatedUniforms.rainbowTransition.B, 0.0);
                 
                 this.gl.uniform1f(this.transitionTimelineLocation, 0.0);
+
+                // Initialize dither as disabled
+                this.gl.uniform1i(this.uEnableDither, false);
             }
 
 
@@ -422,9 +504,10 @@ export const Aurora = () => {
                 this.gl.uniform4fv(this.uGlowingSpheres, this.glowingSphereData);
             }
 
-            startUniformAnimation(newValues, duration) {
+            startUniformAnimation(newValues, duration, easingFunction="easeInOutQuad") {
                 // Get current interpolated values based on timeline
-                const currentProgress = this.easing.easeInOutQuad(this.transitionTimeline);
+                const easingFn = this.easing[easingFunction];
+                const currentProgress = easingFn(this.transitionTimeline);
                 
                 Object.entries(newValues).forEach(([key, value]) => {
                     if (this.animatedUniforms[key]) {
@@ -546,7 +629,8 @@ export const Aurora = () => {
                     console.log('Starting uniform animation');
                     animationRef.current.startUniformAnimation(
                         animationRef.current.colorThemes[event.detail.theme], 
-                        2000
+                        event.detail.duration || 2000,
+                        event.detail.easingFunction || "smoothStep"
                     );
                 }
             };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ProfilePhotoUpload from '../ProfilePhotoUpload/ProfilePhotoUpload';
 import PageSettingsModal from '../PageSettingsModal/PageSettingsModal';
 import { faPaintBrush, faHome, faShare, faCog } from '@fortawesome/free-solid-svg-icons';
@@ -18,6 +18,18 @@ const EditorHeader = ({
     children
 }) => {
     const navigate = useNavigate();
+    const [showShareTooltip, setShowShareTooltip] = useState(false);
+
+    const handleShare = async () => {
+        const shareUrl = `https://links.pcotandy.org/${currentPageURL}`;
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setShowShareTooltip(true);
+            setTimeout(() => setShowShareTooltip(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy URL:', err);
+        }
+    };
 
     return (
         <>
@@ -46,13 +58,14 @@ const EditorHeader = ({
                     </div>
                 </div>
                 <div className="header-orbs">
-                    <button className="header-orb" onClick={() => navigate('/profile')}>
+                    <button className="header-orb" onClick={() => navigate('/profile')} title="Go to Profile">
                         <FontAwesomeIcon icon={faHome} />
                     </button>
-                    <button className="header-orb">
+                    <button className="header-orb" onClick={handleShare} title="Share Page">
                         <FontAwesomeIcon icon={faShare} />
+                        {showShareTooltip && <div className="share-tooltip">LinkCopied!</div>}
                     </button>
-                    <button className="header-orb">
+                    <button className="header-orb" onClick={() => onShowSettings(true)} title="Page Settings">
                         <FontAwesomeIcon icon={faCog} />
                     </button>
                 </div>

@@ -1,0 +1,49 @@
+/* Safari iOS overrides */
+
+/* Remove default blue color from buttons and interactive elements */
+button,
+a,
+select,
+input,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  color: inherit;
+}
+
+/* Remove blue color from links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Remove blue from buttons */
+button {
+  color: inherit;
+  -webkit-appearance: none;
+}
+
+/* Remove blue from inputs */
+input,
+select,
+textarea {
+  color: inherit;
+  -webkit-appearance: none;
+}
+
+/* Specific override for any elements that might still be blue */
+[role="button"],
+[type="button"],
+[type="submit"],
+[type="reset"] {
+  color: inherit;
+  -webkit-appearance: none;
+}
+
+/* Fix for specific components that were showing up blue */
+.pageURL-text,
+.link-title-text,
+.nav a,
+.link {
+  color: inherit !important;
+} 
