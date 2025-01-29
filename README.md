@@ -30,7 +30,8 @@ A "link in bio" website builder focused on unique, artistically-driven templates
   - Embroidery-style generative art
   - Video-based effects
 
-[GIF of template switching/interaction]
+
+![ScreenRecording2025-01-29at12 00 43AM-ezgif com-resize](https://github.com/user-attachments/assets/3a870aab-98c6-4b9a-965f-93ee514b302c)
 
 ## Quick Start
 
