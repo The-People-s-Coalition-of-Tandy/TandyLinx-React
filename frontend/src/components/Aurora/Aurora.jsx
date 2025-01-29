@@ -109,17 +109,53 @@ export const Aurora = () => {
                         bgMix: 0.5,
                         rainbowTransition: 0.0
                     },
+                    // sunset: {
+                    //     skyTop: [1.0, 0.3, 0.0],      // Deep orange
+                    //     skyBottom: [1.0, 0.7, 0.0],    // Golden yellow
+                    //     brightColor: [1.0, 1.0, 1.0, 1.0], // Bright orange
+                    //     bgGradientLight: [1.0, 0.6, 0.0, 1.0], // Warm orange
+                    //     bgGradientDark: [0.9, 0.2, 0.0, 1.0],  // Deep orange-red
+                    //     waveColor: [1.0, 1.0, 1.0],    // Orange-gold
+                    //     audioWaveColor: [1.0, 1.0, 1.0, 1.0], // Bright gold
+                    //     cloudAlpha: 0.0,               // No clouds
+                    //     bgMix: 0.9,                    // Strong background gradient
+                    //     rainbowTransition: 0.0         // No rainbow effect
+                    // },
                     sunset: {
-                        skyTop: [0.8, 0.3, 0.1],      // Orange-red
-                        skyBottom: [0.95, 0.6, 0.4],   // Soft peach
-                        brightColor: [1.0, 0.4, 0.2, 1.0],
-                        bgGradientLight: [1.0, 0.5, 0.2, 1.0],
-                        bgGradientDark: [0.2, 0.05, 0.0, 1.0],
-                        waveColor: [1.0, 0.7, 0.4],
-                        audioWaveColor: [1.0, 0.6, 0.3, 0.9],
-                        cloudAlpha: 0.0,
-                        bgMix: 0.5,
-                        rainbowTransition: 0.0
+                        skyTop: [1.0, 0.4, 0.0],      // Bright orange
+                        skyBottom: [1.0, 0.8, 0.0],    // Vibrant yellow
+                        brightColor: [1.0, 0.6, 0.0, 1.0], // Glowing orange
+                        bgGradientLight: [1.0, 0.5, 0.0, 1.0], // Warm orange
+                        bgGradientDark: [0.8, 0.2, 0.0, 1.0],  // Deep orange
+                        waveColor: [1.0, 0.8, 0.2],    // Golden yellow
+                        audioWaveColor: [1.0, 0.9, 0.3, 0.9], // Bright yellow
+                        cloudAlpha: 0.0,               // No clouds
+                        bgMix: 0.8,                    // Strong background gradient
+                        rainbowTransition: 0.0         // No rainbow effect
+                    },
+                    dorficLight: {
+                        skyTop: [1.0, 0.4, 0.0],      // Bright orange
+                        skyBottom: [1.0, 0.8, 0.0],    // Vibrant yellow
+                        brightColor: [1.0, 0.6, 0.0, 1.0], // Glowing orange
+                        bgGradientLight: [1.0, 0.5, 0.0, 1.0], // Warm orange
+                        bgGradientDark: [0.8, 0.2, 0.0, 1.0],  // Deep orange
+                        waveColor: [1.0, 0.8, 0.2],    // Golden yellow
+                        audioWaveColor: [1.0, 0.9, 0.3, 0.9], // Bright yellow
+                        cloudAlpha: 0.0,               // No clouds
+                        bgMix: 0.8,                    // Strong background gradient
+                        rainbowTransition: 0.0         // No rainbow effect
+                    },
+                    dorficWhite: {
+                        skyTop: [1.0, 1.0, 1.0],      // Pure white
+                        skyBottom: [0.95, 0.95, 0.95], // Slightly off-white
+                        brightColor: [1.0, 0.4, 0.0, 1.0], // Bright orange
+                        bgGradientLight: [1.0, 1.0, 1.0, 0.2], // White with low opacity
+                        bgGradientDark: [0.98, 0.98, 0.98, 0.2], // Almost white with low opacity
+                        waveColor: [1.0, 0.6, 0.0],    // Orange wave
+                        audioWaveColor: [1.0, 0.4, 0.0, 0.9], // Bright orange with high opacity
+                        cloudAlpha: 0.2,               // Subtle clouds
+                        bgMix: 0.3,                    // Light background gradient
+                        rainbowTransition: 0.0         // No rainbow effect
                     },
                     midnight: {
                         skyTop: [0.05, 0.05, 0.2],    // Deep blue
@@ -216,6 +252,18 @@ export const Aurora = () => {
                         cloudAlpha: 1.0,
                         bgMix: 0.0,
                         rainbowTransition: 1.0
+                    },
+                    dorficWhiteTwo: {
+                        skyTop: [1.0, 0.5, 0.0],      // Bright warm orange
+                        skyBottom: [1.0, 0.7, 0.2],    // Golden orange
+                        brightColor: [1.0, 1.0, 1.0, 1.0], // Pure white for geometric elements
+                        bgGradientLight: [1.0, 0.6, 0.0, 1.0], // Vibrant orange
+                        bgGradientDark: [1.0, 0.4, 0.0, 1.0],  // Deep orange
+                        waveColor: [1.0, 1.0, 1.0],    // White waves
+                        audioWaveColor: [1.0, 1.0, 1.0, 0.9], // White with high opacity
+                        cloudAlpha: 0.0,               // No clouds to maintain the clean look
+                        bgMix: 0.9,                    // Strong background gradient
+                        rainbowTransition: 0.0         // No rainbow effect
                     }
                 };
             }
@@ -259,12 +307,13 @@ export const Aurora = () => {
                         this.animate();
                     }
                 });
+                
+                // useful for testing
+                // window.addEventListener('keypress', (e) => {
+                    // console.log(e.duration);
+                    // const themeTransitionDuration = e.duration || 2000; // 2 seconds
 
-                window.addEventListener('keypress', (e) => {
-                    console.log(e.duration);
-                    const themeTransitionDuration = e.duration || 2000; // 2 seconds
-
-                    switch(e.key.toLowerCase()) {
+                    // switch(e.key.toLowerCase()) {
                         // case '1':
                         //     this.startUniformAnimation(this.colorThemes.pink, themeTransitionDuration);
                         //     break;
@@ -296,8 +345,8 @@ export const Aurora = () => {
                         //     this.ditherEnabled = !this.ditherEnabled;
                         //     this.gl.uniform1i(this.uEnableDither, this.ditherEnabled);
                         //     break;
-                    }
-                });
+                    // }
+            //    });
 
                 window.addEventListener('mousemove', (e) => {
                     this.gl.uniform2f(this.uMouse, e.clientX, e.clientY);
