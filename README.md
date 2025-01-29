@@ -1,8 +1,9 @@
 <h1 align="center">TandyLinx</h1>
-<h2 align="center"><i>A creative link management system with unique, artistic templates</i></h2>
 
 
-[Screenshot/GIF of your most visually impressive template]
+![Preview](https://github.com/user-attachments/assets/cf429d1d-07fd-4b98-9bde-6c7459df9c05)
+
+<h2 align="center"><i>A link in bio focused on uniquely aesthetic templates</i></h2>
 
 <p align="center">
   <img alt="Node" src="https://img.shields.io/badge/node-18.x-brightgreen?style=flat-square">
