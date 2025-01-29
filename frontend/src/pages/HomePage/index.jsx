@@ -1,7 +1,7 @@
 import { Navigation } from './components/Navigation';
 import { Title } from './components/Title';
 import styles from './styles/index.module.css';
-import grass from './assets/images/grass.png';
+import grass from './assets/images/grass.webp';
 
 export default function HomePage() {
     return (

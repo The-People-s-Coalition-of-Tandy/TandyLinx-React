@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import usericon from '../assets/icons/user.png';
-import foldericon from '../assets/icons/folder.png';
-import addIcon from '../assets/icons/addIcon.png';
+import usericon from '../assets/icons/user.webp';
+import foldericon from '../assets/icons/folder.webp';
+import addIcon from '../assets/icons/addIcon.webp';
 import bubbleBackground from '../assets/images/bubble.webp';
 import styles from '../styles/index.module.css';
 
