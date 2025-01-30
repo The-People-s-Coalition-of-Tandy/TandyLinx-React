@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
@@ -74,7 +74,7 @@ export const PageSettingsModal = ({ template, onClose }) => {
         if (!user) {
             setShowAuthPrompt(true);
             localStorage.setItem('pendingPage', JSON.stringify({
-                template: template.name,
+                template: template,
                 pageTitle,
                 pageURL
             }));
@@ -85,7 +85,7 @@ export const PageSettingsModal = ({ template, onClose }) => {
             const response = await axios.post('/api/pages', {
                 pageTitle,
                 pageURL,
-                style: template.name
+                style: template
             }, {
                 withCredentials: true
             });
@@ -93,7 +93,7 @@ export const PageSettingsModal = ({ template, onClose }) => {
                 setUserPages(prevPages => [...prevPages, {
                     pageTitle,
                     pageURL,
-                    style: template.name
+                    style: template
                 }]);
                 navigate(`/${pageURL}/edit`, { 
                     state: { transition: true }

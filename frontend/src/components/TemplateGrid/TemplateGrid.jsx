@@ -22,6 +22,7 @@ const TemplateGrid = ({
     }
   }, [isLoading, hasCompletedAnimation]);
 
+
   return (
     <>
       {showLoadingScreen ? (

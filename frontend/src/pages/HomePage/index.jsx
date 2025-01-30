@@ -20,15 +20,16 @@ export default function HomePage() {
 
         const handleThemeChange = () => {
             gsap.to(`.${styles.castle}`, {
-                duration: 1,
+                duration: 1.3,
                 opacity: 0.8,
                 ease: "linear.out"
             });
 
             gsap.to(`.${styles.city}`, {
-                duration: 1,
+                duration: 2,
                 opacity: 0.6,
-                ease: "linear.out"
+                ease: "linear.out",
+                delay: 0.1
             });
         };
 

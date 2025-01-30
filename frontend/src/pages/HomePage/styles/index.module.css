@@ -27,6 +27,11 @@ canvas {
     position: fixed;
     top: 0;
     left: 0;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Layout containers */
@@ -127,6 +132,7 @@ canvas {
 
 .link:hover {
     filter: brightness(1.1);
+    transform: scale(1.1) !important;
 }
 
 .castle {

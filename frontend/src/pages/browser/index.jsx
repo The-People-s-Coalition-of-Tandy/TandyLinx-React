@@ -51,7 +51,8 @@ const Browser = () => {
       'Castle2',
       'Flaming_Demon',
       'Wizard_Walking',
-      'dream3d'
+      'dream3d',
+      'Warrior_Wind'
     ];
 
     let currentMessage = 0;
