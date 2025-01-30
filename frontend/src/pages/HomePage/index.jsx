@@ -1,11 +1,7 @@
 import { Navigation } from './components/Navigation';
 import { Title } from './components/Title';
 import styles from './styles/index.module.css';
-// import grass from './assets/images/grass.webp';
-// import grass from './assets/images/grassTwo.webp';
-// import grass from './assets/images/grassThree.webp';
-// import grass from './assets/images/grassFour.webp';
-// import grass from './assets/images/grass5.png';
+// import grass from './assets/images/grass5.png'; // alternate grass
 import grass from './assets/images/grass6.webp';
 import castle from './assets/images/castle.png';
 import city from './assets/images/city.png';
@@ -14,14 +10,11 @@ import { useEffect } from 'react';
 
 export default function HomePage() {
     useEffect(() => {
-        // Initial state - hide castle and city
         gsap.set(`.${styles.castle}`, {
-            // transform: 'translateX(-2vw)',  // Start from left edge of screen
             opacity: 0
         });
         
         gsap.set(`.${styles.city}`, {
-            // transform: 'translateX(150vw)',   // Start from right edge of screen
             opacity: 0
         });
 

@@ -56,6 +56,18 @@ export const Aurora = () => {
                 
                 this.resize();
                 this.animate();
+
+                // Chrome-specific optimizations
+                if (/Chrome/.test(navigator.userAgent)) {
+                    // Force GPU acceleration
+                    this.canvas.style.transform = 'translateZ(0)';
+                    
+                    // Reduce animation frame rate slightly for Chrome
+                    this.frameInterval = 1000 / 50; // 50fps instead of 60fps
+                    this.lastFrameTime = 0;
+                } else {
+                    this.frameInterval = 0; // Run at full speed for other browsers
+                }
             }
 
             initState() {
@@ -648,6 +660,18 @@ export const Aurora = () => {
 
             animate() {
                 if (!this.isRunning) return;
+                
+                const now = performance.now();
+                
+                // Chrome-specific frame limiting
+                if (this.frameInterval > 0) {
+                    const elapsed = now - this.lastFrameTime;
+                    if (elapsed < this.frameInterval) {
+                        this.rafId = requestAnimationFrame(() => this.animate());
+                        return;
+                    }
+                    this.lastFrameTime = now - (elapsed % this.frameInterval);
+                }
                 
                 this.time += 0.003;
                 this.gl.uniform1f(this.uTime, this.time);

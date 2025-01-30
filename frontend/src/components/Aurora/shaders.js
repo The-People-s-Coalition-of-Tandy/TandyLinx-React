@@ -114,27 +114,24 @@ float getSphere(vec2 pixel, vec4 sphere) {
 }
 
 float getSphereGlow(vec2 pixel, vec4 sphere) {
-    vec2 pos = vec2(sphere.x, sphere.y);
-    float size = sphere.w * 0.05;  // Reduced size multiplier for tighter glow
-    float z = sphere.z;
-    
+    vec2 pos = sphere.xy;
     float dist = length(pixel - pos);
-    float glow = pow(size / dist, 1.5);  // Adjusted power for smoother falloff
-    float depthFactor = 1.0 - (z / 1000.0);
-    
-    return glow * depthFactor * 0.3;  // Reduced intensity multiplier
+    float sizeDepth = sphere.w * 0.05 * (1.0 - sphere.z / 1000.0);
+    float glow = sizeDepth / (dist * dist);
+    return glow * 0.3;
 }
 
 vec3 getVibrantColor(float index) {
-    // Create 6 different vibrant colors
     float normalizedIndex = mod(index, 6.0);
-    
-    if (normalizedIndex < 1.0) return vec3(1.0, 0.0, 1.0); // Magenta
-    if (normalizedIndex < 2.0) return vec3(0.0, 1.0, 1.0); // Cyan
-    if (normalizedIndex < 3.0) return vec3(1.0, 0.0, 0.0); // Red
-    if (normalizedIndex < 4.0) return vec3(0.0, 1.0, 0.0); // Green
-    if (normalizedIndex < 5.0) return vec3(0.0, 0.0, 1.0); // Blue
-    return vec3(1.0, 0.5, 0.0); // Orange
+    vec3[6] colors = vec3[6](
+        vec3(1.0, 0.0, 1.0), // Magenta
+        vec3(0.0, 1.0, 1.0), // Cyan
+        vec3(1.0, 0.0, 0.0), // Red
+        vec3(0.0, 1.0, 0.0), // Green
+        vec3(0.0, 0.0, 1.0), // Blue
+        vec3(1.0, 0.5, 0.0)  // Orange
+    );
+    return colors[int(normalizedIndex)];
 }
 
 float random(vec2 st) {
@@ -166,7 +163,8 @@ float random(vec2 st) {
         float f = 0.0;
         float w = 0.5;
         float freq = mix(uCloudFrequency.A, uCloudFrequency.B, uTransitionTimeline);
-        for (int i = 0; i < 5; i++) {
+        
+        for (int i = 0; i < 4; i++) {
             f += w * noise(p * freq);
             freq *= 2.0;
             w *= 0.5;
@@ -258,13 +256,43 @@ float getSphereGlowIntensity(vec2 pixel) {
 }
 
 float getAudioWaveIntensity(vec2 pixel) {
+    vec2 center = uResolution.xy * 0.8;
+    float angle = 1.2;
+    vec2 rotated = pixel - center;
+    rotated = vec2(
+        rotated.x * cos(angle) - rotated.y * sin(angle),
+        rotated.x * sin(angle) + rotated.y * cos(angle)
+    );
+    rotated += center;
+    
     float intensity = 0.0;
-    for(float i = 0.0; i < 20.0; i++) {
-        float z = 200.0 + i * 10.0;
-        float freq = 0.003 - (i * 0.00005);
-        float amp = 80.0 - (i * 5.0);
-        intensity += getAudioWave(pixel, z, freq, amp) * 0.15;
+    float totalWave = 0.0;
+    
+    // Unroll the loop partially for better Chrome performance
+    for(float i = 0.0; i < 20.0; i += 2.0) {
+        float z1 = 200.0 + i * 10.0;
+        float z2 = 200.0 + (i + 1.0) * 10.0;
+        float freq1 = 0.003 - (i * 0.00005);
+        float freq2 = 0.003 - ((i + 1.0) * 0.00005);
+        float amp1 = 80.0 - (i * 5.0);
+        float amp2 = 80.0 - ((i + 1.0) * 5.0);
+        
+        float wave1 = sin(rotated.x * freq1 + uTime) * amp1 +
+                     sin(rotated.x * freq1 * 0.5 + uTime * 1.5) * amp1 * 0.5;
+        float wave2 = sin(rotated.x * freq2 + uTime) * amp2 +
+                     sin(rotated.x * freq2 * 0.5 + uTime * 1.5) * amp2 * 0.5;
+                     
+        float y1 = center.y + wave1;
+        float y2 = center.y + wave2;
+        float dist1 = abs(rotated.y - y1);
+        float dist2 = abs(rotated.y - y2);
+        float thickness1 = mix(2.0, 8.0, z1 / 1000.0);
+        float thickness2 = mix(2.0, 8.0, z2 / 1000.0);
+        
+        intensity += smoothstep(thickness1 + 1.0, thickness1 - 1.0, dist1) * 0.15;
+        intensity += smoothstep(thickness2 + 1.0, thickness2 - 1.0, dist2) * 0.15;
     }
+    
     return intensity;
 }
 
@@ -304,13 +332,44 @@ void main() {
     vec2 pixel = gl_FragCoord.xy;
     vec2 normalizedPos = pixel / uResolution;
     
-    // Background composition
+    // Cache frequently used calculations
+    float transitionProgress = mix(uRainbowTransition.A, uRainbowTransition.B, uTransitionTimeline);
+    vec4 brightColor = mix(uBrightColor.A, uBrightColor.B, uTransitionTimeline);
+    
+    // Calculate background only once
     vec4 backgroundColor = getSkyAndClouds(pixel);
     float gradientValue = getGradientValue(normalizedPos);
     
+    // Combine sphere calculations
+    float frontSphereIntensity = 0.0;
+    float backSphereIntensity = 0.0;
+    float zThreshold = 900.0;
+    
+    // Process regular spheres in a single loop
+    for(int i = 0; i < 15; i++) {
+        float intensity = getSphere(pixel, uSpheres[i]);
+        if (uSpheres[i].z < zThreshold) {
+            frontSphereIntensity += intensity;
+        } else {
+            backSphereIntensity += intensity;
+        }
+    }
+    
+    // Process glowing spheres more efficiently
+    float glowIntensity = 0.0;
+    vec3 totalGlow = vec3(0.0);
+    
+    for(int i = 0; i < 45; i++) {
+        vec4 sphere = uGlowingSpheres[i];
+        if (sphere.x > -999.0) {
+            float glow = getSphereGlow(pixel, sphere);
+            glowIntensity = max(glowIntensity, glow);
+            totalGlow += glow * getVibrantColor(float(i)) * 1.5;
+        }
+    }
+
     // Color calculation
     float colorPhase = uAnimateColors ? sin(uTime * 0.5) * 0.5 + 0.5 : 0.0;
-    vec4 brightColor = mix(uBrightColor.A, uBrightColor.B, uTransitionTimeline);
     vec4 bgColorDark = mix(uBgGradientDark.A, uBgGradientDark.B, uTransitionTimeline);
     vec4 bgColorLight = mix(uBgGradientLight.A, uBgGradientLight.B, uTransitionTimeline);
     vec4 audioWaveColorMixed = mix(uAudioWaveColor.A, uAudioWaveColor.B, uTransitionTimeline);
@@ -318,19 +377,6 @@ void main() {
     vec4 bgColor = mix(bgColorDark, bgColorLight, gradientValue);
     
     // Effect layers
-    float frontSphereIntensity = 0.0;
-    float backSphereIntensity = 0.0;
-
-
-    for(int i = 0; i < 15; i++) {
-        if (uSpheres[i].z < 900.0) {
-            frontSphereIntensity += getSphere(pixel, uSpheres[i]);
-        } else {
-            backSphereIntensity += getSphere(pixel, uSpheres[i]);
-        }
-    }
-
-    float sphereGlow = getSphereGlowIntensity(pixel);
     float waveIntensity = getAudioWaveIntensity(pixel);
     
     // Wave color with alpha
@@ -341,8 +387,6 @@ void main() {
     );
 
     vec3 rainbow = getRainbowColor(pixel.y / uResolution.y);
-
-    float transitionProgress = mix(uRainbowTransition.A, uRainbowTransition.B, uTransitionTimeline);
 
     float transitionEdge = transitionProgress * (uResolution.x + 200.0) - 400.0; // Add some padding
     float fadeWidth = 400.0; // Width of the transition fade
@@ -365,20 +409,6 @@ void main() {
 
 
     // Handle glowing spheres with vibrant colors and transition
-    vec3 totalGlow = vec3(0.0);
-    float glowIntensity = 0.0;
-    for(int i = 0; i < 45; i++) {  // Process all possible glowing spheres
-        vec4 sphere = uGlowingSpheres[i];
-        // Only process if the sphere is active (not at -1000,-1000)
-        if (sphere.x > -999.0) {  // Check if it's an active particle
-            float glow = getSphereGlow(pixel, sphere);
-            glowIntensity = max(glowIntensity, glow);
-            vec3 vibrantColor = getVibrantColor(float(i));
-            totalGlow += glow * vibrantColor * 1.5;  // Increased intensity for better visibility
-        }
-    }
-    
-    // Add glowing spheres on top
     finalColor = mix(finalColor, brightColor, glowIntensity * 0.6 * uTransitionTimeline);
     finalColor = vec4(finalColor.rgb + (totalGlow * uTransitionTimeline), 1.0);
     
