@@ -16,7 +16,7 @@ body {
     margin: 0;
     padding: 0;
     width: 100%;
-    /* overflow: hidden; */
+    overflow: hidden;
     font-family: 'Inter', sans-serif;
     color: black;
     letter-spacing: 0.05em;
@@ -72,7 +72,6 @@ canvas {
 .titleLinx {
     display: block;
     font-family: 'linotype', Arial, sans-serif;
-    /* font-family: 'frutiger', Arial, sans-serif; */
     opacity: 0;
     will-change: transform, opacity;
     -webkit-transform: translateZ(0);
@@ -116,11 +115,9 @@ canvas {
     justify-content: center;
     text-decoration: none;
     color: rgb(0, 0, 0);
-    /* backdrop-filter: blur(10px); */
     will-change: transform;
     text-align: center;
     text-transform: uppercase;
-    /* background-color: rgba(255, 255, 255, 0.1); */
     letter-spacing: 0.1em;
     opacity: 0;
     transform: scale(0) translateZ(0);
@@ -129,19 +126,99 @@ canvas {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-font-smoothing: antialiased;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .link:hover {
     transform: scale(1.05) !important;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, filter 0.3s ease;
     filter: brightness(1.1);
+}
+
+.castle {
+    position: absolute;
+    top: 50px;
+    left: 20%;
+    height: 300px;
+    opacity: 0.8;
+    /* filter: blur(1px); */
+    /* animation: floatingCastle 5s ease-in-out infinite alternate; */
+}
+
+.city {
+    position: absolute;
+    top: 50px;
+    left: 70%;
+    height: 200px;
+    opacity: 0.6;
+    /* filter: blur(1px); */
+    /* animation: floatingCastle 5s ease-in-out infinite alternate; */
+}
+
+.castleContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.cityContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+@keyframes floatingCastle {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-3px);
+    }
 }
 
 .link svg {
     font-size: 1.8em;
     margin-bottom: 0.5rem;
     opacity: 0.9;
+}
+
+.icon {
+    width: 40px;
+    height: 40px;
+    animation: spin 10s linear infinite;
+    animation-delay: 3s;
+    animation-play-state: running;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate3d(0, 1, 0, 0deg) translate3d(0, -5px, 0);
+    }
+    50% {
+        transform: rotate3d(0, 1, 0, 180deg) translate3d(0, 5px, 0);
+    }
+    100% {
+        transform: rotate3d(0, 1, 0, 360deg) translate3d(0, -5px, 0);
+    }
+}
+
+
+.icon:nth-of-type(2) {
+    animation-delay: 3s;
+    animation-duration: 10.2s;
+}
+
+.icon:nth-of-type(3) {
+    animation-delay: 3.2s;
+    animation-duration: 10.24s;
 }
 
 @keyframes bubble {
@@ -179,14 +256,14 @@ canvas {
     object-fit: cover;
     -webkit-mask-image: linear-gradient(to top, 
         rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.8) 20%,
-        rgba(0, 0, 0, 0.8) 50%,
+        rgba(0, 0, 0, 1) 20%,
+        rgba(0, 0, 0, 1) 50%,
         rgba(0, 0, 0, 0) 100%
     );
     mask-image: linear-gradient(to top, 
         rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.8) 20%,
-        rgba(0, 0, 0, 0.8) 50%,
+        rgba(0, 0, 0, 1) 20%,
+        rgba(0, 0, 0, 1) 50%,
         rgba(0, 0, 0, 0) 100%
     );
 

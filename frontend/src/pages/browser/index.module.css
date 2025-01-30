@@ -1,3 +1,71 @@
+@font-face {
+    font-family: "Frutiger";
+    src: url('./assets/fonts/Frutiger.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: "FrutigerBold";
+    src: url('./assets/fonts/FrutigerBold.ttf') format('truetype');
+}
+
+.titleBold {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 2.2rem;
+}
+
+.titleLight {
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-weight:200;
+  font-size: 1.3rem;
+}
+.version {
+  font-size: 8px;
+}
+
+.headerContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 24px;
+  height: 24px;
+}
+
+.logoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -16px;
+}
+
+.divider {
+  width: 100%;
+  height: 0px;
+  border-top: 1px solid #808080;    /* darker top line */
+  border-bottom: 1px solid #ffffff; /* lighter bottom line */
+  margin: -10px 0 20px 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.headerContainer p {
+  font-family: "Frutiger";
+  font-size: 8px;
+  font-weight: normal;
+}
+
 .browserOverlay {
     position: fixed;
     top: 0;
@@ -140,10 +208,13 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 18px;
-    height: 18px;
-    background: #c0c0c0;
-    border: 2px outset #808080;
+    width: 35px;
+    height: 35px;
+    border-radius: 50px;
+    background: radial-gradient(circle, rgba(255,255,255, 1) 0%, rgb(252, 53, 53) 65%);
+    background-repeat: none;
+    background-position: 0 10px;
+    border: 2px solid #99999935;
     font-family: 'MS Sans Serif', Arial, sans-serif;
     font-size: 12px;
     cursor: pointer;
@@ -152,6 +223,18 @@
     justify-content: center;
     color: black;
     z-index: 2002;
+  }
+  
+  .closePreviewButton::before {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 50%;
+    top: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, #f7a1a1a0 0%, #ffffff00 90%);
+    border-radius: 100%;
   }
   
   .closePreviewButton:active {
@@ -240,6 +323,7 @@
     max-width: 400px;
     z-index: 2002;
     font-family: 'MS Sans Serif', Arial, sans-serif;
+    box-sizing: border-box;
   }
   
   .modalHeader {
@@ -250,17 +334,18 @@
   }
   
   .modalTitle {
-    font-size: 16px;
+    font-size: 1.5rem;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-weight: bold;
     margin: 0;
   }
   
   .modalInput {
     width: 100%;
-    margin-bottom: 12px;
     padding: 4px;
     border: 2px inset #808080;
     background: white;
+    box-sizing: border-box;
     font-family: 'MS Sans Serif', Arial, sans-serif;
   }
   
@@ -293,4 +378,141 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 2001;
-  } 
+  }
+
+.timeContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    margin-top: -8px;
+}
+
+.clock {
+    font-family: "MS Sans Serif", Arial, sans-serif;
+    font-size: 12px !important;
+    color: #000;
+    margin: 0;
+    margin-top: 12px;
+}
+
+.authPrompt {
+    text-align: center;
+    max-width: 90%;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.authButtons {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    justify-content: center;
+    width: 100%;
+    flex-direction: row;
+}
+
+@media (max-width: 480px) {
+    .authButtons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .authPromptText {
+        font-size: 14px;
+        margin: 0.5rem 0;
+    }
+}
+
+.authPromptText {
+    margin: 1rem 0;
+    text-align: left;
+    line-height: 1.5rem;
+    font-weight: 200;
+    color: #000;
+    font-family: "MS Sans Serif", Arial, sans-serif;
+}
+
+.authPromptWelcome {
+    color: #000;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    font-size: 12px;
+    text-align: center;
+    filter: drop-shadow(1px 1px #adadad);
+    text-shadow: 1px 1px #fcfcfc;
+  }
+
+  .authPromptWelcome::after {
+    content: "Welcome to the People's Coalition of Tandy.";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(1px 1px #000);
+  }
+
+.cancelButton {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.loginButton:hover, .registerButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.errorMessage {
+    color: #dc3545;
+    margin: 10px 0;
+    text-align: center;
+    font-size: 14px;
+}
+
+.urlInputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.urlPrefix {
+    font-size: 12px;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    margin-top: 12px;
+    margin-bottom: 4px;
+}
+
+.urlPrefixInput {
+    font-weight: bold;
+    color: blue;
+}
+
+.urlStatus {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+}
+
+.urlStatus.checking {
+    color: #666;
+}
+
+.urlStatus.available {
+    color: #28a745;
+}
+
+.urlStatus.unavailable {
+    color: #dc3545;
+}
+
+.modalButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+} 

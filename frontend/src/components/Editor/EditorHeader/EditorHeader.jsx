@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import ProfilePhotoUpload from '../ProfilePhotoUpload/ProfilePhotoUpload';
 import PageSettingsModal from '../PageSettingsModal/PageSettingsModal';
-import { faPaintBrush, faHome, faShare, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faPaintBrush, faHome, faCog, faShareNodes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './EditorHeader.css';
 
 const EditorHeader = ({ 
@@ -19,6 +20,24 @@ const EditorHeader = ({
 }) => {
     const navigate = useNavigate();
     const [showShareTooltip, setShowShareTooltip] = useState(false);
+    const [templateName, setTemplateName] = useState('');
+
+    // Fetch template name when currentTemplate changes
+    React.useEffect(() => {
+        const fetchTemplateName = async () => {
+            try {
+                const response = await axios.get('/api/templates');
+                if (response.data && response.data[currentTemplate]) {
+                    setTemplateName(response.data[currentTemplate].name);
+                }
+            } catch (error) {
+                console.error('Failed to fetch template name:', error);
+                setTemplateName(currentTemplate); // Fallback to key if fetch fails
+            }
+        };
+
+        fetchTemplateName();
+    }, [currentTemplate]);
 
     const handleShare = async () => {
         const shareUrl = `https://links.pcotandy.org/${currentPageURL}`;
@@ -52,7 +71,7 @@ const EditorHeader = ({
                             </button>
                             <div className='themeBox'>
                                 <span>Current Theme</span>
-                                <p>{currentTemplate}</p>
+                                <p>{templateName}</p>
                             </div>
                         </div>
                     </div>
@@ -62,8 +81,8 @@ const EditorHeader = ({
                         <FontAwesomeIcon icon={faHome} />
                     </button>
                     <button className="header-orb" onClick={handleShare} title="Share Page">
-                        <FontAwesomeIcon icon={faShare} />
-                        {showShareTooltip && <div className="share-tooltip">LinkCopied!</div>}
+                        <FontAwesomeIcon icon={faShareNodes} />
+                        {showShareTooltip && <div className="share-tooltip">Link Copied!</div>}
                     </button>
                     <button className="header-orb" onClick={() => onShowSettings(true)} title="Page Settings">
                         <FontAwesomeIcon icon={faCog} />

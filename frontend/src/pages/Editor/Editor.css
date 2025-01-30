@@ -84,7 +84,10 @@ body::before {
     font-family: 'MS Sans Serif', 'Arial', sans-serif;
     font-weight: bold;
     font-size: 14px;
-    border: 2px outset #27c9ff;
+}
+
+.add-link-button::after {
+    width: 97%;
 }
 
 .add-link-button:active {

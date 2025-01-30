@@ -2,37 +2,46 @@ export const templates = {
     TandyLinx: {
         name: 'TandyLinx',
         template: 'TandyLinx.html',
-        thumbnail: '/templates/TandyLinx/thumbnail.png',
-        description: 'Classic TandyLinx template'
+        thumbnail: '/templates/TandyLinx/thumbnailDithered.png',
+        description: 'Don\'t be afraid, go for it'
     },
     TandyClouds: {
         name: 'TandyClouds',
         template: 'TandyClouds.html',
-        thumbnail: '/templates/TandyClouds/thumbnail.png',
-        description: 'TandyClouds inspired template'
+        thumbnail: '/templates/TandyClouds/thumbnailDithered.png',
+        description: 'Escape to the clouds'
     },
-    Embroidery: {
-        name: 'Embroidery',
-        template: 'Embroidery.html',
-        thumbnail: '/templates/Embroidery/assets/cover.png',
-        description: 'Embroidered style template'
+    VeridansCraestyl: {
+        name: 'Veridan\'s Craestyl',
+        template: 'VeridansCraestyl.html',
+        thumbnail: '/templates/VeridansCraestyl/thumbnailDithered.png',
+        description: 'Gaze into the craestyl'
     },
-    LandsEnd: {
-        name: 'LandsEnd',
-        template: 'LandsEnd.html',
-        thumbnail: '/templates/LandsEnd/thumbnail.png',
-        description: 'Lands End inspired template'
+
+    GifLinx: {
+        name: 'Linx.gif',
+        template: 'GifLinx.html',
+        thumbnail: '/templates/GifLinx/thumbnailDithered.png',
+        description: 'Play to win'
     },
     Cubes: {
         name: 'Cubes',
         template: 'Cubes.html',
-        thumbnail: '/templates/Cubes/thumbnail.png',
-        description: '3D Cube style template'
+        thumbnail: '/templates/Cubes/thumbnailDithered.png',
+        description: 'it\'s cubes'
     },
-    Frutiger: {
-        name: 'Frutiger',
-        template: 'frutiger.html',
-        thumbnail: '/templates/frutiger/thumbnail.png',
-        description: 'Frutiger inspired template'
+    Embroidery: {
+        name: 'Embroidery',
+        id: 'Embroidery',
+        template: 'Embroidery.html',
+        thumbnail: '/templates/Embroidery/assets/cover.png',
+        description: 'Ukrainian embroidery'
+    },
+    LandsEnd: {
+        name: 'Lands End',
+        template: 'LandsEnd.html',
+        thumbnail: '/templates/LandsEnd/thumbnailDithered.png',
+        description: 'Commemorate the release of Lands End by Ko T.C.'
     }
+
 }; 

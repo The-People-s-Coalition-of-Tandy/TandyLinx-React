@@ -6,6 +6,7 @@ import axios from 'axios';
 import EditLink from '../../components/Editor/EditLink/EditLink';
 import Preview from '../../components/Preview/Preview';
 import TemplateBrowser from '../../components/TemplateBrowser/TemplateBrowser';
+import Browser from '../browser';
 import EditorHeader from '../../components/Editor/EditorHeader/EditorHeader';
 import './Editor.css';
 import AeroButton from '../../components/common/AeroButton/AeroButton';
@@ -54,6 +55,7 @@ const Editor = () => {
                 setCurrentPageLinks(links);
                 setPageTitle(title);
                 setCurrentTemplate(style);
+                console.log(style);
                 setCurrentPagePhotoUrl(photoUrl);
                 setIsLoading(false);
             } catch (error) {
@@ -180,7 +182,7 @@ const Editor = () => {
                 />
 
                 <div className="editor-actions">
-                    <button className="add-link-button" onClick={handleAddLink}>+ Add Link</button>
+                    <AeroButton onClick={handleAddLink} color="white" className="add-link-button">+ Add Link</AeroButton>
                 </div>
                 
                 <DragDropContext onDragEnd={onDragEnd}>

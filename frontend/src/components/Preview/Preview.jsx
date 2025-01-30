@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useContext, useState } from 'react';
 import { LinkContext } from '../../context/LinkContext';
 import { useProfilePhoto } from '../../context/ProfilePhotoContext';
+import cellPhone from './assets/cellphone-icon.png';
+import desktop from './assets/computer-icon.png';
+import useIsMobile from '../../hooks/useIsMobile';
 import './Preview.css';
-
-const Preview = ({ pageURL, pageTitle, style, isFullPreview }) => {
+const Preview = ({ pageURL, pageTitle, style, isFullPreview, className }) => {
     const { currentPageLinks } = useContext(LinkContext);
     const { currentPagePhotoUrl } = useProfilePhoto();
+    const isMobile = useIsMobile();
     const keyCounter = useRef(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [isDesktopMode, setIsDesktopMode] = useState(false);
+    const [isDesktopMode, setIsDesktopMode] = useState(!isMobile);
     
     useEffect(() => {
         keyCounter.current += 1;
@@ -19,21 +22,29 @@ const Preview = ({ pageURL, pageTitle, style, isFullPreview }) => {
         setIsLoading(false);
         e.target.classList.add('loaded');
     };
-
-    const togglePreviewMode = () => {
-        setIsDesktopMode(!isDesktopMode);
-    };
     
     return (
-        <div className={`preview-container ${isDesktopMode ? 'desktop-mode' : ''}`}>
+        <div className={`preview-container ${isDesktopMode ? 'desktop-mode' : ''} ${className}`}>
             <div className="preview-header">
-                <button 
-                    className="preview-mode-toggle"
-                    onClick={togglePreviewMode}
-                    title={isDesktopMode ? "Switch to Mobile View" : "Switch to Desktop View"}
-                >
-                    {isDesktopMode ? "📱" : "🖥️"}
-                </button>
+                <div className="preview-mode-toggle">
+                    <button 
+                        className={!isDesktopMode ? 'active' : ''}
+                        onClick={() => setIsDesktopMode(false)}
+                        title="Mobile View"
+                    >
+                        <span className="icon"><img height="24" src={cellPhone} alt="Cell Phone" className="cell-phone" /></span>
+
+                        <span className="label">Mobile</span>
+                    </button>
+                    <button 
+                        className={isDesktopMode ? 'active' : ''}
+                        onClick={() => setIsDesktopMode(true)}
+                        title="Desktop View"
+                    >
+                        <span className="icon"><img height="24" src={desktop} alt="Desktop" className="desktop" /></span>
+                        <span className="label">Desktop</span>
+                    </button>
+                </div>
             </div>
             <div className="preview-content">
                 <div className={`preview-frame-container ${isDesktopMode ? 'desktop' : ''}`}>

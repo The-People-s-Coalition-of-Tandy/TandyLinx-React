@@ -3,10 +3,67 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 100%;
+  box-sizing: border-box;
   padding: 20px;
   color: white;
   font-family: 'linotype', Arial, sans-serif;
+}
+
+.castle {
+  position: absolute;
+  top: 50px;
+  left: 20%;
+  height: 300px;
+  opacity: 0.7;
+  animation: getDarker 1.5s ease forwards;
+}
+
+.castleContainer {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+.city {
+  position: absolute;
+  top: 50px;
+  left: 70%;
+  height: 200px;
+  opacity: 0.6;
+  animation: getDarkerCity 1.5s ease forwards;
+}
+
+.cityContainer {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+@keyframes getDarker {
+  0% {
+    filter: brightness(1) contrast(1);
+  }
+  100% {
+    filter: brightness(0.6) contrast(1.2);
+  }
+}
+
+@keyframes getDarkerCity {
+  0% {
+    opacity: 0.6;
+    filter: brightness(1) contrast(1);
+  }
+  100% {
+    opacity: 0.5;
+    filter: brightness(0.6) contrast(1.2);
+  }
 }
 
 .loginContainer h1 {
@@ -22,9 +79,10 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  max-width: 300px;
+  max-width: 400px;
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.1);
-  padding: 2rem;
+  padding: 2rem 2rem;
   border-radius: 12px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -92,11 +150,12 @@
 }
 
 .registerLink a {
-  color: #646cff;
-  text-decoration: none;
+  color: #e5e5e5;
+  text-decoration: underline;
   transition: all 0.2s ease;
+  text-shadow: 1px 1px #000;
+  filter: drop-shadow(1px 1px 5px #ffffff);
 }
-
 .registerLink a:hover {
   text-decoration: underline;
 } 

@@ -67,11 +67,23 @@
   padding: 12px;
 }
 
-.templateInfo h3 {
-  font-size: 12px;
+.templateText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.templateText h3 {
+  font-size: 16px;
   font-weight: bold;
-  margin: 0 0 12px 0;
-  font-family: 'MS Sans Serif', Arial, sans-serif;
+  margin: 0;
+  font-family: 'Arial Narrow', Arial, sans-serif;
+}
+
+.templateText .description {
+  font-size: 12px;
+  font-family: 'Arial Narrow', Arial, sans-serif;
 }
 
 .buttonGroup {
@@ -98,6 +110,10 @@
 .previewButton:active, .selectButton:active {
   border-style: inset;
   padding: 4px 11px 2px 13px;
+}
+
+.selectButton {
+  background: #808080;
 }
 
 .closeButton {
@@ -171,8 +187,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: -20px;
   min-height: calc(80vh - 40px); /* Account for padding */
+  overflow: hidden !important;
+  box-sizing: border-box;
 }
 
 .loadingText {
@@ -180,10 +197,27 @@
   /* animation: blink 1s step-end infinite; */
 }
 
-.loadingGif {
+.loadingIcon {
   width: 64px;
   height: 64px;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
+}
+
+.loadingGif {
+  max-height: 120px;
+}
+
+.loadingGifContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  min-height: 125px;
+}
+
+.loadingGifContainer img:last-of-type {
+  /* mirror the first gif */
+  transform: scaleX(-1);
 }
 
 .dialupSound {

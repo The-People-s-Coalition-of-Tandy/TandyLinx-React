@@ -91,12 +91,19 @@ const PageSettingsModal = ({
         }
     };
 
+    const handleOverlayClick = (e) => {
+        if (e.target.className === "modal-overlay") {
+            onClose();
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
         <div 
             className="modal-overlay"
             style={{ transform: `translateY(${topOffset}px)` }}
+            onClick={handleOverlayClick}
         >
             <div className="modal-content">
                 <h2>Page Settings</h2>

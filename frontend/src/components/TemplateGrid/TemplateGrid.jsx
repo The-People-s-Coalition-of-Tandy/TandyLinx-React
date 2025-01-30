@@ -11,7 +11,8 @@ const TemplateGrid = ({
   onTemplateSelect,
   onPreviewClick,
   onSelectClick,
-  selectButtonText = (key) => 'Select'  // Configurable button text
+  loadingGif = 'Warrior_Wind',
+  selectButtonText = (key) => 'Select'
 }) => {
   const showLoadingScreen = shouldShowLoading() && isLoading && !hasCompletedAnimation;
   
@@ -25,11 +26,15 @@ const TemplateGrid = ({
     <>
       {showLoadingScreen ? (
         <div className={styles.loadingOverlay}>
-          <img 
-            src="/assets/images/default-profile.png" 
-            alt="Loading animation" 
-            className={styles.loadingGif}
-          />
+          <div className={styles.loadingGifContainer}>
+            <img className={styles.loadingGif} src={`/assets/gifs/loadingGifs/${loadingGif}.gif`}></img>
+            <img 
+              src="/assets/images/default-profile.png" 
+              alt="Loading animation" 
+              className={styles.loadingIcon}
+            />
+            <img className={styles.loadingGif} src={`/assets/gifs/loadingGifs/${loadingGif}.gif`}></img>
+          </div>
           <div className={styles.loadingText}>{loadingStatus}</div>
           <div className={styles.dialupSound}>
             <div className={styles.dialupBars}>
@@ -55,7 +60,7 @@ const TemplateGrid = ({
             <div 
               key={key}
               className={`${styles.templateCard} ${selectedTemplate === key ? styles.selected : ''}`}
-              onClick={() => onTemplateSelect(key)}
+              onClick={() => onPreviewClick(key)}
             >
               <div className={styles.thumbnailWrapper}>
                 <img 
@@ -65,7 +70,10 @@ const TemplateGrid = ({
                 />
               </div>
               <div className={styles.templateInfo}>
-                <h3>{template.name}</h3>
+                <div className={styles.templateText}>
+                  <h3>{template.name}</h3>
+                  <div className={styles.description}>{template.description}</div>
+                </div>
                 <div className={styles.buttonGroup}>
                   <button 
                     className={styles.previewButton}

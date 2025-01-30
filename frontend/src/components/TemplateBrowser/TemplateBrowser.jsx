@@ -3,6 +3,9 @@ import axios from 'axios';
 import styles from './TemplateBrowser.module.css';
 import Preview from '../Preview/Preview';
 import TemplateGrid from '../TemplateGrid/TemplateGrid';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faX } from '@fortawesome/free-solid-svg-icons';
+import logo from '../../assets/images/logo.ico';
 
 const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose, pageURL }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(currentTemplate);
@@ -11,12 +14,37 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
   const [loadingStatus, setLoadingStatus] = useState('Connecting to Template Service...');
   const [templates, setTemplates] = useState({});
   const [hasCompletedAnimation, setHasCompletedAnimation] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   
   const handleOverlayClick = (e) => {
     if (e.target.className === styles.browserOverlay) {
       onClose();
     }
   };
+
+  const handlePreviewOverlayClick = (e) => {
+    if (e.target.className === styles.previewModal) {
+      setPreviewTemplate(null);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+        setCurrentTime(new Date());
+    }, 500);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+    });
+};
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -80,7 +108,23 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
     <div className={styles.browserOverlay} onClick={handleOverlayClick}>
       <div className={styles.browserContent}>
         <button className={styles.closeButton} onClick={onClose}>×</button>
-        <h2>Choose a Template</h2>
+        <div className={styles.headerContainer}>
+          <div className={styles.titleContainer}>
+
+            <h2>          
+              <span className={styles.titleBold}>Template</span>
+              <span className={styles.titleLight}>Browser</span>
+            </h2>
+          </div>
+          <div className={styles.timeContainer}>
+          <div className={styles.logoContainer}>
+                <img src={logo} alt="Template Browser" className={styles.logo} />
+                <sub className={styles.version}>ver 0.0.1</sub>
+          </div>
+            <p className={styles.clock}>{formatTime(currentTime)}</p>
+          </div>
+        </div>
+      <div className={styles.divider}></div>
         
         <TemplateGrid
           isLoading={isLoading}
@@ -96,18 +140,19 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
       </div>
 
       {previewTemplate && (
-        <div className={styles.previewModal}>
+        <div className={styles.previewModal} onClick={handlePreviewOverlayClick}>
           <button 
             className={styles.closePreviewButton} 
             onClick={() => setPreviewTemplate(null)}
           >
-            ×
+            <FontAwesomeIcon icon={faX} />
           </button>
           <Preview 
             pageTitle={pageTitle}
             links={links}
             style={previewTemplate}
             isFullPreview={true}
+            className={"mobile-template-browser"}
           />
         </div>
       )}

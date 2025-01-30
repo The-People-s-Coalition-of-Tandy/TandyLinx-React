@@ -33,13 +33,9 @@
 }
 
 .pageHeader {
-  /* background: var(--header-background); */
-  /* backdrop-filter: blur(10px); */
-  /* border-bottom: 1px solid var(--header-border); */
   font-family: var(--header-font);
   padding: 1rem 2rem;
   margin: 0;
-  /* position: sticky; */
   top: 0;
   z-index: 10;
 }
@@ -282,16 +278,19 @@
 @media (max-width: 768px) {
   .profileContainer {
     padding: 1rem;
+    padding-top: 0;
   }
   
   .pageHeader {
     padding: 1rem;
-    margin: -1rem -1rem 1rem -1rem;
+    margin: -1rem -1rem 0rem -1rem;
+    padding-bottom: 0;
   }
   
   .headerContent {
     flex-direction: column;
     gap: 1rem;
+    margin-top: 16px;
     text-align: center;
   }
   

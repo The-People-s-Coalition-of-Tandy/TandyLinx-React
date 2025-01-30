@@ -11,17 +11,17 @@ export const Navigation = () => {
         <div className={styles.navContainer}>
             <Link to="/register" className={styles.link}>
                 <img className={`${styles.linkBackground} ${styles.linkBackgroundLarge}`} src={bubbleBackground} alt="" />
-                <img width={40} src={addIcon} alt="add" />
+                <img width={40} src={addIcon} alt="add" className={styles.icon} />
                 Sign up
             </Link>
             <Link to="/login" className={styles.link}>
                 <img className={`${styles.linkBackground} ${styles.linkBackgroundLarge}`} src={bubbleBackground} alt="" />
-                <img width={40} src={usericon} alt="user" />
+                <img width={40} src={usericon} alt="user" className={styles.icon} />
                 Login
             </Link>
             <Link to="/browser" className={styles.link}>
                 <img className={`${styles.linkBackground} ${styles.linkBackgroundLarge}`} src={bubbleBackground} alt="" />
-                <img width={40} src={foldericon} alt="folder" />
+                <img width={40} src={foldericon} alt="folder" className={styles.icon} />
                 Templates
             </Link>
         </div>

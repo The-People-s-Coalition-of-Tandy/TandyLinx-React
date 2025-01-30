@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Metallic Cubes</title>
+    <style>
+        @font-face {
+            font-family: "Frutiger";
+            src: url('/assets/fonts/Frutiger.ttf') format('truetype');
+        }
+        body {
+            margin: 0;
+            color: #ffffff;
+            background-color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+        
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 72px;
+        }
+
+        .title-profile {
+            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: slide-down 0.75s ease-in-out backwards 1.2s;
+        }
+
+        @keyframes slide-down {
+            from {
+                opacity: 0;
+                transform: translateY(-20%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-photo-container {
+            width: 150px;
+        }
+
+        .glossy-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(1.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(to right, #fff, #ccc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 0.75rem 2rem;
+            margin: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        @keyframes slide-in {
+            from {
+                transform: translateX(-20%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+
+
+        a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(240, 16, 212, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        a:hover {
+            background: rgba(240, 16, 212, 0.2);
+            transform: translateY(-2px);
+            letter-spacing: 0.1em;
+        }
+
+        a:hover::before {
+            left: 100%;
+        }
+
+        a:active {
+            transform: translateY(0);
+            background: rgba(240, 16, 212, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .profile-photo-container {
+                width: 120px;
+            }
+
+            a {
+                width: 80%;
+                text-align: center;
+            }
+            
+            a:hover {
+                letter-spacing: normal;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+    <main>
+        <div class="title-profile">
+            {% if profilePhotoUrl %}
+            <div class="profile-photo-container">
+                <img src="{{ profilePhotoUrl }}" alt="Profile Photo" class="glossy-image">
+            </div>
+            {% endif %}
+            <h1>{{ pageTitle }}</h1>
+        </div>
+        {% for link in links %}
+            <a href="{{ link.url }}">{{ link.name }}</a>
+        {% endfor %}
+    </main>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.152.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.152.0/examples/jsm/",
+                "cannon-es": "https://unpkg.com/cannon-es@0.20.0/dist/cannon-es.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import * as CANNON from 'cannon-es';
+        import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+        
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 35, 0);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        document.body.appendChild(renderer.domElement);
+
+        // Add environment map
+        const cubeTextureLoader = new THREE.CubeTextureLoader();
+        const environmentMap = cubeTextureLoader
+            .setPath('https://threejs.org/examples/textures/cube/SwedishRoyalCastle/')
+            .load([
+                'px.jpg',
+                'nx.jpg',
+                'py.jpg',
+                'ny.jpg',
+                'pz.jpg',
+                'nz.jpg'
+            ]);
+        
+        scene.environment = environmentMap;
+        scene.background = null; // Keep background transparent
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1.5);
+        pointLight.position.set(10, 20, 10);
+        pointLight.castShadow = true;
+        pointLight.shadow.mapSize.width = 2048;
+        pointLight.shadow.mapSize.height = 2048;
+        scene.add(pointLight);
+
+        // Add rim light for the metallic edge effect
+        const rimLight = new THREE.PointLight(0xffffff, 1);
+        rimLight.position.set(-15, 5, -15);
+        scene.add(rimLight);
+
+        // Ground
+        const groundGeometry = new THREE.PlaneGeometry(60, 60);
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+            // color: 0xFFFFFF,
+            color: 0x000000,
+            roughness: 0.5,
+            metalness: 0.3,
+            envMapIntensity: 0.4,
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Physics world
+        const world = new CANNON.World({ gravity: new CANNON.Vec3(0, -9.82, 0) });
+
+        // Ground physics
+        const groundBody = new CANNON.Body({
+            mass: 0, // Static ground
+            shape: new CANNON.Plane(),
+        });
+        groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+        world.addBody(groundBody);
+
+        // Create walls
+        function createWall(width, height, depth, x, y, z, rotation = 0) {
+            // Physics wall only
+            const wallShape = new CANNON.Box(new CANNON.Vec3(width/2, height/2, depth/2));
+            const wallBody = new CANNON.Body({
+                mass: 0,
+                shape: wallShape,
+            });
+            wallBody.position.set(x, y, z);
+            wallBody.quaternion.setFromEuler(0, rotation, 0);
+            world.addBody(wallBody);
+        }
+
+        // Add walls
+        const wallThickness = 0.5;
+        const wallHeight = 10;  // Reduced from 20
+        const areaSize = 15;    // Reduced from 30
+
+        // Back wall
+        createWall(30, wallHeight, wallThickness, 0, wallHeight/2, -areaSize);
+        // Front wall
+        createWall(30, wallHeight, wallThickness, 0, wallHeight/2, areaSize);
+        // Left wall
+        createWall(30, wallHeight, wallThickness, -areaSize, wallHeight/2, 0, Math.PI/2);
+        // Right wall
+        createWall(30, wallHeight, wallThickness, areaSize, wallHeight/2, 0, Math.PI/2);
+
+        // Cubes
+        const cubes = [];
+        const cubeBodies = [];
+
+        function createCube(x, y, z) {
+            const cubeSize = 5;
+            const geometry = new RoundedBoxGeometry(cubeSize, cubeSize, cubeSize, 16, 0.5);
+            const material = new THREE.MeshPhysicalMaterial({
+                color: 0xF010D4,
+                // color: 0x000000,
+                metalness: 1.0,
+                roughness: 0.02,
+                envMapIntensity: 2.0,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.05,
+                reflectivity: 1.0,
+                ior: 3.0,
+                specularIntensity: 1.0,
+                specularColor: 0xffffff
+            });
+
+            const cube = new THREE.Mesh(geometry, material);
+            cube.castShadow = true;
+            cube.receiveShadow = true;
+            cube.position.set(x, y, z);
+            scene.add(cube);
+            cubes.push(cube);
+
+            // Physics body
+            const shape = new CANNON.Box(new CANNON.Vec3(cubeSize/2, cubeSize/2, cubeSize/2));
+            const body = new CANNON.Body({ 
+                mass: 1,
+                shape: shape,
+                linearDamping: 0.3,
+                angularDamping: 0.9
+            });
+            body.position.set(x, y, z);
+            world.addBody(body);
+            cubeBodies.push(body);
+        }
+
+        // Create multiple cubes
+        for (let i = 0; i < 50; i++) {
+            createCube(
+                Math.random() * 20 - 5,  // Reduced from 20 to 10
+                Math.random() * 20 + 5,  // Reduced from 20 to 10
+                Math.random() * 20 - 5   // Reduced from 20 to 10
+            );
+        }
+
+        // Add after scene setup
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredBody = null;
+
+        // Add mouse move listener
+        document.addEventListener('mousemove', (event) => {
+            // Calculate mouse position in normalized device coordinates (-1 to +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Update the raycaster
+            raycaster.setFromCamera(mouse, camera);
+
+            // Check for intersections
+            const intersects = raycaster.intersectObjects(cubes);
+            
+            if (intersects.length > 0) {
+                const intersectedCube = intersects[0].object;
+                const cubeIndex = cubes.indexOf(intersectedCube);
+                hoveredBody = cubeBodies[cubeIndex];
+                
+                // Dampen any existing angular velocity
+                hoveredBody.angularVelocity.scale(0.5);
+                
+                // Calculate force direction (push upward and away from mouse)
+                const force = new CANNON.Vec3();
+                
+                // Add upward force
+                force.y = 20;
+                
+                // Add reduced horizontal force to minimize spinning
+                force.x = mouse.x * 2;  // Reduced from 10
+                force.z = -mouse.y * 2;  // Reduced from 10
+                
+                // Apply force closer to center of mass to reduce torque
+                const point = new CANNON.Vec3(
+                    hoveredBody.position.x + intersects[0].point.x * 0.1,
+                    hoveredBody.position.y + intersects[0].point.y * 0.1,
+                    hoveredBody.position.z + intersects[0].point.z * 0.1
+                );
+                
+                hoveredBody.applyForce(force, point);
+            } else {
+                hoveredBody = null;
+            }
+        });
+
+        // Modify the animation loop to add a subtle hover effect
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Step physics world
+            world.step(1 / 60);
+
+            // Sync physics bodies with Three.js meshes
+            for (let i = 0; i < cubes.length; i++) {
+                const cube = cubes[i];
+                const body = cubeBodies[i];
+                
+                cube.position.copy(body.position);
+                cube.quaternion.copy(body.quaternion);
+                
+                // Add subtle hover effect
+                if (body === hoveredBody) {
+                    cube.material.emissive.setHex(0x220022);
+                    cube.material.emissiveIntensity = 0.2;
+                } else {
+                    cube.material.emissive.setHex(0x000000);
+                    cube.material.emissiveIntensity = 0;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Resize event
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const links = document.querySelectorAll('main a');
+            links.forEach((link, index) => {
+                link.style.animation = `slide-in 0.75s ease-in-out forwards ${index * 0.2 + 1}s`;
+            });
+        });
+    </script>
+</body>
+</html>

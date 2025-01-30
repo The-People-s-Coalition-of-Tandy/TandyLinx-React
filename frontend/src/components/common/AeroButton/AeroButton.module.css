@@ -31,7 +31,7 @@
 .aeroButton.orange { --button-color: oklch(50% 0.2 45); }
 .aeroButton.pink   { --button-color: oklch(50% 0.2 325); }
 .aeroButton.gray   { --button-color: oklch(50% 0.2 225); }
-.aeroButton.white  { --button-color: oklch(50% 0.2 245); }
+.aeroButton.white  { --button-color: oklch(100% 0.2 245); }
 
 .aeroButton::after {
     content: "";
@@ -45,6 +45,7 @@
     border-radius: 9999px;
     transition: background 400ms;
 }
+
 .aeroButton:hover, .aeroButton:focus {
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
 }

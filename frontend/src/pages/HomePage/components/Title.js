@@ -64,6 +64,8 @@ export const Title = () => {
             detail: { theme: 'rainbowSky', duration: 1200, easingFunction: "linear" }
         });
 
+        const castleThemeChangeEvent = new CustomEvent('castleThemeChange');
+
         const rainbowEvent = new CustomEvent('themeChange', {
             detail: { theme: 'rainbowOnly', duration: 2000, easingFunction: "linear" }
         });
@@ -108,7 +110,9 @@ export const Title = () => {
 
                     setTimeout(() => {
                         window.dispatchEvent(themeChangeEvent);
-                    }, 3000);
+                        window.dispatchEvent(castleThemeChangeEvent);
+
+                    }, 2500);
                 }
             }, "<+=0.125")
             .to(`.${styles.link}`, {
