@@ -5,7 +5,8 @@ import styles from './styles/index.module.css';
 // import grass from './assets/images/grassTwo.webp';
 // import grass from './assets/images/grassThree.webp';
 // import grass from './assets/images/grassFour.webp';
-import grass from './assets/images/grass5.png';
+// import grass from './assets/images/grass5.png';
+import grass from './assets/images/grass6.webp';
 import castle from './assets/images/castle.png';
 import city from './assets/images/city.png';
 import gsap from 'gsap';
@@ -26,13 +27,13 @@ export default function HomePage() {
 
         const handleThemeChange = () => {
             gsap.to(`.${styles.castle}`, {
-                duration: 2,
+                duration: 1,
                 opacity: 0.8,
                 ease: "linear.out"
             });
 
             gsap.to(`.${styles.city}`, {
-                duration: 2,
+                duration: 1,
                 opacity: 0.6,
                 ease: "linear.out"
             });

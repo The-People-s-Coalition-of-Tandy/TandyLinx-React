@@ -10,7 +10,7 @@ export class Particle {
         
         const options = { ...defaults, ...config };
         
-        const initialDelay = 1.5;
+        const initialDelay = 1.4;
         this.startTime = index * 0.01 + options.startTimeOffset + initialDelay;
         
         this.active = false;
