@@ -18,15 +18,13 @@
         }
 
         body {
-            background: linear-gradient(135deg, #a7d9f5, #e8f6ff, #d4e4ff);
+            background: #000000; /* or #ffffff for white flash */
             color: #ffffff;
             font-family: "Frutiger";
             min-height: 100vh;
-            background-image: url('/templates/VeridansCraestyl/assets/ge163_350a.jpg');
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-
         }
 
         .big-container {
@@ -253,6 +251,12 @@ canvas {
     width: 100%;
     height: 100%;
     z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+
+canvas.loaded {
+    opacity: 1;
 }
      </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -282,6 +286,19 @@ canvas {
 
     </div>
 <script>
+    // Add debounce function at the start
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
     const canvas = document.getElementById('warpCanvas');
     const ctx = canvas.getContext('2d');
     let width, height;
@@ -292,6 +309,11 @@ canvas {
     
     const bgImage = new Image();
     bgImage.src = '/templates/VeridansCraestyl/assets/fs125.jpg';
+    
+    // Add performance detection
+    const isLowPerfDevice = window.navigator.hardwareConcurrency <= 4;
+    // Adjust grid size based on performance
+    const GRID_SIZE = isLowPerfDevice ? 40 : 20;
     
     let isFirstMove = true;
     let lastX = null, lastY = null;
@@ -309,13 +331,14 @@ canvas {
         waves.push({
             x,
             y,
-            // Slower velocity for mobile
-            velocity: isMobile ? Math.min(Math.max(velocity, 1), 4) : Math.min(Math.max(velocity, 5), 15),
+            // Reduce velocity range for smoother ripples
+            velocity: isMobile ? 
+                Math.min(Math.max(velocity * 0.3, 0.5), 2) : // Mobile velocity: 0.5-2
+                Math.min(Math.max(velocity * 0.3, 2), 6),    // Desktop velocity: 2-6
             radius: 0,
-            // Gentler amplitude for mobile
-            amplitude: isMobile ? 40 : 40,
-            // Slower decay for mobile
-            decay: isMobile ? 0.99 : 0.98
+            amplitude: isMobile ? 30 : 30,
+            // Slower decay for longer-lasting ripples
+            decay: isMobile ? 0.995 : 0.992
         });
         
         if (waves.length > 10) {
@@ -323,7 +346,8 @@ canvas {
         }
     }
     
-    function updateMousePosition(e) {
+    // Replace updateMousePosition with debounced version
+    const updateMousePosition = debounce((e) => {
         const x = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
         const y = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
         
@@ -338,26 +362,24 @@ canvas {
         const dy = y - lastY;
         const velocity = Math.sqrt(dx * dx + dy * dy);
         
-        clearTimeout(moveTimeout);
-        
         if (!isMoving && velocity > 1) {
             addWave(x, y, velocity);
             isMoving = true;
         }
         
+        clearTimeout(moveTimeout);
         moveTimeout = setTimeout(() => {
             isMoving = false;
         }, 50);
         
         lastX = x;
         lastY = y;
-    }
+    }, 16); // 60fps throttle
     
     let time = 0;
     function animate() {
         time += 0.01;
         
-        // Add random waves on mobile
         addRandomWave();
         
         ctx.clearRect(0, 0, width, height);
@@ -368,12 +390,13 @@ canvas {
             return wave.amplitude > 0.1;
         });
         
-        for(let x = 0; x < width; x += 20) {
-            for(let y = 0; y < height; y += 20) {
+        // Optimize wave rendering
+        for(let x = 0; x < width; x += GRID_SIZE) {
+            for(let y = 0; y < height; y += GRID_SIZE) {
                 let totalDisplacementX = 0;
                 let totalDisplacementY = 0;
                 
-                waves.forEach(wave => {
+                for (const wave of waves) {
                     const dx = x - wave.x;
                     const dy = y - wave.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -386,14 +409,14 @@ canvas {
                         totalDisplacementX += Math.cos(angle) * waveIntensity;
                         totalDisplacementY += Math.sin(angle) * waveIntensity;
                     }
-                });
+                }
                 
                 ctx.drawImage(
                     bgImage,
-                    x, y, 20, 20,
+                    x, y, GRID_SIZE, GRID_SIZE,
                     x + totalDisplacementX,
                     y + totalDisplacementY,
-                    20, 20
+                    GRID_SIZE, GRID_SIZE
                 );
             }
         }
@@ -404,6 +427,8 @@ canvas {
     bgImage.onload = () => {
         resize();
         animate();
+        // Add loaded class to fade in the canvas
+        canvas.classList.add('loaded');
     };
     
     window.addEventListener('resize', resize);
@@ -418,7 +443,8 @@ canvas {
         
         const x = Math.random() * width;
         const y = Math.random() * height;
-        const velocity = 3 + Math.random() * 3; // Reduced velocity range for mobile (3-6)
+        // Reduce random wave velocity
+        const velocity = 1 + Math.random() * 2; // Reduced velocity range (1-3)
         
         addWave(x, y, velocity, true);
         lastRandomWave = now;

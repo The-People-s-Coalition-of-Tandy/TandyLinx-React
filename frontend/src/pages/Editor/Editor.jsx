@@ -153,7 +153,7 @@ const Editor = () => {
         setPreviewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop');
     };
 
-    if (isLoading) return <div className="editor loading">Loading...</div>;
+    if (isLoading) return <div className="editor loading"></div>;
 
     return (
         <div className="editor-layout">

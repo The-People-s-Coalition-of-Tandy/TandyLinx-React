@@ -38,7 +38,7 @@ const AuthorizedRoute = ({ children }) => {
   }, [user, pageURL]);
 
   if (!initialized || loading || checkingAuth) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   if (!user) {

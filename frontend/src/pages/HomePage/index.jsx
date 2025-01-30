@@ -3,8 +3,8 @@ import { Title } from './components/Title';
 import styles from './styles/index.module.css';
 // import grass from './assets/images/grass5.png'; // alternate grass
 import grass from './assets/images/grass6.webp';
-import castle from './assets/images/castle.png';
-import city from './assets/images/city.png';
+import castle from './assets/images/castle.webp';
+import city from './assets/images/city.webp';
 import gsap from 'gsap';
 import { useEffect } from 'react';
 

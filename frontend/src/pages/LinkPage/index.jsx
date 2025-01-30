@@ -25,7 +25,7 @@ const TemplatePage = () => {
   }, [pageURL]);
 
   if (error) return <div>Error: {error}</div>;
-  if (!pageData) return <div>Loading...</div>;
+  if (!pageData) return <div>Loading</div>;
 
   // Redirect to the server-rendered template
   window.location.href = `/${pageURL}`;

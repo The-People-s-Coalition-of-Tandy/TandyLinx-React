@@ -8,10 +8,9 @@ import './Preview.css';
 const Preview = ({ pageURL, pageTitle, style, isFullPreview, className }) => {
     const { currentPageLinks } = useContext(LinkContext);
     const { currentPagePhotoUrl } = useProfilePhoto();
-    const isMobile = useIsMobile();
     const keyCounter = useRef(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [isDesktopMode, setIsDesktopMode] = useState(!isMobile);
+    const [isDesktopMode, setIsDesktopMode] = useState();
     
     useEffect(() => {
         keyCounter.current += 1;

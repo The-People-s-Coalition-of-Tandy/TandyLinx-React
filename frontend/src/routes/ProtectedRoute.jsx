@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children }) => {
   }, [initialized, loading, checkAuth]);
 
   if (!initialized || loading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   if (!user) {

@@ -67,7 +67,7 @@ const Login = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   return (

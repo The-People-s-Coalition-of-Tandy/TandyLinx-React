@@ -115,23 +115,17 @@ canvas {
     justify-content: center;
     text-decoration: none;
     color: rgb(0, 0, 0);
-    will-change: transform;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     opacity: 0;
-    transform: scale(0) translateZ(0);
     padding: 10px;
-    -webkit-transform: scale(0) translateZ(0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-font-smoothing: antialiased;
-    transition: transform 0.3s ease, filter 0.3s ease;
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .link:hover {
-    transform: scale(1.05) !important;
-    transition: transform 0.3s ease, filter 0.3s ease;
     filter: brightness(1.1);
 }
 
@@ -289,7 +283,6 @@ canvas {
     border-radius: 50%;
     z-index: -1;
     pointer-events: none;
-    animation: bubble 6s ease-in-out infinite;
 }
 
 .linkBackgroundLarge {
@@ -297,7 +290,6 @@ canvas {
     height: 110%;
     top: -5%;
     left: -5%;
-    animation-duration: 7s;
 }
 
 /* Particles */

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import joinIcon from '../assets/icons/join.ico';
-import PCoTandyLogo from '../assets/icons/PCoTandyLogo.ico';
-import pcotandylogo3 from '../assets/icons/pcotandylogo3.ico';
+import PCoTandyLogo from '../assets/icons/PCoTandyLogo.webp';
+import pcotandylogo3 from '../assets/icons/pcotandylogo3.webp';
 import { gsap } from 'gsap';
 import styles from '../styles/index.module.css';
 
@@ -115,27 +115,47 @@ export const Title = () => {
                     }, 2500);
                 }
             }, "<+=0.125")
-            .to(`.${styles.link}`, {
-                duration: 0.5,
-                scale: 1,
-                opacity: 1,
-                stagger: 0.1,
-                ease: "back.out(1.7)",
-                transformOrigin: "center center"
-            }, "+=0.55")
             .add(() => {
                 const links = document.querySelectorAll(`.${styles.link}`);
+                const backgrounds = document.querySelectorAll(`.${styles.linkBackground}`);
+                
+                gsap.set(links, { scale: 0, opacity: 0 });
+                gsap.set(backgrounds, { scale: 0 });
+                
                 links.forEach((link, i) => {
                     gsap.to(link, {
-                        y: -8,
-                        duration: 1.5,
-                        ease: "sine.inOut",
-                        repeat: -1,
-                        yoyo: true,
-                        delay: i * 0.2
+                        scale: 1,
+                        opacity: 1,
+                        duration: 0.6,
+                        ease: "back.out(1.7)",
+                        delay: 0.55 + (i * 0.1)
+                    });
+                    
+                    gsap.to(backgrounds[i], {
+                        scale: 1,
+                        duration: 0.6,
+                        ease: "back.out(1.7)",
+                        delay: 0.55 + (i * 0.1),
+                        onComplete: () => {
+                            gsap.to(link, {
+                                y: -4,
+                                duration: 2,
+                                ease: "sine.inOut",
+                                repeat: -1,
+                                yoyo: true
+                            });
+                            
+                            gsap.to(backgrounds[i], {
+                                scale: 1.03,
+                                duration: 2,
+                                ease: "sine.inOut",
+                                repeat: -1,
+                                yoyo: true
+                            });
+                        }
                     });
                 });
-            });
+            }, "+=0.55");
         });
     }, []);
 
