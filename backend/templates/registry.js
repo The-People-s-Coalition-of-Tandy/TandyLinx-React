@@ -34,7 +34,7 @@ export const templates = {
         name: 'Embroidery',
         id: 'Embroidery',
         template: 'Embroidery.html',
-        thumbnail: '/templates/Embroidery/assets/cover.png',
+        thumbnail: '/templates/Embroidery/thumbnailDithered.png',
         description: 'Ukrainian embroidery'
     },
     LandsEnd: {

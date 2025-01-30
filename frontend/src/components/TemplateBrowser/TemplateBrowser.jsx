@@ -149,6 +149,7 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
           </button>
           <Preview 
             pageTitle={pageTitle}
+            pageURL={`preview/${previewTemplate}`}
             links={links}
             style={previewTemplate}
             isFullPreview={true}

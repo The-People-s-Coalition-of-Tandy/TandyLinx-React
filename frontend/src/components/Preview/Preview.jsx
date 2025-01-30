@@ -16,7 +16,7 @@ const Preview = ({ pageURL, pageTitle, style, isFullPreview, className }) => {
     useEffect(() => {
         keyCounter.current += 1;
         setIsLoading(true);
-    }, [pageURL, pageTitle, style, isFullPreview, currentPageLinks, currentPagePhotoUrl]);
+    }, [pageURL, pageTitle, style, isFullPreview, isDesktopMode, currentPageLinks, currentPagePhotoUrl]);
     
     const handleLoad = (e) => {
         setIsLoading(false);
