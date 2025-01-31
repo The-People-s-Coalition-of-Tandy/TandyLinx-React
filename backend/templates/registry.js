@@ -27,7 +27,7 @@ export const templates = {
     Cubes: {
         name: 'Cubes',
         template: 'cubes.html',
-        thumbnail: '/templates/Cubes/thumbnailDithered.png',
+        thumbnail: '/templates/cubes/thumbnailDithered.png',
         description: 'it\'s cubes'
     },
     Embroidery: {
