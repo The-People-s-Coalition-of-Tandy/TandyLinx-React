@@ -45,4 +45,17 @@ let wheat = function(p){
     }
 }
 
-new p5(wheat, "wheat");
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+window.addEventListener('resize', debounce(() => {
+  // wheat = new p5(wheat, "wheat");
+}, 250));
+
+wheat = new p5(wheat, "wheat");

@@ -1,15 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { LinkContext } from '../../context/LinkContext';
-import { templates } from '../../templates/registry';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import EditLink from '../../components/Editor/EditLink/EditLink';
-import PageHeader from '../../components/Editor/TitleEditor/PageHeader';
 import Preview from '../../components/Preview/Preview';
-import MobilePreview from '../../components/Preview/MobilePreview';
 import TemplateBrowser from '../../components/TemplateBrowser/TemplateBrowser';
+import Browser from '../browser';
+import EditorHeader from '../../components/Editor/EditorHeader/EditorHeader';
 import './Editor.css';
+import AeroButton from '../../components/common/AeroButton/AeroButton';
+import DeleteConfirmModal from '../../components/Editor/DeleteConfirmModal/DeleteConfirmModal';
+import { useProfilePhoto } from '../../context/ProfilePhotoContext';
 
 const Editor = () => {
     const { 
@@ -18,47 +20,62 @@ const Editor = () => {
         getLinksFromPage,
         savePageChangesImmediate 
     } = useContext(LinkContext);
+    const { setCurrentPagePhotoUrl } = useProfilePhoto();
     const [isLoading, setIsLoading] = useState(true);
     const [pageTitle, setPageTitle] = useState('');
-    const [currentTemplate, setCurrentTemplate] = useState('');
+    const [currentTemplate, setCurrentTemplate] = useState('TandyLinx');
     const [showPreview, setShowPreview] = useState(false);
     const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
     const { pageURL } = useParams();
+    const navigate = useNavigate();
+    const [deleteModalState, setDeleteModalState] = useState({ isOpen: false, linkIndex: null });
+    const [showSettings, setShowSettings] = useState(false);
+    const [previewMode, setPreviewMode] = useState('desktop');
+
+    const themeChangeEvent = new CustomEvent('themeChange', {
+        detail: { theme: 'plain' }
+    });
+
+    useEffect(() => {
+        window.dispatchEvent(themeChangeEvent);
+    }, []);
 
     useEffect(() => {
         const fetchPageData = async () => {
-            setIsLoading(true);
             try {
-                const response = await axios.get(`http://localhost:3000/api/get-page/${pageURL}`, {
+                const response = await axios.get(`/api/get-page/${pageURL}`, {
                     withCredentials: true
                 });
-                const links = response.data.links ? JSON.parse(response.data.links) : [];
+                
+                const links = response.data?.links ? JSON.parse(response.data.links) : [];
+                const title = response.data?.pageTitle || '';
+                const style = response.data?.style || 'TandyLinx';
+                const photoUrl = response.data?.pagePhotoUrl;
+                
                 setCurrentPageLinks(links);
-                setPageTitle(response.data.pageTitle);
-                setCurrentTemplate(response.data.style || 'TandyLinx');
+                setPageTitle(title);
+                setCurrentTemplate(style);
+                console.log(style);
+                setCurrentPagePhotoUrl(photoUrl);
+                setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching page data:', error);
                 setCurrentPageLinks([]);
-            } finally {
                 setIsLoading(false);
             }
         };
-        fetchPageData();
-    }, [pageURL]);
 
-    const handleTemplateChange = async (e) => {
-        const newTemplate = e.target.value;
-        setCurrentTemplate(newTemplate);
-        try {
-            await axios.put(`http://localhost:3000/api/pages/${pageURL}`, 
-                { style: newTemplate },
-                { withCredentials: true }
-            );
-        } catch (error) {
-            console.error('Failed to update template:', error);
-            setCurrentTemplate(currentTemplate);
+        fetchPageData();
+    }, [pageURL, setCurrentPageLinks, setCurrentPagePhotoUrl]);
+
+    useEffect(() => {
+        const editor = document.querySelector('.editor');
+        if (deleteModalState.isOpen || showSettings) {
+            editor?.classList.add('no-scroll');
+        } else {
+            editor?.classList.remove('no-scroll');
         }
-    };
+    }, [deleteModalState.isOpen, showSettings]);
 
     const onDragEnd = async (result) => {
         if (!result.destination) return;
@@ -90,67 +107,128 @@ const Editor = () => {
         }
     };
 
-    if (isLoading) return <div className="editor loading">Loading...</div>;
+    const handleURLChange = async (newURL) => {
+        try {
+            const response = await axios.put(
+                `/api/pages/${pageURL}`,
+                { newPageURL: newURL },
+                { withCredentials: true }
+            );
+            
+            if (response.data.success) {
+                navigate(`/${response.data.newPageURL}/edit`, { replace: true });
+            }
+        } catch (error) {
+            console.error('Failed to update URL:', error);
+        }
+    };
+
+    const handleDeleteClick = (index) => {
+        setDeleteModalState({ isOpen: true, linkIndex: index });
+    };
+
+    const handleDeleteConfirm = async () => {
+        const index = deleteModalState.linkIndex;
+        const updatedLinks = [
+            ...currentPageLinks.slice(0, index),
+            ...currentPageLinks.slice(index + 1)
+        ];
+        
+        try {
+            await savePageChangesImmediate(pageURL, { links: updatedLinks });
+            setCurrentPageLinks(updatedLinks);
+        } catch (error) {
+            console.error('Failed to delete link:', error);
+            const originalLinks = await getLinksFromPage(pageURL);
+            setCurrentPageLinks(originalLinks);
+        }
+        setDeleteModalState({ isOpen: false, linkIndex: null });
+    };
+
+    const handleShowSettings = (show) => {
+        setShowSettings(show);
+    };
+
+    const togglePreviewMode = () => {
+        setPreviewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop');
+    };
+
+    if (isLoading) return <div className="editor loading"></div>;
 
     return (
         <div className="editor-layout">
-            <div className="editor">
-                <PageHeader 
-                    currentPageURL={pageURL} 
-                    initialTitle={pageTitle} 
-                    onTitleChange={setPageTitle} 
+            {showTemplateBrowser && (
+                <TemplateBrowser
+                    currentTemplate={currentTemplate}
+                    onSelect={setCurrentTemplate}
+                    pageTitle={pageTitle}
+                    links={currentPageLinks}
+                    onClose={() => setShowTemplateBrowser(false)}
+                    pageURL={pageURL}
                 />
-                
-                <div className="template-selector">
-                    <label htmlFor="template">Template Style:</label>
-                    <select id="template" value={currentTemplate} onChange={handleTemplateChange}>
-                        {Object.entries(templates).map(([key, template]) => (
-                            <option key={key} value={key}>{template.name}</option>
-                        ))}
-                    </select>
-                    <button 
-                        className="browse-templates-button" 
-                        onClick={() => setShowTemplateBrowser(true)}
-                    >
-                        Browse Templates
-                    </button>
+            )}
+            <div className="editor">
+                <EditorHeader
+                    currentPageURL={pageURL}
+                    initialTitle={pageTitle}
+                    onTitleChange={setPageTitle}
+                    onURLChange={handleURLChange}
+                    currentTemplate={currentTemplate}
+                    onBrowseTemplates={() => setShowTemplateBrowser(true)}
+                    showSettings={showSettings}
+                    onShowSettings={handleShowSettings}
+                    previewMode={previewMode}
+                    onTogglePreviewMode={togglePreviewMode}
+                />
+
+                <div className="editor-actions">
+                    <AeroButton onClick={handleAddLink} color="white" className="add-link-button">+ Add Link</AeroButton>
                 </div>
-
-                {showTemplateBrowser && (
-                    <TemplateBrowser
-                        currentTemplate={currentTemplate}
-                        onSelect={handleTemplateChange}
-                        pageTitle={pageTitle}
-                        links={currentPageLinks}
-                        onClose={() => setShowTemplateBrowser(false)}
-                    />
-                )}
-
-                <button className="add-link-button" onClick={handleAddLink}>Add Link</button>
                 
                 <DragDropContext onDragEnd={onDragEnd}>
                     <Droppable droppableId="droppable-column">
                         {(provided) => (
                             <div {...provided.droppableProps} ref={provided.innerRef}>
                                 {currentPageLinks.map((link, index) => (
-                                    <EditLink key={index} link={{...link, pageURL}} index={index} />
+                                    <EditLink 
+                                        key={index} 
+                                        link={{...link, pageURL}} 
+                                        index={index}
+                                        onDeleteClick={handleDeleteClick}
+                                    />
                                 ))}
                                 {provided.placeholder}
                             </div>
                         )}
                     </Droppable>
                 </DragDropContext>
+
+                <DeleteConfirmModal 
+                    isOpen={deleteModalState.isOpen}
+                    onClose={() => setDeleteModalState({ isOpen: false, linkIndex: null })}
+                    onConfirm={handleDeleteConfirm}
+                />
             </div>
 
-            <Preview pageTitle={pageTitle} links={currentPageLinks} style={currentTemplate} />
+            <Preview 
+                pageURL={pageURL} 
+                style={currentTemplate} 
+                pageTitle={pageTitle}
+                viewportMode={previewMode} 
+            />
 
-            <button className="preview-button" onClick={() => setShowPreview(true)}>
+            <AeroButton onClick={() => setShowPreview(true)} className="preview-button" color="green">
                 Preview
-            </button>
+            </AeroButton>
 
             <div className={`preview-modal ${showPreview ? 'open' : ''}`}>
                 <button className="close-preview" onClick={() => setShowPreview(false)}>×</button>
-                <MobilePreview pageTitle={pageTitle} links={currentPageLinks} style={currentTemplate} />
+                <Preview 
+                    pageTitle={pageTitle} 
+                    links={currentPageLinks} 
+                    style={currentTemplate}
+                    pageURL={pageURL} 
+                />
             </div>
         </div>
     );

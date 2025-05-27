@@ -7,8 +7,30 @@ const CreatePage = () => {
     const [pageTitle, setPageTitle] = useState('');
     const [pageURL, setPageURL] = useState('');
     const [error, setError] = useState('');
+    const [urlError, setUrlError] = useState('');
     const { createPage } = useContext(LinkContext);
     const navigate = useNavigate();
+
+    const validateURL = (value) => {
+        // Only allow alphanumeric characters and hyphens
+        return /^[a-zA-Z0-9-]+$/.test(value);
+    };
+
+    const handleURLChange = (e) => {
+        const newUrl = e.target.value;
+        setPageURL(newUrl);
+        
+        if (!newUrl) {
+            setUrlError('');
+            return;
+        }
+        
+        if (!validateURL(newUrl)) {
+            setUrlError('URL can only contain letters, numbers, and hyphens');
+        } else {
+            setUrlError('');
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,8 +41,7 @@ const CreatePage = () => {
             return;
         }
 
-        // Basic URL validation - alphanumeric and hyphens only
-        if (!/^[a-zA-Z0-9-]+$/.test(pageURL)) {
+        if (!validateURL(pageURL)) {
             setError('URL can only contain letters, numbers, and hyphens');
             return;
         }
@@ -56,12 +77,17 @@ const CreatePage = () => {
                             type="text"
                             id="pageURL"
                             value={pageURL}
-                            onChange={(e) => setPageURL(e.target.value)}
+                            onChange={handleURLChange}
                             placeholder="my-links"
                         />
                     </div>
+                    {urlError && <div className={styles.urlError}>{urlError}</div>}
                 </div>
-                <button type="submit" className={styles.submitButton}>
+                <button 
+                    type="submit" 
+                    className={styles.submitButton}
+                    disabled={!!urlError}
+                >
                     Create Page
                 </button>
             </form>

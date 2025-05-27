@@ -1,32 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { templates } from '../../templates/registry';
-import '../../templates/shared/template-base.css';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const TemplatePage = () => {
   const { pageURL } = useParams();
   const [pageData, setPageData] = useState(null);
-  const [Template, setTemplate] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadPage = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/public/pages/${pageURL}`);
-        
+        const response = await axios.get(`/api/public/pages/${pageURL}`);
         if (!response.ok) {
-          throw new Error(`Page not found`);
+          throw new Error('Page not found');
         }
-        
-        const data = await response.json();
-        setPageData(data);
-        console.log(data.style);
-        const templateStyle = templates[data.style] ? data.style : 'TandyLinx';
-        const { folder } = templates[templateStyle];
-        
-        const module = await import(`../../templates/${folder}`);
-        setTemplate(() => module.default);
+        setPageData(response.data);
       } catch (error) {
         setError(error.message);
         console.error('Error loading page:', error);
@@ -37,20 +25,11 @@ const TemplatePage = () => {
   }, [pageURL]);
 
   if (error) return <div>Error: {error}</div>;
-  if (!pageData || !Template) return <div>Loading...</div>;
+  if (!pageData) return <div>Loading</div>;
 
-  return (
-    <>
-      <Helmet>
-        <title>{pageData.pageTitle}</title>
-        <meta name="description" content={`Links for ${pageData.pageTitle}`} />
-      </Helmet>
-        <Template 
-          pageTitle={pageData.pageTitle}
-          links={JSON.parse(pageData.links)}
-        />
-    </>
-  );
+  // Redirect to the server-rendered template
+  window.location.href = `/${pageURL}`;
+  return null;
 };
 
 export default TemplatePage;

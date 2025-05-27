@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+     <style>
+        @font-face {
+            font-family: "Frutiger";
+            src: url('/assets/fonts/Joy Kim.otf') format('opentype');
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            background: #000000; /* or #ffffff for white flash */
+            color: #ffffff;
+            font-family: "Frutiger";
+            min-height: 100vh;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .big-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: clamp(1.2rem, 4vw, 2.8rem);
+            margin: 0.25rem 0;
+            color: rgb(0, 0, 0);
+            mix-blend-mode: color-burn;
+            text-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.2),
+                0 4px 8px rgba(124, 194, 66, 0.3);
+            letter-spacing: 1px;
+            font-weight: 600;
+            word-break: break-word;
+            max-width: 100%;
+            padding: 0 0.75rem;
+            box-sizing: border-box;
+        }
+
+        .title-profile {
+            width: fit-content;
+            max-width: 90%;
+            gap: 15px;
+            margin: 2rem auto 1rem auto;
+            margin-bottom: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(to bottom, rgba(108, 162, 64, 0.9), rgba(124, 194, 66, 0.122));
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        .title-profile::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/templates/VeridansCraestyl/assets/ge060_350a.jpg');
+            background-size: cover;
+            border-radius: 24px;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .container {
+            margin-top: 2rem;
+            background: linear-gradient(to bottom, rgba(108, 162, 64, 0.9), rgba(124, 194, 66, 0.122));
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.281),
+                inset 0 0 32px rgba(255, 255, 255, 0.25);
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: start;
+            z-index: 2;
+            position: relative;
+        }
+
+        .container > * {
+            z-index: 2;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/templates/VeridansCraestyl/assets/ge060_350a.jpg');
+            background-size: cover;
+            border-radius: 24px;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .container::after, .title-profile::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.167), rgba(255, 255, 255, 0.047));
+            border-radius: 24px 24px 90% 0px / 24px 24px 50% 0px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .aeroButton {
+            /* Base properties */
+            --bottom-glow: radial-gradient(farthest-corner at bottom center, rgba(255, 255, 255, 0.7), transparent);
+            --button-color: oklch(75% 0.1 245); /* Default color definition */
+            --button-background: oklch(from var(--button-color) l c h / 0.4);
+            --bg-dark: oklch(from var(--button-color) calc(l - 0.3) c h / 0.35);
+            --button-foreground: oklch(from var(--button-color) calc(l - 0.3) calc(c - 0.15) h);
+
+            background-color: var(--button-background);
+            background: var(--bottom-glow), linear-gradient(to bottom, var(--bg-dark), var(--button-background));
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--button-background);
+            border-radius: 9999px;
+            color: var(--button-foreground);
+            cursor: pointer;
+            font-family: "Lucida Grande", "Lucida Sans Unicode", "Lunasima", sans-serif;
+            font-weight: 600;
+            margin: 1em 1ex;
+            padding: 1ex 1em;
+            position: relative;
+            text-shadow: 0 2px 0.5em #0003;
+            transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+            text-decoration: none;
+            text-align: center;
+        }
+
+/* Color variations */
+.aeroButton.blue   { --button-color: oklch(50% 0.2 245); }
+.aeroButton.green  { --button-color: oklch(50% 0.2 145); }
+.aeroButton.red    { --button-color: oklch(50% 0.2 345); }
+.aeroButton.yellow { --button-color: oklch(50% 0.2 45); }
+.aeroButton.purple { --button-color: oklch(50% 0.2 305); }
+.aeroButton.orange { --button-color: oklch(50% 0.2 45); }
+.aeroButton.pink   { --button-color: oklch(50% 0.2 325); }
+.aeroButton.gray   { --button-color: oklch(50% 0.2 225); }
+.aeroButton.white  { --button-color: oklch(50% 0.2 245); }
+
+.aeroButton::after {
+    content: "";
+    position: absolute;
+    top: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 40%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
+    border-radius: 9999px;
+    transition: background 400ms;
+}
+.aeroButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+}
+.aeroButton:active {
+    transform: translateY(1px);
+}
+
+.glossy-image {
+    width: 80px;
+    position: relative;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        /* grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); */
+        width: 90%;
+        box-sizing: border-box;
+    }
+    
+    .title-profile {
+        margin: 1rem auto 0.5rem auto;
+        margin-bottom: 0px;
+        padding: 0.75rem 1rem;
+        gap: 10px;
+    }
+    
+    .glossy-image {
+        width: 60px;
+    }
+    
+    h1 {
+        font-size: clamp(1rem, 3.5vw, 2rem);
+        letter-spacing: 0.5px;
+        padding: 0 0.5rem;
+    }
+}
+
+/* Add these new styles */
+.light-warp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(
+        circle 800px at var(--x, 50%) var(--y, 50%),
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(124, 194, 66, 0.4) 20%,
+        rgba(124, 194, 66, 0.2) 40%,
+        transparent 70%
+    );
+    z-index: 1;
+    mix-blend-mode: overlay;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+
+canvas.loaded {
+    opacity: 1;
+}
+     </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pageTitle }}</title>
+</head>
+<body>
+    <!-- Add canvas element right after body opening -->
+    <canvas id="warpCanvas"></canvas>
+
+    <div class="big-container">
+    <div class="title-profile">
+        {% if profilePhotoUrl %}
+    <div class="profile-photo-container">
+        <img src="{{ profilePhotoUrl }}" alt="Profile Photo" class="glossy-image">
+    </div>
+    {% endif %}
+        <h1>{{ pageTitle }}</h1>
+    </div>
+        <img src="/templates/VeridansCraestyl/assets/pipe.png" height="30px" alt="Chrome Cylinder" class="connector">
+    
+
+    <div class="container"> 
+        {% for link in links %}
+            <a class="aeroButton" href="{{ link.url }}">{{ link.name }}</a>
+        {% endfor %}
+    </div>
+
+    </div>
+<script>
+    // Add debounce function at the start
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    const canvas = document.getElementById('warpCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    
+    let waves = [];
+    let isMoving = false;
+    let moveTimeout;
+    
+    const bgImage = new Image();
+    bgImage.src = '/templates/VeridansCraestyl/assets/fs125.jpg';
+    
+    // Add performance detection
+    const isLowPerfDevice = window.navigator.hardwareConcurrency <= 4;
+    // Adjust grid size based on performance
+    const GRID_SIZE = isLowPerfDevice ? 40 : 20;
+    
+    let isFirstMove = true;
+    let lastX = null, lastY = null;
+    
+    // Add these variables for random waves
+    let lastRandomWave = 0;
+    const RANDOM_WAVE_INTERVAL = 3000; // Increased to 3 seconds
+    
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    
+    function addWave(x, y, velocity, isMobile = false) {
+        waves.push({
+            x,
+            y,
+            // Reduce velocity range for smoother ripples
+            velocity: isMobile ? 
+                Math.min(Math.max(velocity * 0.3, 0.5), 2) : // Mobile velocity: 0.5-2
+                Math.min(Math.max(velocity * 0.3, 2), 6),    // Desktop velocity: 2-6
+            radius: 0,
+            amplitude: isMobile ? 30 : 30,
+            // Slower decay for longer-lasting ripples
+            decay: isMobile ? 0.995 : 0.992
+        });
+        
+        if (waves.length > 10) {
+            waves.shift();
+        }
+    }
+    
+    // Replace updateMousePosition with debounced version
+    const updateMousePosition = debounce((e) => {
+        const x = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const y = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+        
+        if (isFirstMove) {
+            lastX = x;
+            lastY = y;
+            isFirstMove = false;
+            return;
+        }
+        
+        const dx = x - lastX;
+        const dy = y - lastY;
+        const velocity = Math.sqrt(dx * dx + dy * dy);
+        
+        if (!isMoving && velocity > 1) {
+            addWave(x, y, velocity);
+            isMoving = true;
+        }
+        
+        clearTimeout(moveTimeout);
+        moveTimeout = setTimeout(() => {
+            isMoving = false;
+        }, 50);
+        
+        lastX = x;
+        lastY = y;
+    }, 16); // 60fps throttle
+    
+    let time = 0;
+    function animate() {
+        time += 0.01;
+        
+        addRandomWave();
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        waves = waves.filter(wave => {
+            wave.radius += wave.velocity;
+            wave.amplitude *= wave.decay;
+            return wave.amplitude > 0.1;
+        });
+        
+        // Optimize wave rendering
+        for(let x = 0; x < width; x += GRID_SIZE) {
+            for(let y = 0; y < height; y += GRID_SIZE) {
+                let totalDisplacementX = 0;
+                let totalDisplacementY = 0;
+                
+                for (const wave of waves) {
+                    const dx = x - wave.x;
+                    const dy = y - wave.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    const distanceFromWave = Math.abs(distance - wave.radius);
+                    if (distanceFromWave < 50) {
+                        const waveIntensity = (1 - distanceFromWave / 50) * wave.amplitude;
+                        const angle = Math.atan2(dy, dx);
+                        
+                        totalDisplacementX += Math.cos(angle) * waveIntensity;
+                        totalDisplacementY += Math.sin(angle) * waveIntensity;
+                    }
+                }
+                
+                ctx.drawImage(
+                    bgImage,
+                    x, y, GRID_SIZE, GRID_SIZE,
+                    x + totalDisplacementX,
+                    y + totalDisplacementY,
+                    GRID_SIZE, GRID_SIZE
+                );
+            }
+        }
+        
+        requestAnimationFrame(animate);
+    }
+    
+    bgImage.onload = () => {
+        resize();
+        animate();
+        // Add loaded class to fade in the canvas
+        canvas.classList.add('loaded');
+    };
+    
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', updateMousePosition);
+    window.addEventListener('touchmove', updateMousePosition);
+    
+    function addRandomWave() {
+        if (window.innerWidth > 768) return;
+        
+        const now = Date.now();
+        if (now - lastRandomWave < RANDOM_WAVE_INTERVAL) return;
+        
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        // Reduce random wave velocity
+        const velocity = 1 + Math.random() * 2; // Reduced velocity range (1-3)
+        
+        addWave(x, y, velocity, true);
+        lastRandomWave = now;
+    }
+    
+    // Modify device orientation handler
+    window.addEventListener('deviceorientation', (e) => {
+        if (window.innerWidth <= 768) {
+            const velocity = Math.sqrt(e.gamma * e.gamma + e.beta * e.beta) * 0.05; // Reduced multiplier
+            const x = ((e.gamma || 0) / 60 + 0.5) * width;
+            const y = ((e.beta || 0) / 60 + 0.5) * height;
+            currentMouseX = x;
+            currentMouseY = y;
+            
+            if (velocity > 1.5) { // Increased threshold
+                addWave(x, y, velocity, true);
+            }
+        }
+    });
+</script>
+</body>
+</html>

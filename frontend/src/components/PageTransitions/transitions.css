@@ -1,0 +1,14 @@
+.page-transition-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  /* Ensure content doesn't jump during transitions */
+  html, body {
+    overflow-x: hidden;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }

@@ -1,0 +1,714 @@
+<html>
+<head>
+    <title>Butterfly</title>
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%;
+            background: rgb(0, 0, 0);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .title-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            color: rgb(255, 255, 255);
+            font-family: 'Comic Sans MS', cursive;
+            /* font-size: 24px; */
+            background-color: rgb(136, 0, 255);
+            border: 3px ridge rgb(212, 182, 213);
+            padding: 20px;
+        }
+
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            /* align-items: center; */
+            justify-content: center;
+            gap: 40px;
+            padding: 20px;
+        }
+        
+        .link{
+            color: rgb(0, 0, 0);
+            padding: 10px;
+            width: 100%;
+            text-align: left;
+            /* margin: 10px; */
+            background-color: rgb(255, 255, 255);
+            border: 3px ridge rgb(0, 0, 0);
+            /* border-radius: 5px; */
+        }
+
+        .link:hover {
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255);
+            border: 3px ridge rgb(0, 0, 0);
+        }
+
+        .score-display {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-family: 'Comic Sans MS', cursive;
+            color: #000000;
+            font-size: 24px;
+        }
+
+        .combo-display {
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            font-family: 'Comic Sans MS', cursive;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #fff;
+            font-size: 18px;
+        }
+
+        .background-gif {
+            position: fixed;
+            pointer-events: none; /* So they don't interfere with the game */
+            z-index: -1;
+            /* opacity: 0.5; */
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .floating {
+            /* animation: float 3s ease-in-out infinite; */
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .butterfly {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            transition: transform 0.2s ease-out;
+        }
+        .butterfly:hover {
+            transform: scale(1.2);
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+</head>
+<body>
+    <canvas id="emojiCanvas"></canvas>
+
+    <main>
+        <div class="title-profile">
+            {% if profilePhotoUrl %}
+                <img src="{{ profilePhotoUrl }}" alt="Profile Photo" class="glossy-image">
+            {% endif %}
+            <h1>{{ pageTitle }}</h1>
+        </div>
+        <div class="links">
+            {% for link in links %}
+            <div class="link-container">
+                <img height="20" src="/assets/gifs/rotatestar.gif" alt="Heart" class="heart-gif">
+                <a href="{{ link.url }}" class="link">{{ link.name }}</a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>    
+        const canvas = document.getElementById('emojiCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set actual canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const emojis = [];
+        const scorePopups = [];
+        const targetZones = [];
+        let score = 0;
+        
+        // Create array of emoji images
+        const emojiImages = [];
+        const emojiSources = [
+            '/templates/emoji/emoji.png',
+            '/templates/emoji/emoji.gif',
+            '/assets/gifs/Sword_Spin.gif',
+            '/assets/gifs/Flaming_Demon.gif',
+            '/assets/gifs/Cleric_Walking.gif'
+            // '/templates/emoji/emoji3.png',
+            // '/templates/emoji/emoji4.png'
+        ];
+
+        // Load all emoji images
+        let loadedImages = 0;
+        emojiSources.forEach(src => {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => {
+                loadedImages++;
+                if (loadedImages === emojiSources.length) {
+                    // Start animation when all images are loaded
+                    animate();
+                }
+            };
+            emojiImages.push(img);
+        });
+
+        // Add new global variables
+        let combo = 0;
+        let maxCombo = 0;
+        let screenShake = 0;
+        let lastHitTime = Date.now();
+        
+        class Emoji {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.baseSize = 40 + Math.random() * 30;
+                this.velocityX = (Math.random() - 0.5) * 5;
+                this.velocityY = -5 - Math.random() * 5;
+                this.gravity = 0.2;
+                this.bounce = 0.7;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+                this.markedForDeletion = false;
+                this.image = emojiImages[Math.floor(Math.random() * emojiImages.length)];
+                this.calculateDimensions();
+                
+                // New properties for GIF handling
+                this.isGif = this.image.src.toLowerCase().endsWith('.gif');
+                if (this.isGif) {
+                    this.canvas = document.createElement('canvas');
+                    this.initGif();
+                }
+                this.scale = 1;
+                this.targetScale = 1;
+                this.depth = Math.random() * 0.5 + 0.5; // 3D effect
+                this.baseSize *= this.depth; // Larger emojis appear closer
+            }
+
+            async initGif() {
+                try {
+                    const gif = gifler(this.image.src);
+                    await gif.frames(this.canvas, (ctx, frame) => {
+                        this.canvas.width = frame.width;
+                        this.canvas.height = frame.height;
+                        ctx.drawImage(frame.buffer, 0, 0);
+                    });
+                } catch (error) {
+                    console.error('Error loading gif:', error);
+                }
+            }
+
+            calculateDimensions() {
+                const aspectRatio = this.image.width / this.image.height;
+                if (aspectRatio >= 1) {
+                    // Image is wider than tall
+                    this.width = this.baseSize;
+                    this.height = this.baseSize / aspectRatio;
+                } else {
+                    // Image is taller than wide
+                    this.height = this.baseSize;
+                    this.width = this.baseSize * aspectRatio;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x + this.width/2, this.y + this.height/2);
+                
+                // Add screen shake
+                if (screenShake > 0) {
+                    ctx.translate(
+                        (Math.random() - 0.5) * screenShake,
+                        (Math.random() - 0.5) * screenShake
+                    );
+                }
+                
+                // Add 3D shadow effect
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 5 * this.depth;
+                ctx.shadowOffsetY = 5 * this.depth;
+                
+                ctx.rotate(this.rotation);
+                ctx.scale(this.scale, this.scale);
+                
+                if (this.isGif) {
+                    ctx.drawImage(this.canvas, -this.width/2, -this.height/2, this.width, this.height);
+                } else {
+                    ctx.drawImage(this.image, -this.width/2, -this.height/2, this.width, this.height);
+                }
+                
+                ctx.restore();
+            }
+
+            destroy() {
+                // No special cleanup needed anymore
+            }
+
+            update() {
+                // Apply gravity
+                this.velocityY += this.gravity;
+                
+                // Update position
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                
+                // Update rotation
+                this.rotation += this.rotationSpeed;
+
+                // Bounce off walls
+                if (this.x + this.width > canvas.width) {
+                    this.x = canvas.width - this.width;
+                    this.velocityX *= -this.bounce;
+                }
+                if (this.x < 0) {
+                    this.x = 0;
+                    this.velocityX *= -this.bounce;
+                }
+
+                // Hit bottom - remove emoji and lose points
+                if (this.y + this.height > canvas.height) {
+                    this.markedForDeletion = true;
+                    score = Math.max(0, score - 10); // Deduct 10 points, but don't go below 0
+                    combo = 0; // Reset combo
+                    
+                    // Add negative score popup
+                    scorePopups.push(new ScorePopup(
+                        this.x,
+                        this.y,
+                        '-10 pts!'
+                    ));
+                    
+                    return;
+                }
+
+                // Bounce off ceiling
+                if (this.y < 0) {
+                    this.y = 0;
+                    this.velocityY *= -this.bounce;
+                }
+
+                // Smooth scale animation
+                this.scale += (this.targetScale - this.scale) * 0.1;
+                
+                // Add wobble effect
+                this.rotation += Math.sin(Date.now() / 1000) * 0.02;
+            }
+        }
+
+        class ScorePopup {
+            constructor(x, y, score) {
+                this.x = x;
+                this.y = y;
+                this.score = score;
+                this.opacity = 1;
+                this.velocity = -2;
+                this.color = this.score.toString().includes('-') ? 'red' : 'lime';
+            }
+
+            update() {
+                this.y += this.velocity;
+                this.opacity -= 0.02;
+                
+                // Return false when the popup should be removed
+                if (this.opacity <= 0) {
+                    return false;
+                }
+                return true;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.font = '20px "Comic Sans MS", cursive';
+                
+                // Add text outline
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = `rgba(0, 0, 0, ${this.opacity * 0.8})`;
+                ctx.strokeText(this.score, this.x, this.y);
+                
+                // Create gradient
+                let gradient = ctx.createLinearGradient(this.x, this.y - 20, this.x, this.y);
+                if (this.color === 'red') {
+                    gradient.addColorStop(0, `rgba(255, 68, 68, ${this.opacity})`);
+                    gradient.addColorStop(1, `rgba(255, 0, 0, ${this.opacity})`);
+                } else {
+                    gradient.addColorStop(0, `rgba(255, 221, 0, ${this.opacity})`);
+                    gradient.addColorStop(1, `rgba(255, 102, 0, ${this.opacity})`);
+                }
+                
+                ctx.fillStyle = gradient;
+                ctx.fillText(this.score, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        class TargetZone {
+            constructor() {
+                this.width = 100;
+                this.height = 100;
+                this.x = Math.random() * (canvas.width - this.width);
+                this.y = Math.random() * (canvas.height - this.height);
+                this.timeLeft = 5000; // 5 seconds
+                this.type = Math.random() < 0.3 ? 'bonus' : 'normal';
+                this.pulsePhase = 0;
+            }
+
+            draw() {
+                ctx.save();
+                
+                // Pulse animation
+                this.pulsePhase += 0.05;
+                const pulse = Math.sin(this.pulsePhase) * 0.2 + 0.8;
+                
+                // Different colors for different types
+                const color = this.type === 'bonus' ? 
+                    'rgba(255, 0, 255, 0.8)' : 
+                    'rgba(255, 215, 0, 0.8)';
+                
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3 * pulse;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(this.x, this.y, this.width, this.height);
+                
+                // Add glow effect
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 20;
+                ctx.strokeRect(this.x, this.y, this.width, this.height);
+                
+                ctx.restore();
+            }
+
+            contains(emoji) {
+                return emoji.x < this.x + this.width &&
+                       emoji.x + emoji.width > this.x &&
+                       emoji.y < this.y + this.height &&
+                       emoji.y + emoji.height > this.y;
+            }
+        }
+
+        function addEmoji() {
+            const x = Math.random() * (canvas.width - 50);
+            const y = canvas.height - 50;
+            emojis.push(new Emoji(x, y));
+        }
+
+        function addTargetZone() {
+            if (targetZones.length < 3) {
+                targetZones.push(new TargetZone());
+            }
+        }
+
+        function handleCollision(emoji, zone) {
+            const points = zone.type === 'bonus' ? 50 : 20;
+            score += points;
+            combo++;
+            maxCombo = Math.max(maxCombo, combo);
+            
+            // Update lastHitTime when collision occurs
+            lastHitTime = Date.now();
+            
+            // Add screen shake
+            screenShake = 5;
+            
+            // Scale effect on emoji
+            emoji.targetScale = 1.5;
+            setTimeout(() => emoji.targetScale = 1, 200);
+            
+            scorePopups.push(new ScorePopup(
+                emoji.x, 
+                emoji.y, 
+                `+${points} (${combo}x COMBO!)`
+            ));
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw score with outline and gradient
+            ctx.save();
+            ctx.font = '24px "Comic Sans MS", cursive';
+            
+            // Add text outline
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.strokeText(`Score: ${score}`, 20, 30);
+            
+            // Create gradient
+            let gradient = ctx.createLinearGradient(20, 10, 20, 30);
+            gradient.addColorStop(0, '#ffdd00');
+            gradient.addColorStop(1, '#ff6600');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillText(`Score: ${score}`, 20, 30);
+            ctx.restore();
+
+            // Randomly add target zones
+            if (Math.random() < 0.005) {
+                addTargetZone();
+            }
+
+            // Draw and update target zones
+            targetZones.forEach((zone, index) => {
+                zone.draw();
+                zone.timeLeft -= 16; // Approximate time between frames
+                if (zone.timeLeft <= 0) {
+                    targetZones.splice(index, 1);
+                }
+            });
+
+            // Update and draw score popups
+            scorePopups.forEach((popup, index) => {
+                if (!popup.update()) {
+                    scorePopups.splice(index, 1);
+                } else {
+                    popup.draw();
+                }
+            });
+
+            // Update and draw all emojis
+            emojis.forEach((emoji, index) => {
+                emoji.update();
+                
+                // Check collision with target zones
+                targetZones.forEach(zone => {
+                    if (zone.contains(emoji) && !emoji.markedForDeletion) {
+                        handleCollision(emoji, zone);
+                        emoji.markedForDeletion = true;
+                        emojis.splice(index, 1);
+                    }
+                });
+
+                if (emoji.markedForDeletion) {
+                    emoji.destroy();
+                    emojis.splice(index, 1);
+                } else {
+                    emoji.draw();
+                }
+            });
+
+            // Update screen shake
+            if (screenShake > 0) {
+                screenShake *= 0.9;
+            }
+            
+            // Reset combo if no hits for a while
+            if (Date.now() - lastHitTime > 2000) {
+                combo = 0;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        document.querySelectorAll('.link').forEach(link => {
+            link.addEventListener('mouseenter', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                for (let i = 0; i < 5; i++) {
+                    emojis.push(new Emoji(x, y));
+                }
+            });
+        });
+
+        // Add emojis on click
+        // canvas.addEventListener('mousemove', (e) => {
+        //     const rect = canvas.getBoundingClientRect();
+        //     const x = e.clientX - rect.left;
+        //     const y = e.clientY - rect.top;
+        //     // for (let i = 0; i < 5; i++) {
+        //         emojis.push(new Emoji(x, y));
+        //     // }
+        // });
+
+        // Add this after your existing canvas setup
+        const backgroundGifs = [
+            'Castle2.gif', 'Cleric_Walking.gif',
+            'dream3d.gif', 'Flaming_Demon.gif',
+             'heart3d.gif', 'house09.gif', 'house12.gif', 'hpw9.gif', 'kahana2.jpg',
+             'newletters.gif',
+            'orbstar.gif', 'rotatestar.gif','Spiked_Creature.gif', 'star_juggle.gif', 'star-happy.gif',
+            'star-silly.gif', 'star.gif', 'starfsh.gif', 'Sword_Spin.gif',
+            'Tantalis_Orb.gif', 'Torch_Dark.gif', 'Torch_Light.gif',  "pop_can_walking_hg_clr.gif",
+  "dolfring.gif",
+  "draco_flying_md_clr.gif",
+  "mapleani.gif",
+  "slime (1).gif",
+  "3monban2.gif",
+  "fmr1.gif",
+  "Heavyarms_Custom1.gif",
+  "Deathscythe-Hell_Custom.gif",
+  "tower_with_pendant_md_clr.gif",
+  "bee_hive_lg_clr.gif",
+  "frog02.gif",
+  "smile.gif"
+        ];
+
+        function addBackgroundGifs() {
+            // Add about 20 random GIFs
+            for (let i = 0; i < 20; i++) {
+                const randomGif = backgroundGifs[Math.floor(Math.random() * backgroundGifs.length)];
+                const img = document.createElement('img');
+                img.src = `/assets/gifs/${randomGif}`;
+                img.className = 'background-gif floating';
+                
+                // Random position
+                img.style.left = `${Math.random() * 100}vw`;
+                img.style.top = `${Math.random() * 100}vh`;
+                
+                // Random size (50px to 150px)
+                const size = 50 + Math.random() * 100;
+                img.style.width = `${size}px`;
+                img.style.height = `${size}px`;
+                
+                // Random animation delay
+                img.style.animationDelay = `${Math.random() * 2}s`;
+                
+                // Random animation duration (2-4 seconds)
+                img.style.animationDuration = `${2 + Math.random() * 2}s`;
+                
+                document.body.appendChild(img);
+            }
+        }
+
+        // Call this after your canvas is set up
+        addBackgroundGifs();
+
+        // Add before the existing canvas code
+        class Butterfly {
+            constructor(id) {
+                this.img = document.createElement('img');
+                this.img.src = `/templates/emoji/butterflies/${id}.gif`;
+                this.img.className = 'butterfly';
+                this.img.style.position = 'fixed';
+                this.img.style.pointerEvents = 'none';
+                this.img.style.width = '50px';
+                this.img.style.height = '50px';
+                this.img.style.transition = 'all 10s ease-out';
+                this.img.style.zIndex = '1000';
+                
+                // Random starting position off-screen
+                this.x = Math.random() < 0.5 ? -50 : window.innerWidth + 50;
+                this.y = Math.random() * window.innerHeight;
+                this.targetX = this.x;
+                this.targetY = this.y;
+                this.speed = Math.random() * 0.05;
+                this.wanderRadius = 100;
+                this.isLanded = false;
+                this.landedElement = null;
+                
+                document.body.appendChild(this.img);
+                this.updatePosition();
+            }
+
+            updatePosition() {
+                this.img.style.left = `${this.x}px`;
+                this.img.style.top = `${this.y}px`;
+            }
+
+            move() {
+                if (this.isLanded) return;
+
+                // Move towards target with reduced random movement
+                const dx = this.targetX - this.x;
+                const dy = this.targetY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance > 1) {
+                    this.x += (dx / distance) * this.speed + (Math.random() - 0.5) * 0.2;
+                    this.y += (dy / distance) * this.speed + (Math.random() - 0.5) * 0.2;
+                    this.updatePosition();
+                }
+            }
+
+            setTarget(x, y) {
+                this.targetX = x;
+                this.targetY = y;
+            }
+
+            landOn(element) {
+                const rect = element.getBoundingClientRect();
+                this.isLanded = true;
+                this.landedElement = element;
+                
+                // Land at a random position on the element
+                this.x = rect.left + Math.random() * rect.width;
+                this.y = rect.top + Math.random() * rect.height;
+                this.updatePosition();
+            }
+
+            disperse() {
+                if (!this.isLanded) return;
+                
+                this.isLanded = false;
+                this.landedElement = null;
+                
+                // Fly in a random direction
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 200 + Math.random() * 300;
+                this.targetX = this.x + Math.cos(angle) * distance;
+                this.targetY = this.y + Math.sin(angle) * distance;
+            }
+        }
+
+        // Initialize butterflies
+        const butterflies = [];
+        for (let i = 1; i <= 19; i++) {
+            butterflies.push(new Butterfly(i));
+        }
+
+        // Animation loop for butterflies
+        function animateButterflies() {
+            butterflies.forEach(butterfly => butterfly.move());
+            requestAnimationFrame(animateButterflies);
+        }
+        animateButterflies();
+
+        // Find landing spots periodically
+        setInterval(() => {
+            const landableElements = document.querySelectorAll('.link, h1, .link-container');
+            butterflies.forEach(butterfly => {
+                if (!butterfly.isLanded && Math.random() < 0.1) {
+                    const randomElement = landableElements[Math.floor(Math.random() * landableElements.length)];
+                    butterfly.landOn(randomElement);
+                }
+            });
+        }, 2000);
+
+        // Add hover handlers to make butterflies disperse
+        document.querySelectorAll('.link, h1, .link-container').forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                butterflies.forEach(butterfly => {
+                    if (butterfly.landedElement === element) {
+                        butterfly.disperse();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

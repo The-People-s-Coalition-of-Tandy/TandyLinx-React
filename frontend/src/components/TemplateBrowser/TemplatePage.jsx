@@ -11,7 +11,7 @@ const TemplatePage = () => {
   useEffect(() => {
     const loadPage = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/public/pages/${pageURL}`);
+        const response = await fetch(`/api/public/pages/${pageURL}`);
         
         if (!response.ok) {
           throw new Error(`Page not found`);

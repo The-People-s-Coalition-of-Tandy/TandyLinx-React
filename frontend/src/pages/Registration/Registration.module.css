@@ -1,0 +1,151 @@
+.registrationContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 20px;
+  color: white;
+  font-family: 'linotype', Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.registrationContainer h1 {
+  color: white;
+  margin-bottom: 2rem;
+  font-weight: 200;
+  font-size: 2rem;
+  letter-spacing: 0.15em;
+}
+
+.registrationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.registrationForm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(to bottom, #ffffff4a 0%, #ffffff14 100%);
+  border-radius: 12px;
+  border-bottom-right-radius: 40%;
+  pointer-events: none;
+}
+
+.registrationForm input {
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-family: 'inter', Arial, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.registrationForm input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'inter', Arial, sans-serif;
+}
+
+
+.registrationForm button:hover {
+  background-color: #535bf2;
+}
+
+.error {
+  color: #ff6b6b;
+  margin-bottom: 10px;
+  font-family: 'inter', Arial, sans-serif;
+}
+
+.loginLink {
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'inter', Arial, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.loginLink a {
+  color: #e5e5e5;
+  text-decoration: underline;
+  transition: all 0.2s ease;
+  text-shadow: 1px 1px #000;
+  filter: drop-shadow(1px 1px 5px #ffffff);
+}
+
+.loginLink a:hover {
+  text-decoration: underline;
+} 
+
+
+.castle {
+  position: absolute;
+  top: 50px;
+  left: 20%;
+  height: 300px;
+  opacity: 0.8;
+  animation: getDarker 1.5s ease forwards;
+}
+
+.castleContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.city {
+  position: absolute;
+  top: 50px;
+  left: 70%;
+  height: 200px;
+  opacity: 0.6;
+  animation: getDarkerCity 1.5s ease forwards;
+}
+
+.cityContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes getDarker {
+  0% {
+    filter: brightness(1) contrast(1);
+  }
+  100% {
+    filter: brightness(0.6) contrast(1.2);
+  }
+}
+
+@keyframes getDarkerCity {
+  0% {
+    opacity: 0.6;
+    filter: brightness(1) contrast(1);
+  }
+  100% {
+    opacity: 0.5;
+    filter: brightness(0.6) contrast(1.2);
+  }
+}

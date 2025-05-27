@@ -153,4 +153,21 @@ let embroideryFrame = function (p) {
   }   
 }
 
-const embroidery = new p5(embroideryFrame);
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+let embroidery;   
+
+window.addEventListener('resize', debounce(() => {
+  embroidery.remove();
+  embroidery = new p5(embroideryFrame);
+
+  // cleanup
+}, 250)); 
+
+embroidery = new p5(embroideryFrame);

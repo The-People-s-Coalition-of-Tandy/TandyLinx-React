@@ -1,0 +1,144 @@
+<html>
+<head>
+    <title>{{ pageTitle }}</title>
+    <style>
+        body {
+            background-color: rgb(0, 0, 0);
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .title-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            color: rgb(255, 255, 255);
+            font-family: 'Comic Sans MS', cursive;
+            background-color: rgb(136, 0, 255);
+            border: 3px ridge rgb(212, 182, 213);
+            padding: 20px;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            padding: 20px;
+        }
+        
+        .link {
+            color: rgb(0, 0, 0);
+            padding: 10px;
+            width: 100%;
+            text-align: left;
+            background-color: rgb(255, 255, 255);
+            border: 3px ridge rgb(0, 0, 0);
+        }
+
+        .link:hover {
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255);
+            border: 3px ridge rgb(0, 0, 0);
+        }
+
+        .link-container:hover img {
+            transform: scale(1.5);
+            filter: brightness(1.5) drop-shadow(0 0 10px #fff);
+        }
+
+        .background-gif {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+            object-fit: contain;
+        }
+
+        /* .floating {
+            animation: float 3s ease-in-out infinite;
+        } */
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+    <main>
+        <div class="title-profile">
+            {% if profilePhotoUrl %}
+                <img src="{{ profilePhotoUrl }}" alt="Profile Photo" class="glossy-image">
+            {% endif %}
+            <h1>{{ pageTitle }}</h1>
+        </div>
+        <div class="links">
+            {% for link in links %}
+            <div class="link-container">
+                <img height="20" src="/assets/gifs/star.gif" alt="Heart" class="heart-gif">
+                <a href="{{ link.url }}" class="link">{{ link.name }}</a>
+                <img height="20" src="/assets/gifs/star.gif" alt="Heart" class="heart-gif">
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        const backgroundGifs = [
+            'Castle2.gif', 'Cleric_Walking.gif',
+            'dream3d.gif', 'Flaming_Demon.gif',
+            'heart3d.gif', 'house09.gif', 'house12.gif', 'hpw9.gif', 'kahana2.jpg',
+            'newletters.gif', 'orbstar.gif', 'rotatestar.gif','Spiked_Creature.gif', 
+            'star_juggle.gif', 'star-happy.gif', 'star-silly.gif', 'star.gif', 
+            'starfsh.gif', 'Sword_Spin.gif', 'Tantalis_Orb.gif', 'Torch_Dark.gif', 
+            'Torch_Light.gif', "pop_can_walking_hg_clr.gif", "dolfring.gif",
+            "draco_flying_md_clr.gif", "mapleani.gif", "slime (1).gif",
+            "3monban2.gif", "fmr1.gif", "Heavyarms_Custom1.gif",
+            "Deathscythe-Hell_Custom.gif", "tower_with_pendant_md_clr.gif",
+            "bee_hive_lg_clr.gif", "frog02.gif", "smile.gif", "hombrepc.gif", 
+            "emoticon.35.gif", "3d-star.gif", "music.gif"
+        ];
+
+        function addBackgroundGifs() {
+            for (let i = 0; i < 300; i++) {
+                const randomGif = backgroundGifs[Math.floor(Math.random() * backgroundGifs.length)];
+                const img = document.createElement('img');
+                img.src = `/assets/gifs/${randomGif}`;
+                img.className = 'background-gif floating';
+                
+                // Random size (50px to 150px)
+                const size = 50 + Math.random() * 100;
+                img.style.width = `${size}px`;
+                img.style.height = `${size}px`;
+                
+                // Random position (allowing overflow equally on both sides)
+                const overflow = (size/window.innerWidth) * 100; // percentage of viewport width
+                img.style.left = `${Math.random() * (100 + 2 * overflow) - overflow}vw`;
+                img.style.top = `${Math.random() * (100 + 2 * overflow) - overflow}vh`;
+                
+                // Random animation delay
+                img.style.animationDelay = `${Math.random() * 2}s`;
+                
+                // Random animation duration (2-4 seconds)
+                img.style.animationDuration = `${2 + Math.random() * 2}s`;
+                
+                document.body.appendChild(img);
+            }
+        }
+
+        // Initialize background GIFs when the page loads
+        addBackgroundGifs();
+    </script>
+</body>
+</html>

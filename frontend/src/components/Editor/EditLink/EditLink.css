@@ -1,3 +1,35 @@
+@font-face {
+    font-family: 'Hoefler Text';
+    src: url('/assets/fonts/Hoefler Text Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'play';
+    src: url('/assets/fonts/Play-Regular.ttf') format('truetype');
+  }
+  
+  @font-face {
+    font-family: 'Garamond';
+    src: url('/assets/fonts/AppleGaramond.ttf') format('truetype');
+  }
+  
+  @font-face {
+    font-family: 'linotype';
+    src: url('/assets/fonts/linotype-aroma-extra-light.ttf') format('truetype');
+  }
+
+  @font-face {
+    font-family: 'inter';
+    src: url('/assets/fonts/Inter-Regular.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'frutiger';
+    src: url('/assets/fonts/Frutiger.woff') format('woff');
+  }
+
 .link-field-container {
     display: flex;
     flex-direction: column;
@@ -5,6 +37,11 @@
     padding: 10px;
     flex-grow: 1;
     min-width: 0;
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), transparent);
+    box-shadow: 
+        inset -1px 0 1px rgba(0, 0, 0, 0.1),
+        1px 0 0 rgba(255, 255, 255, 0.3);
 }
 
 .link-field {
@@ -12,6 +49,11 @@
     align-items: center;
     gap: 4px;
     width: 100%;
+}
+
+.link-field-input {
+    /* background: linear-gradient(to bottom, #ffffff10, #ffffff00); */
+    touch-action: pan-x pan-y;
 }
 
 p.link-field-input {
@@ -27,29 +69,26 @@ p.link-field-input {
     align-items: center;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    display: block;
+    overflow: hidden;
     max-width: calc(100% - 30px);
-}
-
-p.link-field-input::-webkit-scrollbar {
-    display: none;
+    color: #000;
+    touch-action: none;
 }
 
 .edit-button.hidden {
     visibility: hidden;
 }
 
-.link-field-input:focus-visible {
+.edit-button:focus-visible {
     outline: 2px solid #000000;
     background-color: #ffffff;
+    color: #000000;
     text-overflow: clip;
 }
 
 .edit-button {
     background-color: transparent;
+    color: rgb(0, 0, 0);
     border: none;
     cursor: pointer;
     padding: 0px;
@@ -65,23 +104,51 @@ p.link-field-input::-webkit-scrollbar {
 .drag-test-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    background-color: #ababab;
+    gap: 0;
+    background: linear-gradient(180deg, #ffffff90 0%, #ffffff40 100%);
     border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
     max-width: 100%;
     min-width: 0;
+    position: relative;
+    backdrop-filter: blur(2px);
+    box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.6),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        0 0 0 2px #4cbdee;
+    font-family: 'inter';
+    touch-action: pan-y pinch-zoom;
+}
+
+.drag-test-item::before {
+    content: '';
+    position: absolute;
+    border-radius: 6px;
+    width: 100%;
+    height: 50%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, #ffffff68 0%, #ffffff00 100%)   ;
 }
 
 .drag-handle {
     padding: 6px;
     cursor: grab;
-    opacity: 0.6;
-    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 24px;
+    flex-shrink: 0;
     align-self: stretch;
+    color: rgb(0, 0, 0);
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+    border-radius: 4px 0 0 4px;
+    box-shadow: 
+        inset -1px 0 1px rgba(0, 0, 0, 0.1),
+        1px 0 0 rgba(255, 255, 255, 0.3);
+    touch-action: none;
 }
 
 .drag-handle-dots {
@@ -106,6 +173,7 @@ p.link-field-input::-webkit-scrollbar {
 
 .link-title-text {
     font-weight: 500;
+    color: #000;
 }
 
 .link-url-text {
@@ -118,22 +186,47 @@ p.link-field-input::-webkit-scrollbar {
     gap: 8px;
     padding: 0 12px;
     flex-shrink: 0;
-    margin-left: auto;
+    margin-left: 0;
+    align-self: center;
+    /* background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2)); */
+    border-radius: 0 4px 4px 0;
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.3);
 }
 
 .delete-button {
-    background-color: transparent;
+    --orb-color: rgb(90, 0, 0);
+    --orb-specular: rgb(154, 154, 154);
     border: none;
     cursor: pointer;
     padding: 6px;
-    border-radius: 4px;
-    color: #ff4a4a;
-    opacity: 0.6;
+    border-radius: 100%;
+    color: rgb(255, 255, 255);
     display: flex;
     align-items: center;
+    background: radial-gradient(circle, var(--orb-specular) 0%, var(--orb-color) 65%);
+    background-repeat: none;
+    background-position: 0 10px;
+    position: relative;
+}
+
+.delete-button::before {
+    content: '';
+  position: absolute;
+  width: 60%;
+  height: 50%;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(to bottom, var(--orb-specular) 0%, #ffffff00 90%);
+  border-radius: 100%;
 }
 
 .delete-button:hover {
     opacity: 1;
     background-color: #404040;
+}
+
+.link-field-input.placeholder {
+    color: #a0a0a0;
+    font-style: italic;
 }

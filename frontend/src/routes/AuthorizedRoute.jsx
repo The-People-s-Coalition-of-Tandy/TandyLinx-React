@@ -22,7 +22,7 @@ const AuthorizedRoute = ({ children }) => {
       if (!user) return;
       
       try {
-        const response = await axios.get(`http://localhost:3000/api/get-page/${pageURL}`, {
+        const response = await axios.get(`/api/get-page/${pageURL}`, {
           withCredentials: true
         });
         
@@ -38,7 +38,7 @@ const AuthorizedRoute = ({ children }) => {
   }, [user, pageURL]);
 
   if (!initialized || loading || checkingAuth) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   if (!user) {

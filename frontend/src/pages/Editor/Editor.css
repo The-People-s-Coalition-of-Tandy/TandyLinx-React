@@ -1,90 +1,209 @@
 body {
-    background-image: url('../assets/images/TandyLogoBG.png');
+    background-color: transparent;
+    position: relative;
+}
+
+/* Add new overlay pseudo-element */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    mix-blend-mode: luminosity;
+    pointer-events: none;
+    z-index: 0;
+    animation: fadeIn 1s linear forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 0.5;
+        backdrop-filter: blur(10px);
+    }
 }
 
 .editor-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 20px;
-    padding: 20px;
+    grid-template-columns: minmax(400px, 600px) minmax(400px, 1fr);
+    gap: 32px;
+    padding: 32px;
     max-width: 1800px;
     margin: 0 auto;
-    height: calc(100vh - 40px);
+    height: calc(100vh - 64px);
     position: relative;
+    justify-content: center;
 }
 
 .editor {
-    max-width: 800px;
-    margin: 0;
+    position: relative;
+    --background-color: oklch(0.9 0 0 / 0);
+    --background-color-light: oklch(from var(--background-color) calc(l + 0.5) c h);
+    --background-color-light2: oklch(from var(--background-color) calc(l + 0.4) c h);
+    --background-color-light3: oklch(from var(--background-color) calc(l + 0.2) c h);
+    
+    border-radius: 12px;
+    width: 100%;
+    margin: 0 auto;
     overflow: auto;
-    padding: 12px;
-    border-radius: 6px;
+    padding: 32px;
     height: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    font-family: Roboto, sans-serif;
+    background: linear-gradient(180deg, var(--background-color-light) 0%, var(--background-color-light2) 1%, var(--background-color-light3) 2%, var(--background-color) 5%);
+}
+
+/* Add a pseudo-element for the blur effect */
+.editor::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.editor > *:not(.browserOverlay):not(.modal-overlay) {
+    position: relative;
+    z-index: 2;
 }
 
 .add-link-button {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     width: 100%;
     box-sizing: border-box;
     cursor: pointer;
-    transition: background-color 0.2s;
+    padding: 12px 20px;
+    color: #000;
+    font-family: 'MS Sans Serif', 'Arial', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
 }
 
-.add-link-button:hover {
-    background-color: #777777;
+.add-link-button::after {
+    width: 97%;
+}
+
+.add-link-button:active {
+    border-style: inset;
 }
 
 .template-selector {
-    margin-bottom: 20px;
-    padding: 16px;
-    background-color: #e8e8e8;
-    border-radius: 6px;
+    margin-bottom: 24px;
+    padding: 20px;
+    background-color: #c0c0c0;
+    border: 2px outset #808080;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .template-selector label {
-    font-weight: 500;
+    font-weight: bold;
     min-width: 100px;
+    color: #000;
+    text-transform: uppercase;
+    font-family: 'MS Sans Serif', 'Arial', sans-serif;
 }
 
 .template-selector select {
     padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #d0d0d0;
+    border: 2px inset #808080;
     background-color: white;
-    font-size: inherit;
-    font-family: inherit;
-    min-width: 200px;
+    font-size: 14px;
+    font-family: 'MS Sans Serif', 'Arial', sans-serif;
+    min-width: 220px;
+    color: #000;
+    cursor: pointer;
 }
 
-.template-selector select:focus {
-    outline: none;
-    border-color: #4a4eff;
+.browse-templates-button {
+    padding: 8px 16px;
+    border: 2px outset #808080;
+    background-color: #c0c0c0;
+    color: #000;
+    font-family: 'MS Sans Serif', 'Arial', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.browse-templates-button:active {
+    border-style: inset;
+}
+
+.preview-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    cursor: pointer;
+    display: none;
+    z-index: 1000;
+    font-size: 16pt;
 }
 
 @media (max-width: 1024px) {
     .editor-layout {
         grid-template-columns: 1fr;
-        padding: 12px;
+        padding: 16px;
         height: auto;
-        min-height: calc(100vh - 24px);
-        overflow-x: hidden;
+        min-height: calc(100vh - 32px);
     }
 
     .editor {
+        padding: 16px;
         width: 100%;
         max-width: 100%;
         margin: 0;
         box-sizing: border-box;
     }
 
-    .preview-button {
-        display: block;
+    .template-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px;
     }
 
-    .preview-container {
-        display: none;
+    .template-selector select {
+        width: 100%;
     }
+
+    .browse-templates-button {
+        width: 100%;
+    }
+
+    .preview-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.editor-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.home-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.home-button svg {
+    margin-right: 4px;
+}
+
+.no-scroll {
+    overflow: hidden !important;
 }
