@@ -1,5 +1,5 @@
 let embroideryFrame = function (p) {
-  let images = ['./templates/Embroidery/Embroidery/blue.png', './templates/Embroidery/Embroidery/emb3White1.png', './templates/Embroidery/Embroidery/ukraine1.png', './templates/Embroidery/Embroidery/embroider2white.png' ]
+  let images = ['/templates/Embroidery/Embroidery/blue.png', '/templates/Embroidery/Embroidery/emb3White1.png', '/templates/Embroidery/Embroidery/ukraine1.png', '/templates/Embroidery/Embroidery/embroider2white.png' ]
   let x = 0
   let rotation = 0
   

@@ -13,8 +13,9 @@ RUN npm cache clean --force && \
 # Copy the rest of the application
 COPY . .
 
-# Create Database directory with proper permissions
-RUN mkdir -p /app/Database && chmod 777 /app/Database
+# Create Database and uploads directories with proper permissions
+RUN mkdir -p /app/Database && chmod 777 /app/Database && \
+    mkdir -p /app/public/uploads/profiles && chmod 777 /app/public/uploads/profiles
 
 # Expose the port your app runs on
 EXPOSE 3000

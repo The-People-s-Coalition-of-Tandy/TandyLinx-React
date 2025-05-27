@@ -22,3 +22,6 @@ db.exec(`
 
 console.log('Database initialized successfully.');
 db.close();
+
+
+// ALTER TABLE links ADD COLUMN pagePhotoUrl TEXT;

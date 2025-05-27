@@ -1,11 +1,13 @@
-body {
+.container {
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: Verdana, sans-serif;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     margin: 0;
+    padding: 20px 0;
+    box-sizing: border-box;
 }
 
 video {
@@ -14,6 +16,8 @@ video {
     bottom: 0;
     min-width: 100%;
     min-height: 100%;
+    width: auto;
+    height: auto;
     z-index: -1;
 }
 
@@ -26,11 +30,14 @@ video {
 }
 
 header {
+    margin: 0 auto;
     text-align: center;
-    background-color: rgb(64, 5, 131);
-    border: 3px solid black;
-    margin-bottom: 15px;
-    padding: 5px;
+    border: 2px gray solid;
+    background-color: rgb(42, 27, 61);
+    padding: 20px;
+    width: fit-content;
+    border-radius: 20px;
+    margin-bottom: 25px;
     border-radius: 17px;
     color: white;
     letter-spacing: 1px;
@@ -39,10 +46,6 @@ header {
 .release-name {
     font-size: 13pt;
     font-weight: bold;
-    border: 2px gray solid;
-    background-color: rgb(42, 27, 61);
-    padding: 10px;
-    border-radius: 20px;
 }
 
 .link {
