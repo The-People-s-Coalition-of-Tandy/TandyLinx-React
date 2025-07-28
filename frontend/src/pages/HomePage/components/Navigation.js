@@ -3,6 +3,7 @@ import usericon from '../assets/icons/user.webp';
 import foldericon from '../assets/icons/folder.webp';
 import addIcon from '../assets/icons/addIcon.webp';
 import bubbleBackground from '../assets/images/bubble.webp';
+import aboutIcon from '../assets/icons/about2.png';
 import styles from '../styles/index.module.css';
 
 export const Navigation = () => {
@@ -23,6 +24,11 @@ export const Navigation = () => {
                 <img className={`${styles.linkBackground} ${styles.linkBackgroundLarge}`} src={bubbleBackground} alt="" />
                 <img width={40} src={foldericon} alt="folder" className={styles.icon} />
                 Templates
+            </Link>
+
+            <Link to="/about" className={styles.aboutBubble}>
+                {/* <img className={`${styles.linkBackground}`} src={bubbleBackground} alt="" /> */}
+                <img width={30} src={aboutIcon} alt="about" />
             </Link>
         </div>
     );

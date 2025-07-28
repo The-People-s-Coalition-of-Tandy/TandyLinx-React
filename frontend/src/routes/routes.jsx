@@ -11,10 +11,15 @@ const HomePage = lazy(() => import('../pages/HomePage/'));
 const TemplateSelector = lazy(() => import('../pages/TemplateSelector/TemplateSelector'));
 const Registration = lazy(() => import('../pages/Registration/Registration'));
 const Browser = lazy(() => import('../pages/browser/index'));
+const About = lazy(() => import('../pages/About/index'));
 export const routes = [
   {
     path: '/',
     element: <PageTransition><HomePage /></PageTransition>
+  },
+  {
+    path: '/about',
+    element: <PageTransition><About /></PageTransition>
   },
   {
     path: '/login',

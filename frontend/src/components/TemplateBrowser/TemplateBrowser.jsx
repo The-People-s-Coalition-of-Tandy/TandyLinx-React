@@ -72,6 +72,11 @@ const TemplateBrowser = ({ currentTemplate, onSelect, pageTitle, links, onClose,
       'Connection established!'
     ];
 
+    // Skip loading animation for now
+    setHasCompletedAnimation(true);
+    setIsLoading(false);
+    return;
+
     let currentMessage = 0;
     const interval = setInterval(() => {
       setLoadingStatus(statusMessages[currentMessage]);

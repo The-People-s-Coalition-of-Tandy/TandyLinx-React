@@ -67,13 +67,13 @@ export const Title = () => {
         const castleThemeChangeEvent = new CustomEvent('castleThemeChange');
 
         const rainbowEvent = new CustomEvent('themeChange', {
-            detail: { theme: 'rainbowOnly', duration: 2000, easingFunction: "linear" }
+            detail: { theme: 'rainbowOnly', duration: 1500, easingFunction: "linear" }
         });
 
         document.fonts.ready.then(() => {
             const tl = gsap.timeline();
             
-            tl.set([`.${styles.titleTandy}`, `.${styles.titleLinx}`], { 
+            tl.set([`.${styles.titleTandy}`, `.${styles.titleLinx}`, `.${styles.subtitle}`], { 
                 opacity: 0
             })
             .set(`.${styles.titleLinx}`, {
@@ -82,6 +82,9 @@ export const Title = () => {
             .set(`.${styles.titleTandy}`, { 
                 x: window.innerWidth < 768 ? 0 : '1.5em',
                 y: '-0.2em'
+            })
+            .set(`.${styles.subtitle}`, {
+                y: '1em'
             })
             .to(`.${styles.titleTandy}`, {
                 opacity: 1,
@@ -105,22 +108,36 @@ export const Title = () => {
                 onStart: () => {
                     createParticleBurst();
                     setTimeout(() => {
-                        window.dispatchEvent(rainbowEvent);
+                        // window.dispatchEvent(rainbowEvent);
                     }, 300);
 
                     setTimeout(() => {
                         window.dispatchEvent(themeChangeEvent);
-                        window.dispatchEvent(castleThemeChangeEvent);
+                    }, 1500);
 
-                    }, 2500);
+                    setTimeout(() => {
+                        window.dispatchEvent(castleThemeChangeEvent);
+                    }, 1700);
                 }
-            }, "<+=0.125")
+            }, "<+=0.1")
+            .to(`.${styles.subtitle}`, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power2.out"
+            }, "<+=0.3")
             .add(() => {
                 const links = document.querySelectorAll(`.${styles.link}`);
                 const backgrounds = document.querySelectorAll(`.${styles.linkBackground}`);
+                const aboutIcon = document.querySelector(`.${styles.aboutBubble}`);
                 
                 gsap.set(links, { scale: 0, opacity: 0 });
                 gsap.set(backgrounds, { scale: 0 });
+                
+                // Set initial state for about icon
+                if (aboutIcon) {
+                    gsap.set(aboutIcon, { scale: 0, opacity: 0 });
+                }
                 
                 links.forEach((link, i) => {
                     gsap.to(link, {
@@ -128,14 +145,14 @@ export const Title = () => {
                         opacity: 1,
                         duration: 0.6,
                         ease: "back.out(1.7)",
-                        delay: 0.55 + (i * 0.1)
+                        delay: 0.1 + (i * 0.05)
                     });
                     
                     gsap.to(backgrounds[i], {
                         scale: 1,
                         duration: 0.6,
                         ease: "back.out(1.7)",
-                        delay: 0.55 + (i * 0.1),
+                        delay: 0.1 + (i * 0.05),
                         onComplete: () => {
                             gsap.to(link, {
                                 y: -4,
@@ -155,7 +172,27 @@ export const Title = () => {
                         }
                     });
                 });
-            }, "+=0.55");
+                
+                // Animate about icon with a slight delay after the main links
+                if (aboutIcon) {
+                    gsap.to(aboutIcon, {
+                        scale: 1,
+                        opacity: 1,
+                        duration: 0.6,
+                        ease: "back.out(1.7)",
+                        delay: 0.1 + (links.length * 0.05) + 0.1,
+                        onComplete: () => {
+                            gsap.to(aboutIcon, {
+                                y: -3,
+                                duration: 2.5,
+                                ease: "sine.inOut",
+                                repeat: -1,
+                                yoyo: true
+                            });
+                        }
+                    });
+                }
+            }, "<+=0.1");
         });
     }, []);
 
@@ -166,6 +203,10 @@ export const Title = () => {
                 <span className={styles.titleTandy}>Tandy</span>
                 <span className={styles.titleLinx}>Linx</span>
             </h1>
+            <h2 className={styles.subtitle}>
+                Link pages, but they aren't boring.
+                {/* "Enjoy our unique templates." - julie bodian */}
+            </h2>
         </>
     );
 }; 
